@@ -614,8 +614,16 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	writeJSON(filepath.Join(evDir, "input.json"), inputObj)
 	writeJSON(filepath.Join(evDir, "output.json"), outputObj)
 
+	// 摘要模板按语言选择：artifacts/summary.template.en.md 存在时优先用于英文输出。
+	// 模板属于**呈现**，所以它不进哈希（和 messages.json 同一条铁律）。
 	tpl := "# 结论摘要\n\n<conclusion>\n"
-	if b, rerr := os.ReadFile(filepath.Join(root, "artifacts", "summary.template.md")); rerr == nil {
+	tplName := "summary.template.md"
+	if i18n.IsEn() {
+		if _, serr := os.Stat(filepath.Join(root, "artifacts", "summary.template.en.md")); serr == nil {
+			tplName = "summary.template.en.md"
+		}
+	}
+	if b, rerr := os.ReadFile(filepath.Join(root, "artifacts", tplName)); rerr == nil {
 		tpl = string(b)
 	}
 	// 显示/存档用**副本**：文案在这里按 --lang 渲染。
@@ -669,7 +677,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	}
 	repl := map[string]string{
 		"<case_id>":          c.ID,
-		"<case_title>":       c.Title,
+		"<case_title>":       c.DisplayTitle(),
 		"<subject>":          subj,
 		"<verdict>":          asString(outMap["verdict"]),
 		"<findings>":         findText,

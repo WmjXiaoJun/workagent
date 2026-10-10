@@ -1,45 +1,47 @@
-# 通信负载与轮询周期测算（Modbus RTU / TCP）
+# Modbus polling load and cycle time (RTU / TCP)
 
-**形态**：测算型 ｜ **复现等级**：L3（纯确定性，无 LLM）
+**Form**: estimation ｜ **Reproducibility**: L3 (fully deterministic, no LLM)
 
-## 为什么这个必须算
+## Why this has to be computed
 
-上位机项目最常见的现场事故：**点表点了 300 个点，轮询周期设 200 ms，上线就卡**。
-算一遍只要几秒，不算就是现场返工。
+The most common field failure in host-software projects: **a point table with 300 points and a 200 ms
+polling target that stalls the moment it goes live.** Computing it takes seconds; skipping it means
+rework on site.
 
-## 计算规则（来自 Modbus 协议帧格式）
+## The rules (from the Modbus frame format)
 
 ```text
-RTU 帧       = 从站地址(1) + 功能码(1) + 数据(N) + CRC(2)
-FC03/04 请求 = 8 字节
-FC03/04 响应 = 5 + 2 x 寄存器数 字节
-字符位数     = 1 起始位 + 数据位 + 校验位 + 停止位     （8E1 = 11 位）
-字符时间     = 字符位数 / 波特率
-帧间静默     = 3.5 个字符时间（RTU 规范要求）
-单次请求上限 = 125 个寄存器
+RTU frame            = slave address(1) + function(1) + data(N) + CRC(2)
+FC03/04 request      = 8 bytes
+FC03/04 response     = 5 + 2 x register count bytes
+bits per character   = 1 start bit + data bits + parity + stop bits   (8E1 = 11 bits)
+character time       = bits per character / baud rate
+inter-frame silence  = 3.5 character times (required by the RTU spec)
+max per request      = 125 registers
 ```
 
-## 关键优化：合并连续寄存器
+## The key optimisation: merging adjacent registers
 
-**相邻寄存器的点可以合并成一次请求。** 地址连续的点越多，合并收益越大。
-本测算同时给出**合并前 vs 合并后**的对比，直接告诉你合并省了多少。
+**Points in adjacent registers can merge into a single request.** The more contiguous the addresses,
+the bigger the win. The computation reports **merged versus unmerged** side by side, so you can see
+exactly what merging saves.
 
-## 输出
+## Output
 
-| 项 | 说明 |
+| Field | Meaning |
 |---|---|
-| `cycle_merged_ms` | 合并后一轮耗时 —— **这是能不能达标的数** |
-| `cycle_solo_ms` | 不合并的一轮耗时（对比用） |
-| `requests_merged` | 合并后的请求次数 |
-| `margin_ms` | 距离目标周期的余量 |
-| `requests` | 每次请求的功能码、起始地址、寄存器数、耗时 |
+| `cycle_merged_ms` | one cycle after merging — **the number that decides pass or fail** |
+| `cycle_solo_ms` | one cycle without merging (for comparison) |
+| `requests_merged` | number of requests after merging |
+| `margin_ms` | headroom against the target cycle |
+| `requests` | function code, start address, register count and cost of each request |
 
-## 运行
+## Run
 
 ```bash
 workagent run --case modbus_poll --input examples/modbus_poll/input.json .
 workagent verify .
 ```
 
-示例输入是 RS-485 / 9600 / 8E1 / 12 个点 / 目标周期 500 ms —— 一个**典型会超时**的配置。
-跑一遍就能看到合并省了多少、以及该调什么。
+The sample input is RS-485 / 9600 / 8E1 / 12 points / 500 ms target — a **configuration that typically
+times out**. One run shows how much merging saves and what to tune.

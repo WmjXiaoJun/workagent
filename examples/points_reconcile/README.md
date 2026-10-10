@@ -1,59 +1,63 @@
-# 积分账本一致性对账
+# Points ledger reconciliation
 
-**形态**：核验型 ｜ **复现等级**：L3（纯确定性，无 LLM）
+**Form**: verification ｜ **Reproducibility**: L3 (fully deterministic, no LLM)
 
-## 规则从哪来
+## Where the rules come from
 
-**不是我想出来的，是在真实生产库上验证出来的。**
+**They were not invented; they were validated against a real production database.**
 
-先拿下面七条不变量去跑一个真实运行的计费库（21 条账本 / 20 个账户 / 8 笔订单）：
-**违反数 0**。确认规则正确后，才把它固化成可复现场景。
+The seven invariants below were first run against a live billing database (21 ledger entries / 20
+accounts / 8 orders): **zero violations**. Only then were they frozen into a reproducible scenario.
 
-> 示例数据是**合成的**——结构照抄真实库，行不是。真实账本含用户与金额，不入公开仓库。
+> The sample data is **synthetic** — its shape is copied from the real database, its rows are not.
+> A real ledger contains users and amounts, and does not belong in a public repository.
 
-## 七项不变量
+## The seven invariants
 
-| 代号 | 规则 | 级别 |
+| Code | Rule | Level |
 |---|---|---|
-| PR-01 | 账本链式累计：`balance_after[i] == balance_after[i-1] + signed_amount` | error |
-| PR-02 | 账户 `available_points` == 该用户账本末笔 `balance_after` | error |
+| PR-01 | Chain accumulation: `balance_after[i] == balance_after[i-1] + signed_amount` | error |
+| PR-02 | Account `available_points` == that user's last ledger `balance_after` | error |
 | PR-03 | `available + frozen == lifetime_granted - lifetime_spent` | error |
-| PR-04 | `idempotency_key` 全局唯一 | error |
-| PR-05 | 已支付订单必须有对应入账 entry | error |
-| PR-06 | reserve 必须被 capture 或 refund 结清（预扣不能悬空） | warn |
-| PR-07 | 金额符号与 `entry_type` 语义一致 | warn |
+| PR-04 | `idempotency_key` is globally unique | error |
+| PR-05 | Every paid order has a corresponding ledger entry | error |
+| PR-06 | Every reservation is settled by a capture or a refund | warn |
+| PR-07 | The amount's sign matches its `entry_type` semantics | warn |
 
-### reserve / capture / refund 的坑
+### The reserve / capture / refund trap
 
-真实账本的 `entry_type` 不止 grant/spend，还有一整套预扣-结算-退款流：
-
-```text
-计入余额增加: grant, admin_grant, capture, refund, sub2api_capture, sub2api_refund
-计入余额减少: spend, reserve, sub2api_reserve
-```
-
-**PR-03 在这个语义下最容易误判。** reserve 时 `available` 减少、`frozen` 等量增加，
-所以 `available + frozen` 应保持不变；如果 `lifetime_spent` 也把 reserve 计进去，
-就会出现"同一笔预扣被计了两次"——恒等式不成立。示例数据里 u_0003 正是这一类错误。
-
-## 实测输出
+A real ledger's `entry_type` is not just grant/spend; it carries a full
+reserve–settle–refund flow:
 
 ```text
-对账判定「不平」：账本 7 条 / 账户 3 个，错误 2 项、告警 1 项
-
-[error] PR-03 账户恒等式不成立：user=u_0003 可用+冻结=525.00 累计授予-累计消费=425.00
-[error] PR-05 已支付订单未入账：order=ap_A0005 user=u_0003 积分=500
-[warn]  PR-06 预扣未结清：user=u_0003 reference=t_001 未结清笔数=1
+increase the balance: grant, admin_grant, capture, refund, sub2api_capture, sub2api_refund
+decrease the balance: spend, reserve, sub2api_reserve
 ```
 
-## 运行
+**PR-03 is the easiest to get wrong under these semantics.** A reserve lowers `available` and raises
+`frozen` by the same amount, so `available + frozen` should stay constant; if
+`lifetime_spent` also counts the reservation, the same amount is counted twice and the identity
+fails. Account u_0003 in the sample data is exactly this mistake.
+
+## Measured output
+
+```text
+Reconciliation verdict "out of balance": 7 ledger entries / 3 accounts, 2 error(s), 1 warning(s)
+
+[error] PR-03 Account identity does not hold: user=u_0003 available+frozen=525.00 ...
+[error] PR-05 Paid order has no ledger entry: order=ap_A0005 user=u_0003 points=500
+[warn]  PR-06 Reservation not settled: user=u_0003 reference=t_001 open count=1
+```
+
+## Run
 
 ```bash
 workagent run --case points_reconcile --input examples/points_reconcile/input.json .
 workagent verify .
 ```
 
-## 边界
+## Boundary
 
-**只做自洽性对账，不校验业务语义。** 它不会告诉你"这笔 500 积分该不该给"，
-只会告诉你"这笔预扣没结清、这个订单付了钱没入账"。**后者才是资损。**
+**It checks self-consistency only, not business semantics.** It will not tell you whether a 500-point
+grant *should* have been made; it tells you that a reservation was never settled and that a paid order
+never reached the ledger. **The second kind is money.**

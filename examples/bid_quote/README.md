@@ -1,32 +1,34 @@
-# 示例：投标报价测算
+# Example: bid pricing
 
-本示例用于验证 WorkAgent 的最小闭环：**输入 → 结论 → 证据包**。
+This example demonstrates WorkAgent's minimal loop: **input → conclusion → evidence bundle**.
 
-## 运行
+## Run
 
 ```bash
 workagent run    --input examples/bid_quote/input.json .
 workagent verify .
 ```
 
-（`workagent` 是构建出来的 CLI：`go build -o workagent ./cmd/workagent`）
+(`workagent` is the CLI you build: `go build -o workagent ./cmd/workagent`)
 
-## 为什么这个例子是"可验证"的
+## Why this example counts as "verifiable"
 
-| 条件 | 本示例 |
+| Condition | This example |
 |---|---|
-| 执行体确定性（无随机、无网络、无时间依赖） | 是 |
-| 输入输出有 JSON Schema | 是 |
-| 结论可通过重放比对摘要验证 | 是（`verify`） |
-| 假设与边界显式声明 | 是（`provenance/assumptions.json`、`x-workagent/boundary.json`） |
-| 越界输入会拒绝而非硬算 | 是（`stop_condition`） |
+| The executor is deterministic (no randomness, no network, no time dependence) | yes |
+| Input and output have JSON Schemas | yes |
+| The conclusion can be verified by replaying and comparing digests | yes (`verify`) |
+| Assumptions and boundaries are declared explicitly | yes (`provenance/assumptions.json`, `x-workagent/boundary.json`) |
+| Out-of-range input is refused rather than force-computed | yes (`stop_condition`) |
 
-## 换成你自己的场景
+## Turning it into your own scenario
 
-1. 复制本目录为 `examples/your_case/`；
-2. 改 `executor.py`（保持契约：读 `argv[1]`，向 stdout 输出 `{"output": {...}}`），**换任何语言都可以**；
-3. 改根目录 `inputs.schema.json` 与 `artifacts/output_schema.json`；
-4. 改 `agent.yaml` 里的 `execution.executor.command`；
-5. 重跑 `check / adapt / attest / run / verify / seal`。
+1. Copy this directory to `examples/your_case/`.
+2. Change `executor.py` (keep the contract: read `argv[1]`, write `{"output": {...}}` to
+   stdout) — **any language will do**.
+3. Change `inputs.schema.json` and `artifacts/output_schema.json` at the package root.
+4. Change the executor command in `agent.yaml`.
+5. Re-run `check / adapt / attest / run / verify / seal`.
 
-> 提示：CLI 会自动处理 `python@@ / `python3@@ 的差异——声明的解释器在系统上不存在时，会尝试另一个。
+> The CLI handles the `python` / `python3` difference for you: if the declared interpreter is
+> missing, it tries the other one.

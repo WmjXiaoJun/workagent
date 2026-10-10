@@ -1,29 +1,32 @@
-# 报销单合规审核
+# Expense compliance review
 
-**形态**：核验型 ｜ **复现等级**：L2 / L1
+**Form**: verification ｜ **Reproducibility**: L2 / L1
 
-模型只把报销说明读成结构化明细；**合规判定全部由确定性代码完成**。
+The model only reads the claim into structured line items; **every compliance judgement is made by
+deterministic code**.
 
-## 检查项
+## Checks
 
-| 代号 | 检查 | 级别 |
+| Code | Check | Level |
 |---|---|---|
-| EXP-01 | 申报总额与明细合计不一致 | error |
-| EXP-02 | 单笔超过政策上限 | error |
-| EXP-03 | 超过类别限额（餐饮 1000 / 办公 500 / 住宿 600） | error |
-| EXP-04 | 发生日期晚于提交日期，或超过报销时限 | error |
-| EXP-05 | 类别不在白名单 | warn |
-| EXP-06 | 缺少发票号 | warn |
-| EXP-07 | 模型标注了不确定项 | warn |
+| EXP-01 | Claimed total does not match the line-item total | error |
+| EXP-02 | A single item exceeds the policy cap | error |
+| EXP-03 | A category cap is exceeded (meals 1000 / office 500 / lodging 600) | error |
+| EXP-04 | The expense date is after the submission date, or past the claim window | error |
+| EXP-05 | The category is not on the allow-list | warn |
+| EXP-06 | No invoice number | warn |
+| EXP-07 | The model flagged uncertain items | warn |
 
-## 运行
+## Run
 
 ```bash
-# 首次：真实调用模型并录制
+# first time: call the model for real and record the response
 workagent run --case expense_audit --input examples/expense_audit/input.natural.json .
-# 之后（含 CI）：离线重放，无需 key
+# afterwards (including CI): replay offline, no key needed
 workagent run --case expense_audit --input examples/expense_audit/input.natural.json . --replay
 workagent verify .
 ```
 
-示例数据故意包含 3 类问题：申报总额 3120 与明细合计 3260 不符、餐饮 1180 超类别限额、部分项缺发票号。
+The sample data deliberately contains three classes of problem: a claimed total of 3120 against
+line items of 3260, a meal expense of 1180 over the category cap, and several items with no invoice
+number.

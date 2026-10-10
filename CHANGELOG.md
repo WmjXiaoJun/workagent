@@ -2,6 +2,41 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+> **English readers**: this changelog is historical and stays in Chinese. Release notes on the
+> [releases page](https://github.com/WmjXiaoJun/workagent/releases) are written in both languages,
+> and all current documentation is English by default with a `.zh-CN` counterpart.
+
+## [0.14.0] - 2026-10-11
+
+**文档英文化：仓库对外的默认语言全部切换为英文，中文以 `*.zh-CN.md` 保留。**
+
+### Changed
+| 文件 | 现在 |
+|---|---|
+| `docs/SPEC.md`、`COMPAT.md`、`VERTICALS.md`、`EXAMPLES.md`、`PROVIDERS.md`、`MESSAGES.md` | 英文；中文移至同名 `*.zh-CN.md` |
+| `CONTRIBUTING.md` | 英文；中文移至 `CONTRIBUTING.zh-CN.md` |
+| 12 个 `examples/*/README.md` | 英文；中文移至 `README.zh-CN.md` |
+| `adapters/README.md`、`signature/README.md` | 英文；中文保留 |
+
+每份文档顶部都有语言切换链接。**中文版没有被删除**——它仍然是从中使用者的主要入口。
+
+### Added
+- `artifacts/summary.template.en.md`：结论摘要模板**按语言选择**
+  （`run` 在英文模式下优先用它）。模板属于**呈现**，与 `messages.json` 同一条铁律：不进哈希。
+
+### Fixed
+- **`spec_version` 语义被我自己搞混了**：它应该表示**格式版本**（规范文档是 v0.3.0），
+  却被我一直跟着发布版本一起 bump —— 而格式并没有每次发布都变。已修正为
+  `spec_version: "0.3.0"` / `version: "0.14.0"`，并在规范里写明两者独立演进。
+- 英文摘要里的 `<case_title>` 仍是中文（用了 `c.Title` 而非 `c.DisplayTitle()`）。已修。
+- `adapters/README.md` 与 `signature/README.md` 里的命令写成 `python tools/workagent.py …`，
+  早已过时（现在是 Go 二进制）。中英两版都已修正。
+
+### 仍未覆盖（如实记录）
+- 执行体写的 `subject`、`confidence.basis`、`risks` **仍是中文**：
+  它们和 `findings[].message` 是同一类问题，本轮没有一并迁移到 `messages.json`。
+  英文模式下这三处会显示中文原文。
+
 ## [0.13.0] - 2026-10-10
 
 **12 个执行体全部迁移完成：执行体只输出 code + args，一个自然语言字都没有。**

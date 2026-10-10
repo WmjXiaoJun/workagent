@@ -1,27 +1,28 @@
-# SPC 控制图判异
+# SPC control-chart rules
 
-**形态**：核验型 ｜ **复现等级**：L3（纯确定性）
+**Form**: verification ｜ **Reproducibility**: L3 (fully deterministic)
 
-## 8 条判异准则（Western Electric / Nelson）
+## The eight detection rules (Western Electric / Nelson)
 
-| 代号 | 准则 | 含义 |
+| Code | Rule | Meaning |
 |---|---|---|
-| R1 | 1 点超出 3σ | 明显异常 |
-| R2 | 连续 3 点中 2 点超出同侧 2σ | 偏移 |
-| R3 | 连续 5 点中 4 点超出同侧 1σ | 偏移 |
-| R4 | 连续 8 点在中心线同侧 | 均值漂移 |
-| R5 | 连续 6 点单调递增/递减 | 趋势 |
-| R6 | 连续 15 点落在 1σ 内 | 分层（波动异常小） |
-| R7 | 连续 14 点交替上下 | 周期性 |
-| R8 | 连续 8 点超出 1σ | 混合 |
+| R1 | 1 point beyond 3σ | clear outlier |
+| R2 | 2 of 3 consecutive points beyond 2σ on the same side | shift |
+| R3 | 4 of 5 consecutive points beyond 1σ on the same side | shift |
+| R4 | 8 consecutive points on the same side of the centre line | mean drift |
+| R5 | 6 consecutive points monotonically increasing/decreasing | trend |
+| R6 | 15 consecutive points within 1σ | stratification (unusually small variation) |
+| R7 | 14 consecutive points alternating up and down | periodicity |
+| R8 | 8 consecutive points beyond 1σ | mixture |
 
-R1~R4 判「失控」，R5~R8 判「预警」。
+R1–R4 mean "out of control"; R5–R8 mean "warning".
 
-## 运行
+## Run
 
 ```bash
 workagent run --case spc_control --input examples/spc_control/input.json .
 workagent verify .
 ```
 
-示例数据是一条**明显的上升趋势**（12.002 → 12.033），应当触发 R5 与 R3/R4。
+The sample series is a **clear upward trend** (12.002 → 12.033) and should trigger R5 together with
+R3/R4.

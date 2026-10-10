@@ -1,37 +1,40 @@
-# 通信点表核对
+# Modbus point-table audit
 
-**形态**：核验型 ｜ **复现等级**：L2 / L1
+**Form**: verification ｜ **Reproducibility**: L2 / L1
 
-**每个项目都要做，做错就是现场事故。** 规则完全确定，模型只负责把点表读成结构化数据。
+**Every project needs this, and getting it wrong is a field incident.** The rules are fully
+deterministic; the model only reads the point table into structured data.
 
-## 检查项
+## Checks
 
-| 代号 | 检查 | 级别 |
+| Code | Check | Level |
 |---|---|---|
-| PT-01 | 同一功能码内地址区间重叠 | error |
-| PT-02 | 数据类型未知，无法判断寄存器数量 | warn |
-| PT-03 | 量程上下限倒置 | error |
-| PT-04 | 地址超出 Modbus 可寻址范围 | error |
-| PT-05 | 缺少工程单位 | warn |
-| PT-06 | 非法功能码 | error |
+| PT-01 | Address ranges overlap within the same function code | error |
+| PT-02 | Unknown data type, so the register count cannot be derived | warn |
+| PT-03 | The range's lower bound is above its upper bound | error |
+| PT-04 | The address is outside the Modbus addressable range | error |
+| PT-05 | Missing engineering unit | warn |
+| PT-06 | Illegal function code | error |
 
-## Modbus 参考地址归一化
+## Modbus reference-address normalisation
 
-现场点表普遍写 `40001` 这类"参考号"，**实际偏移是 %%10000**。不归一化会造成大面积误判：
+Field point tables routinely use reference numbers such as `40001`, where the **actual offset is
+minus 10000**. Skipping the normalisation causes a flood of false findings:
 
 ```text
-4xxxxx → 保持寄存器，偏移 = addr - 40001
-3xxxxx → 输入寄存器，偏移 = addr - 30001
-1xxxxx → 离散输入，偏移 = addr - 10001
-0xxxxx → 线圈，    偏移 = addr - 1
+4xxxxx → holding registers,  offset = addr - 40001
+3xxxxx → input registers,    offset = addr - 30001
+1xxxxx → discrete inputs,    offset = addr - 10001
+0xxxxx → coils,              offset = addr - 1
 ```
 
-## 运行
+## Run
 
 ```bash
 workagent run --case point_table --input examples/point_table/input.natural.json .
 workagent verify .
 ```
 
-示例点表故意埋了 4 个典型错误：两个点位都占 40001（重叠）、浊度量程写成 100~0（倒置）、
-液位地址 70000（越界）、温度没写单位。
+The sample point table hides four typical mistakes: two points both claiming 40001 (overlap), a
+turbidity range written as 100~0 (inverted), a level address of 70000 (out of range), and a
+temperature with no unit.

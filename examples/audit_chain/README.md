@@ -1,47 +1,50 @@
-# 知识库摄入审计核验
+# Knowledge-base audit-log integrity
 
-**形态**：核验型 ｜ **复现等级**：L3（纯确定性，无 LLM）
+**Form**: verification ｜ **Reproducibility**: L3 (fully deterministic, no LLM)
 
-## 规则从哪来
+## Where the rules come from
 
-字段与事件类型**取自一份真实运行的审计日志**（22,253 条事件，
-带 `old_sha256` / `new_sha256` / `line_count` / `semantic_stale` / `source_changed`）。
-示例数据是**合成的**——真实日志含你的文档路径与内容哈希，不入公开仓库。
+The fields and event types were **taken from a real audit log** (22,253 events carrying
+`old_sha256` / `new_sha256` / `line_count` / `semantic_stale` /
+`source_changed`). The sample data is **synthetic** — a real log contains your document paths and
+content hashes, and does not belong in a public repository.
 
-## 六项核验
+## The six checks
 
-| 代号 | 校验 | 级别 |
+| Code | Check | Level |
 |---|---|---|
-| AC-01 | 同一 `doc_id` 的哈希链：`old_sha256` 必须等于该文档上一次的 `new_sha256` | error |
-| AC-02 | `source_changed=true` 时哈希必须真的变了 | error |
-| AC-03 | `semantic_stale=true` 时 `semantic_status` 必须标记为需更新 | warn |
-| AC-04 | `line_count` 相对上次下降超过阈值（默认 50%）——疑似截断 | error |
-| AC-05 | 同一文档的事件时间戳不得倒退 | warn |
-| AC-06 | 非摄入事件引用了从未被建立过的 `doc_id` | warn |
+| AC-01 | Per `doc_id` hash chain: `old_sha256` must equal that document's previous `new_sha256` | error |
+| AC-02 | When `source_changed=true` the hash must actually change | error |
+| AC-03 | When `semantic_stale=true`, `semantic_status` must be marked as needing an update | warn |
+| AC-04 | `line_count` drops by more than the threshold (50% by default) — suspected truncation | error |
+| AC-05 | Event timestamps for one document must not go backwards | warn |
+| AC-06 | A non-ingest event references a `doc_id` that was never established | warn |
 
-### 一个实现上的关键点
+### One critical implementation point
 
-**不能按 ts 全局排序后再校验。** 审计日志是追加写的有序流，
-按时间戳排序会把"时间戳倒退"这个要检测的现象**直接排掉**——bug 消失得无影无踪。
+**Do not sort globally by timestamp before checking.** An audit log is an append-only ordered stream,
+and sorting by timestamp silently removes the very thing you are trying to detect — timestamps going
+backwards. The bug disappears without trace.
 
-正确做法：**按文档分组，组内保留日志原始顺序**。这个坑是写第一版时踩到的。
+The correct approach is to **group by document and keep the log's original order within each group**.
+We hit this on the first implementation.
 
-## 实测输出
+## Measured output
 
 ```text
-核验判定「不一致」：事件 9 条 / 文档 4 个，错误 3 项、告警 3 项
+Audit verdict "inconsistent": 9 events / 4 documents, 3 error(s), 3 warning(s)
 
-[error] AC-01 哈希链断裂：doc=doc_beta id=a04 old=bbbb9999… 应为 bbbb1111…
-[error] AC-02 标称源已变更但哈希未变：doc=doc_delta id=a08 sha=dddd1111…
-[error] AC-04 行数异常下降：doc=doc_gamma id=a06 上次 300 行 → 本次 90 行（降幅 70%）
-[warn]  AC-05 时间戳倒退：doc=doc_beta id=a04 上一条 ts=...300 本条 ts=...250
-[warn]  AC-03 标记语义过期但状态未更新：doc=doc_gamma id=a05 semantic_status='fresh'
-[warn]  AC-06 引用了未经摄入建立的文档：doc=doc_missing 事件=section.update id=a09
+[error] AC-01 Hash chain broken: doc=doc_beta id=a04 old=bbbb9999... expected bbbb1111...
+[error] AC-02 source_changed is true but the hash did not change: doc=doc_delta id=a08
+[error] AC-04 Line count dropped abnormally: doc=doc_gamma 300 lines -> 90 lines (70% drop)
+[warn]  AC-05 Timestamp went backwards: doc=doc_beta previous ts=...300 this ts=...250
+[warn]  AC-03 Marked semantically stale but the status was not updated: doc=doc_gamma
+[warn]  AC-06 References a document that was never established: doc=doc_missing
 ```
 
-六条规则**各命中一次**，没有假阳性。
+All six rules fire exactly once, with no false positives.
 
-## 运行
+## Run
 
 ```bash
 workagent run --case audit_chain --input examples/audit_chain/input.json .

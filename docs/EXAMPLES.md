@@ -1,134 +1,160 @@
-# 场景清单：按交付形态组织
+# Scenario list, organised by delivery form
 
-> **不按行业分。** 行业是结果，不是选择依据——为什么这样切，见 [VERTICALS.md](VERTICALS.md)。
+> **Not by industry.** Industry is an outcome, not a selection criterion — for why, see [VERTICALS.md](VERTICALS.md).
 
 ```bash
-workagent cases .                                   # 按形态分组列出全部场景
-workagent run --case <ID> --input <文件> .           # 运行
-workagent verify --all .                            # 全部场景复现校验
+workagent cases .                            # list every scenario, grouped by form
+workagent run --case <ID> --input <file> .   # run one
+workagent verify --all .                     # reproducibility check across all
 ```
 
-## 五种交付形态
+## The five delivery forms
 
-| 形态 | 输入 → 输出 | 模型的角色 | 怎么验真 | 本包已实现 |
+| Form | Input → output | The model's role | How it is verified | Shipped here |
 |---|---|---|---|---|
-| **测算型** | 参数 → 数值 | 无，或只做抽取 | 与后续实际值对比 | ✅ 5 个 |
-| **核验型** | 一堆材料 → 通过 / 退回 + 原因 | 抽取 + 分类 | 人工复核作为基准 | ✅ 7 个 |
-| **抽取型** | 非结构化文本 → 结构化数据 | **主角** | 与原文逐字段对照 | ⬜ 待补 |
-| **排程型** | 约束 → 方案 | 辅助 | 约束满足性可验证 | ⬜ 待补 |
-| **推演型** | 条件 → 结论 / 建议 | **主角** | 弱，事后才知道 | ⬜ 待补 |
+| **Estimation** | parameters → numbers | none, or extraction only | compare against later actuals | ✅ 5 |
+| **Verification** | a pile of material → pass / return + reasons | extraction + classification | human review as the baseline | ✅ 7 |
+| **Extraction** | unstructured text → structured data | **the lead** | field-by-field against the original | ⬜ todo |
+| **Scheduling** | constraints → a plan | supporting | constraint satisfaction is checkable | ⬜ todo |
+| **Projection** | conditions → conclusions / advice | **the lead** | weak; only known afterwards | ⬜ todo |
 
 ```text
-$ workagent cases .
-WorkAgent cases —— 按交付形态分组
+$ workagent cases . --lang en
+WorkAgent cases — grouped by delivery form
 
-【测算型】5 个
-  bid_quote       L2/L1    投标报价测算
-  salary_tax      L3       工资薪金个税测算
-  loan_dscr       L3       项目贷款偿债能力测算
-  modbus_poll     L3       通信负载与轮询周期测算
-  firmware_budget L3       固件资源预算测算
+[Estimation] 5
+  bid_quote        L2/L1    Bid pricing
+  salary_tax       L3       Payroll income tax
+  loan_dscr        L3       Loan debt-service coverage
+  modbus_poll      L3       Modbus polling load and cycle time
+  firmware_budget  L3       Firmware Flash / RAM / stack budget
 
-【核验型】7 个
-  expense_audit    L2/L1    报销单合规审核
-  lab_report       L2/L1    检验报告异常判定
-  point_table      L2/L1    通信点表核对
-  spc_control      L3       SPC 控制图判异
-  pin_conflict     L3       引脚 / 中断 / DMA 资源冲突检测
-  points_reconcile L3       积分账本一致性对账
-  audit_chain      L3       知识库摄入审计核验
+[Verification] 7
+  expense_audit    L2/L1    Expense compliance review
+  lab_report       L2/L1    Lab report flagging
+  point_table      L2/L1    Modbus point-table audit
+  spc_control      L3       SPC control-chart rules
+  pin_conflict     L3       Pin / IRQ / DMA resource conflicts
+  points_reconcile L3       Points ledger reconciliation
+  audit_chain      L3       Knowledge-base audit-log integrity
 ```
 
 ---
 
-## 测算型
+## Estimation
 
-参数进、数值出，**模型（如果用）只负责把自然语言读成参数**。
+Parameters in, numbers out. **The model, when used at all, only reads natural language into parameters.**
 
-### `salary_tax` 工资薪金个税测算
-按累计预扣法逐月计算应纳税额，输出每月明细与全年合计、实际税负率。
-**规则来源**：《个人所得税法》居民个人综合所得预扣预缴 7 级超额累进表（3%~45%，速算扣除数 0~181920），基本减除费用 5,000 元/月。
+### `salary_tax` Payroll income tax
+Computes the monthly liability with the cumulative withholding method, and reports the monthly
+breakdown, the annual total and the effective rate.
+**Rule source**: the 7-bracket progressive withholding table for resident comprehensive income under
+China's Individual Income Tax Law (3%–45%, quick deductions 0–181,920), with a standard deduction of
+5,000 per month.
 
-### `loan_dscr` 项目贷款偿债能力测算
-`DSCR = (净利润 + 折旧 + 摊销 + 利息) / (本金摊还 + 利息)`，另计利息保障倍数。
-阈值 1.25 / 1.10 **写在输入里而不是代码里**——不同机构政策不同，硬编码是错的。
+### `loan_dscr` Loan debt-service coverage
+`DSCR = (net profit + depreciation + amortisation + interest) / (principal amortisation + interest)`,
+plus an interest-coverage ratio.
+The 1.25 / 1.10 thresholds **live in the input, not in the code** — policies differ between lenders,
+and hard-coding them is simply wrong.
 
-### `bid_quote` 投标报价测算
-结构化明细直接算（L3），或自然语言描述经模型抽取后算（L2）。两条路径共用同一执行体。
+### `bid_quote` Bid pricing
+Either compute straight from structured line items (L3), or extract them from a natural-language
+description first (L2). Both paths share one executor.
 
-### `modbus_poll` 通信负载与轮询周期测算
-给定链路参数（波特率 / 校验 / 停止位）与点表，算出**一轮轮询要多久**、能否满足目标周期、瓶颈在哪。
-**规则来自 Modbus 帧格式**：RTU 帧 = 地址(1)+功能码(1)+数据(2n)+CRC(2)，字符位数 = 1+数据位+校验位+停止位，
-帧间静默 3.5 个字符时间，单次请求上限 125 个寄存器。
-**关键优化**：相邻寄存器的点可合并成一次请求——示例里 12 个点合并后只要 5 次请求、一轮 75 ms。
+### `modbus_poll` Modbus polling load and cycle time
+Given link parameters (baud rate / parity / stop bits) and a point table, computes **how long one
+polling cycle takes**, whether it meets the target, and where the bottleneck is.
+**The rules come from the Modbus frame format**: an RTU frame is address(1) + function(1) + data(2n) +
+CRC(2); a character is 1 start bit + data bits + parity + stop bits; the inter-frame silence is 3.5
+character times; one request carries at most 125 registers.
+**The key optimisation**: adjacent registers merge into a single request — in the example, 12 points
+merge down to 5 requests and one 75 ms cycle.
 
-### `firmware_budget` 固件资源预算测算
-汇总各模块 Flash / RAM 占用与任务栈实测高水位，与 MCU 容量比对。
-**FR-05（栈余量低于安全下限）是最有价值的一条**——栈溢出是现场最难查的故障，症状千奇百怪。
-
----
-
-## 核验型
-
-一堆材料进，判定 + 原因出。**模型只做抽取，判定全部由确定性代码完成。**
-
-### `spc_control` SPC 控制图判异
-对一串测量值执行 8 条判异准则，指出**具体哪一点违反了哪条**。
-R1~R4 判「失控」，R5~R8 判「预警」。中心线与西格玛可用 I-MR 法自动估计（MRbar / 1.128）。
-**规则来源**：Western Electric / Nelson 判异准则（公开标准）。
-
-### `pin_conflict` 引脚 / 中断 / DMA 资源冲突检测
-引脚复用、保留调试口、优先级重复、优先级越界、DMA 通道争用、引脚命名格式。
-**冲突就是 bug，编译期就能验真，规则完全确定。**
-
-### `expense_audit` 报销单合规审核
-单笔限额、类别限额、时限、发票号、合计一致性。数据里故意埋了 3 类问题，全部被检出。
-
-### `lab_report` 检验报告异常判定
-按性别区分的参考区间判定，危急值单独标记。
-> ⚠️ **参考区间为示例值，本结论不构成医学诊断。** 实际以检验科报告单标注为准。
-
-### `point_table` 通信点表核对
-地址区间重叠、数据类型与寄存器数量、量程倒置、地址越界、缺单位、非法功能码。
-**含 Modbus 参考地址归一化**（`40001` → 偏移 0）——现场点表普遍写参考号，不归一化会大面积误判。
-
-### `points_reconcile` 积分账本一致性对账
-七项不变量：账本链式累计、账户余额与账本一致、`可用+冻结 = 累计授予-累计消费`、
-幂等键唯一、已支付订单必入账、预扣必结清、金额符号语义。
-**规则先在真实生产库上验证（违反数 0）再固化**；示例数据是合成行，结构照抄真库。
-坑在 reserve 语义：预扣时 `available` 减、`frozen` 等量增，
-若 `lifetime_spent` 也把预扣计进去，就是同一笔被计两次。
-
-### `audit_chain` 知识库摄入审计核验
-六项校验：哈希链连续、源变更则哈希必变、语义过期状态一致、行数突降、时间戳单调、孤儿引用。
-**实现上的关键点**：不能按 ts 全局排序——那会把"时间戳倒退"这个要检测的现象直接排掉。
-正确做法是按文档分组、组内保留日志原始顺序。
+### `firmware_budget` Firmware Flash / RAM / stack budget
+Aggregates per-module Flash and RAM usage and measured task stack high-water marks, and compares them
+against the MCU capacity.
+**FR-05 (stack margin below the safety floor) is the most valuable check** — stack overflow is the
+hardest fault to diagnose in the field, and its symptoms are wildly varied.
 
 ---
 
-## 尚未覆盖的三种形态
+## Verification
 
-| 形态 | 为什么还没做 | 要做需要什么 |
+A pile of material goes in; a verdict and its reasons come out. **The model only extracts; every
+judgement is made by deterministic code.**
+
+### `spc_control` SPC control-chart rules
+Applies eight detection rules to a series of measurements and names **which point violated which rule**.
+R1–R4 mean "out of control"; R5–R8 mean "warning". The centre line and sigma can be estimated
+automatically with the I-MR method (MRbar / 1.128).
+**Rule source**: the Western Electric / Nelson detection rules (public standard).
+
+### `pin_conflict` Pin / IRQ / DMA resource conflicts
+Pin reuse, reserved debug pins, duplicate priorities, out-of-range priorities, DMA channel contention,
+pin naming. **A conflict is a bug, it is verifiable at compile time, and the rules are fully deterministic.**
+
+### `expense_audit` Expense compliance review
+Per-item limits, per-category limits, time limits, invoice numbers, total consistency. The sample data
+hides three classes of problem, and all three are caught.
+
+### `lab_report` Lab report flagging
+Sex-specific reference-interval judgement, with critical values flagged separately.
+> ⚠️ **The reference intervals are example values and this conclusion is not a medical diagnosis.**
+> In practice, use the intervals printed on the laboratory report.
+
+### `point_table` Modbus point-table audit
+Overlapping address ranges, data types versus register counts, inverted ranges, out-of-range
+addresses, missing units, illegal function codes.
+**Includes Modbus reference-address normalisation** (`40001` → offset 0) — field point tables
+routinely use reference numbers, and skipping the normalisation produces a flood of false findings.
+
+### `points_reconcile` Points ledger reconciliation
+Seven invariants: the ledger chain accumulates correctly, the account balance agrees with the last
+ledger entry, `available + frozen = lifetime_granted - lifetime_spent`, idempotency keys are
+unique, paid orders have ledger entries, reservations are settled, and amount signs match their
+entry semantics.
+**The rules were validated against a real production database (zero violations) before being frozen
+in.** The sample rows are synthetic; their shape is copied from the real one.
+The trap is reservation semantics: on a reserve, `available` falls and `frozen` rises by
+the same amount, so if `lifetime_spent` also counts the reservation, the same amount is counted twice.
+
+### `audit_chain` Knowledge-base audit-log integrity
+Six checks: hash chain continuity, a claimed source change really changing the hash, semantic-stale
+status consistency, sudden drops in line count, monotonic timestamps, orphan references.
+**The implementation trap**: do not sort globally by timestamp — that silently removes the very thing
+you are trying to detect, namely timestamps going backwards. Group by document and keep the log's
+original order within each group.
+
+---
+
+## The three forms not yet covered
+
+| Form | Why not yet | What it would take |
 |---|---|---|
-| **抽取型** | 纯抽取的"结论"就是结构化数据本身，验真方式是逐字段对照原文；比核验型少一层判定 | 一份带标注的原文-字段对照集 |
-| **排程型** | 排程结果好坏需要多目标评价（工期/成本/资源均衡），阈值难标准化 | 一个可验证的排程约束集 |
-| **推演型** | **结论无法事后验真**——这正是本项目不优先做它的原因 | 不推荐；若必须做，只能降到 L1 并明确标注 |
+| **Extraction** | A pure extraction "conclusion" is the structured data itself, and verifying it means field-by-field comparison against the source — one layer of judgement less than verification | an annotated source-to-field corpus |
+| **Scheduling** | Judging a schedule needs multi-objective evaluation (duration / cost / resource levelling) and the thresholds resist standardisation | a verifiable scheduling constraint set |
+| **Projection** | **Its conclusions cannot be verified after the fact** — which is exactly why this project does not prioritise it | not recommended; if you must, it can only be L1 and clearly labelled |
 
 ---
 
-## 加一个新场景要做什么
+## Adding a scenario
 
-1. 建目录 `examples/<id>/`，写 `executor.py`、`input.json`、`boundary.json`、`README.md`；
-2. 需要模型抽取的，再加 `prompt.md` 和 `input.natural.json`；
-3. 在 `agent.yaml` 的 `execution.cases` 里登记一条，填 `shape`（五种形态之一）；
-4. `workagent check .` 校验文件齐备，`run` 跑一次建立基线，`verify --all` 确认可复现。
+1. Create `examples/<id>/` with `executor.py`, `input.json`, `boundary.json` and `README.md`.
+2. If it needs model extraction, add a prompt and a natural-language input.
+3. Register one entry under `execution.cases` in `agent.yaml`, setting `shape` (one of the five forms).
+4. `workagent check .` validates the files; `run` establishes a baseline; `verify --all` confirms reproducibility.
 
-## 执行体契约
+## Executor contract
 
 ```text
-输入: argv[1] = 输入 JSON 路径（可能是富化后的 {"input": ..., "llm": {...}}）
-成功: 退出码 0，stdout 输出 {"output": {...}}，纯 ASCII
-失败: 退出码非 0，stderr 给出 BOUNDARY_VIOLATION 原因
+input:   argv[1] = path to the input JSON (possibly enriched: {"input": ..., "llm": {...}})
+success: exit code 0, stdout = {"output": {...}} (valid JSON)
+failure: non-zero exit code, stderr gives the BOUNDARY_VIOLATION reason
 ```
 
-输出建议包含：`subject`、`verdict`、`conclusion`、`findings`、`metrics`、`confidence`、`risks`。
+The output should carry `subject`, `verdict`, `conclusion`, `conclusion_args`,
+`findings`, `metrics`, `confidence` and `risks`.
+
+**Executors emit facts, not prose.** Each finding carries `code` and `args`; the wording lives in
+`messages.json` and is rendered by the toolchain in the output language. See `docs/MESSAGES.md`.

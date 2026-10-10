@@ -1,31 +1,32 @@
-# 模型适配：22 家服务商，零第三方依赖
+# Model adapters: 22 providers, zero third-party dependencies
 
 ```bash
-workagent models            # 列出全部服务商、端点、所需环境变量与可用状态（不联网）
-workagent models --probe    # 额外探测本地端点是否在跑
+workagent models            # list every provider, endpoint, required env var and availability (no network)
+workagent models --probe    # additionally probe whether local endpoints are running
 ```
 
-## 三种协议族
+## Three protocol families
 
-适配层只实现了**三种协议**，其余全部通过"一个引擎 + 一张 profile 表"覆盖：
+The adapter layer implements **three protocols**; everything else is covered by one engine plus a
+profile table:
 
-| 协议族 | 覆盖的服务商 | 请求 | 认证 |
+| Family | Covers | Request | Auth |
 |---|---|---|---|
-| **OpenAI 兼容** | 绝大多数（含全部国内厂商与本地推理） | `POST /chat/completions` | `Authorization: Bearer <key>` |
+| **OpenAI-compatible** | the vast majority (every Chinese vendor, all local inference) | `POST /chat/completions` | `Authorization: Bearer <key>` |
 | **Anthropic** | Claude | `POST /messages` | `x-api-key` + `anthropic-version` |
-| **Gemini** | Google | `POST /models/<m>:generateContent?key=` | URL 参数 |
+| **Gemini** | Google | `POST /models/<m>:generateContent?key=` | URL parameter |
 
-## 服务商清单
+## Provider list
 
-### 本地推理（无需密钥，可离线，可做到 L2/L3）
-| Provider | 端点 | 默认模型 |
+### Local inference (no key, offline, can reach L2/L3)
+| Provider | Endpoint | Default model |
 |---|---|---|
 | `ollama` | `http://127.0.0.1:11434/v1` | `qwen2.5:7b` |
-| `vllm` | `http://127.0.0.1:8000/v1` | 需指定 |
-| `lmstudio` | `http://127.0.0.1:1234/v1` | 需指定 |
+| `vllm` | `http://127.0.0.1:8000/v1` | must be specified |
+| `lmstudio` | `http://127.0.0.1:1234/v1` | must be specified |
 
-### 国际
-| Provider | 环境变量 | 默认模型 |
+### International
+| Provider | Env var | Default model |
 |---|---|---|
 | `openai` | `OPENAI_API_KEY` | gpt-4o-mini |
 | `anthropic` | `ANTHROPIC_API_KEY` | claude-sonnet-4-5 |
@@ -34,24 +35,24 @@ workagent models --probe    # 额外探测本地端点是否在跑
 | `xai` | `XAI_API_KEY` | grok-2-latest |
 | `groq` | `GROQ_API_KEY` | llama-3.3-70b-versatile |
 | `together` | `TOGETHER_API_KEY` | Llama-3.3-70B-Instruct-Turbo |
-| `openrouter` | `OPENROUTER_API_KEY` | （聚合数百模型） |
+| `openrouter` | `OPENROUTER_API_KEY` | (aggregates hundreds of models) |
 
-### 国内
-| Provider | 环境变量 | 默认模型 |
+### Chinese vendors
+| Provider | Env var | Default model |
 |---|---|---|
 | `deepseek` | `DEEPSEEK_API_KEY` | deepseek-chat |
-| `qwen`（通义/百炼） | `DASHSCOPE_API_KEY` | qwen-plus |
-| `moonshot`（Kimi） | `MOONSHOT_API_KEY` | moonshot-v1-8k |
-| `zhipu`（智谱 GLM） | `ZHIPUAI_API_KEY` | glm-4-plus |
-| `doubao`（火山方舟） | `ARK_API_KEY` | 需填推理接入点 ID |
-| `hunyuan`（腾讯混元） | `HUNYUAN_API_KEY` | hunyuan-turbo |
+| `qwen` (Tongyi / Bailian) | `DASHSCOPE_API_KEY` | qwen-plus |
+| `moonshot` (Kimi) | `MOONSHOT_API_KEY` | moonshot-v1-8k |
+| `zhipu` (GLM) | `ZHIPUAI_API_KEY` | glm-4-plus |
+| `doubao` (Volcano Ark) | `ARK_API_KEY` | must be an inference endpoint id |
+| `hunyuan` (Tencent) | `HUNYUAN_API_KEY` | hunyuan-turbo |
 | `baichuan` | `BAICHUAN_API_KEY` | Baichuan4 |
 | `minimax` | `MINIMAX_API_KEY` | abab6.5s-chat |
-| `spark`（讯飞星火） | `SPARK_API_KEY` | generalv3.5 |
-| `siliconflow`（硅基流动） | `SILICONFLOW_API_KEY` | Qwen/Qwen2.5-72B-Instruct |
+| `spark` (iFlytek) | `SPARK_API_KEY` | generalv3.5 |
+| `siliconflow` | `SILICONFLOW_API_KEY` | Qwen/Qwen2.5-72B-Instruct |
 
-### 任意其它
-任何 OpenAI 兼容端点：
+### Anything else
+Any OpenAI-compatible endpoint:
 
 ```bash
 export CUSTOM_BASE_URL=https://your-endpoint/v1
@@ -59,48 +60,50 @@ export CUSTOM_API_KEY=sk-xxx
 workagent run --case bid_quote --input examples/bid_quote/input.natural.json . --provider custom --model your-model
 ```
 
-## 切换模型：一条命令
+## Switching models: one command
 
 ```bash
-# 本地 qwen2.5:7b（默认，可离线）
+# local qwen2.5:7b (default, works offline)
 workagent run --case expense_audit --input examples/expense_audit/input.natural.json .
 
-# 换成 DeepSeek
+# switch to DeepSeek
 export DEEPSEEK_API_KEY=sk-xxx
 workagent run --case expense_audit --input examples/expense_audit/input.natural.json . --provider deepseek --model deepseek-chat
 
-# 换成 Claude
+# switch to Claude
 export ANTHROPIC_API_KEY=sk-ant-xxx
 workagent run --case expense_audit --input examples/expense_audit/input.natural.json . --provider anthropic --model claude-sonnet-4-5
 ```
 
-**执行体完全不用改** —— 换模型只是换了一个"抽取器"，规则与判定一行都不动。
+**The executor does not change at all** — switching models swaps the *extractor*; not one line of the
+rules or the judgement moves.
 
-## 适配层是被测试过的
+## The adapter layer is tested
 
 ```bash
 go test ./internal/llm/ -v
 ```
 
-6 个测试覆盖三种协议族：请求头、请求体字段、响应解析。
-用 `httptest` 造假服务端，**不需要任何 API key、不联网**也能在 CI 里跑。
+Six tests cover the three protocol families: request headers, request body fields, response parsing.
+They use `httptest` with a fake server, so they run in CI with **no API key and no network**.
 
 ```text
-PASS: TestOpenAICompatibleChat   （Authorization / response_format / content 解析）
-PASS: TestAnthropicChat          （x-api-key / system 提升 / content 数组解析 / max_tokens 必填）
-PASS: TestGeminiChat             （:generateContent / key 参数 / candidates 解析）
-PASS: TestUnknownProvider        （未注册 provider 必须报错）
-PASS: TestLocalProviderNeedsNoKey（本地推理不要求密钥）
-PASS: TestProfileCount           （内置 profile 数量）
+PASS: TestOpenAICompatibleChat    (Authorization / response_format / content parsing)
+PASS: TestAnthropicChat           (x-api-key / system hoisting / content array / max_tokens required)
+PASS: TestGeminiChat              (:generateContent / key parameter / candidates parsing)
+PASS: TestUnknownProvider         (an unregistered provider must error)
+PASS: TestLocalProviderNeedsNoKey (local inference requires no key)
+PASS: TestProfileCount            (number of built-in profiles)
 ```
 
-## 复现等级与模型选择
+## Reproducibility level vs model choice
 
-| 你选的模型 | 能达到的等级 |
+| The model you pick | The level you can reach |
 |---|---|
-| 不用模型（纯确定性场景） | **L3** |
-| 本地开权重 + `temperature=0` + 固定 seed | **L2**（实测 qwen2.5:7b 三次调用逐字节一致） |
-| 任意云端模型 | **L1**（靠录制重放；模型本身不保证复现） |
-| `temperature>0` | **L0**（只是一次调用记录） |
+| none (deterministic scenarios) | **L3** |
+| local open weights + `temperature=0` + fixed seed | **L2** (measured: qwen2.5:7b returned byte-identical responses across three calls) |
+| any cloud model | **L1** (replayed from a recording; the model itself is not guaranteed) |
+| `temperature>0` | **L0** (a record of one call) |
 
-等级由 `workagent` 自动判定并写进 `evidence.json`，**不允许手工声称**。
+The level is determined by `workagent` automatically and written into `evidence.json`.
+**You are not allowed to declare it by hand.**

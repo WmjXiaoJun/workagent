@@ -1,34 +1,36 @@
-# 检验报告异常判定
+# Lab report flagging
 
-**形态**：核验型 ｜ **复现等级**：L2 / L1
+**Form**: verification ｜ **Reproducibility**: L2 / L1
 
-> ⚠️ **本示例不构成医学诊断。** 参考区间为示例值，实际以检验科报告单标注为准。
+> ⚠️ **This example is not a medical diagnosis.** The reference intervals are example values; in
+> practice use the intervals printed on the laboratory report.
 
-## 参考区间（示例，成人）
+## Reference intervals (example, adults)
 
-| 项目 | 男 | 女 | 单位 |
+| Item | Male | Female | Unit |
 |---|---|---|---|
 | ALT | 9 ~ 50 | 7 ~ 40 | U/L |
 | AST | 15 ~ 40 | 13 ~ 35 | U/L |
-| 空腹血糖 | 3.9 ~ 6.1 | 3.9 ~ 6.1 | mmol/L |
-| 肌酐 | 57 ~ 97 | 41 ~ 73 | umol/L |
-| 白细胞 | 3.5 ~ 9.5 | 3.5 ~ 9.5 | 10^9/L |
-| 血红蛋白 | 130 ~ 175 | 115 ~ 150 | g/L |
-| 血小板 | 125 ~ 350 | 125 ~ 350 | 10^9/L |
-| 总胆固醇 | < 5.2 | < 5.2 | mmol/L |
+| Fasting glucose | 3.9 ~ 6.1 | 3.9 ~ 6.1 | mmol/L |
+| Creatinine | 57 ~ 97 | 41 ~ 73 | umol/L |
+| White blood cells | 3.5 ~ 9.5 | 3.5 ~ 9.5 | 10^9/L |
+| Haemoglobin | 130 ~ 175 | 115 ~ 150 | g/L |
+| Platelets | 125 ~ 350 | 125 ~ 350 | 10^9/L |
+| Total cholesterol | < 5.2 | < 5.2 | mmol/L |
 
-**危急值**（示例）：血糖 <2.8 或 >22.2；白细胞 <1.5 或 >30；血小板 <30 或 >1000；血红蛋白 <60。
+**Critical values** (example): glucose < 2.8 or > 22.2; WBC < 1.5 or > 30; platelets < 30 or > 1000;
+haemoglobin < 60.
 
-## 检查项
+## Checks
 
-| 代号 | 检查 | 级别 |
+| Code | Check | Level |
 |---|---|---|
-| CRIT-01 | 达到危急值 | error |
-| REF-01 / REF-02 | 低于下限 / 高于上限 | warn |
-| LAB-02 | 数值无法解析 | warn |
-| LAB-03 | 指标不在参考表中，不判定 | info |
+| CRIT-01 | Reaches a critical value | error |
+| REF-01 / REF-02 | Below the lower / above the upper limit | warn |
+| LAB-02 | The value could not be parsed | warn |
+| LAB-03 | The item is not in the reference table; not judged | info |
 
-## 运行
+## Run
 
 ```bash
 workagent run --case lab_report --input examples/lab_report/input.natural.json .

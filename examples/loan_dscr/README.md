@@ -1,23 +1,24 @@
-# 项目贷款偿债能力测算
+# Loan debt-service coverage
 
-**形态**：测算型 ｜ **复现等级**：L3
+**Form**: estimation ｜ **Reproducibility**: L3
 
-## 规则
+## Rules
 
 ```text
-DSCR = (净利润 + 折旧 + 摊销 + 利息支出) / (本金摊还 + 利息支出)
-ICR  = EBIT / 利息支出
+DSCR = (net profit + depreciation + amortisation + interest) / (principal amortisation + interest)
+ICR  = EBIT / interest expense
 ```
 
-| DSCR | 判定 |
+| DSCR | Verdict |
 |---|---|
-| ≥ 1.25 | 通过 |
-| 1.10 ~ 1.25 | 需复核 |
-| < 1.10 | 不予通过 |
+| ≥ 1.25 | passed |
+| 1.10 ~ 1.25 | needs review |
+| < 1.10 | rejected |
 
-阈值可在输入中覆盖（`dscr_min` / `dscr_review`），**不写死在代码里**——不同机构的政策不同。
+The thresholds can be overridden in the input (`dscr_min` / `dscr_review`) and are
+**deliberately not hard-coded** — policies differ between lenders.
 
-## 运行
+## Run
 
 ```bash
 workagent run --case loan_dscr --input examples/loan_dscr/input.json .

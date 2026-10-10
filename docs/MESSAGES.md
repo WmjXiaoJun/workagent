@@ -1,35 +1,40 @@
-# 文案表（messages.json）
+# Message catalog (`messages.json`)
 
-**执行体不写人话，人话在这里。**
+**Executors do not write prose. The prose lives here.**
 
-## 为什么要这么分
+[中文](MESSAGES.zh-CN.md) · **English**
 
-执行体是**独立进程**，拿不到 CLI 的语言设置。更要紧的是：文案属于**内容**，
-它的真源应该和 `agent.yaml` 一样留在交付包里，而不是散在 12 个 Python 文件里。
+## Why it is split this way
+
+An executor is a **separate process**: it cannot see the CLI's language setting. More importantly,
+wording is **content**, and its source of truth belongs in the delivery package alongside
+`agent.yaml` — not scattered across twelve Python files.
 
 ```text
-执行体（Python）    →  只输出 code + args，不含任何自然语言
-messages.json       →  承载文案，zh / en 并排，缺哪条一眼可见
-workagent（Go）     →  按 --lang 渲染
+executor (Python)   →  emits code + args only, no natural language at all
+messages.json       →  the wording, zh and en side by side, so a missing one is visible
+workagent (Go)      →  renders according to --lang
 ```
 
-## 一条铁律：渲染绝不参与哈希
+## One iron rule: rendering never takes part in hashing
 
-`output_digest` 取自**执行体的原始结构化输出**，渲染发生在取摘要**之后**。
+`output_digest` is taken from the executor's **raw structured output**; rendering happens
+**after** the digest is computed.
 
-如果渲染结果进了哈希，中文跑一次、英文跑一次就会得到两个不同的摘要，`verify` 立刻失效。
-实测证据：
+If rendering fed the digest, a Chinese run and an English run would produce two different digests and
+`verify` would fail immediately. Measured:
 
 ```text
 $ workagent run --case audit_chain .
-  证据包编号 ed6532b74aec41d1
+  evidence bundle: ed6532b74aec41d1
 $ workagent run --case audit_chain . --lang en
-  Evidence bundle id ed6532b74aec41d1      ← 同一个
+  Evidence bundle: ed6532b74aec41d1      ← the same
 ```
 
-证据包里的 `output.json` 保持原始输出；给人看的是 `summary.md` 和 `records/`。
+The evidence bundle's `output.json` keeps the raw output; what a human reads is `summary.md`
+and `records/`.
 
-## 格式
+## Format
 
 ```json
 {
@@ -46,31 +51,41 @@ $ workagent run --case audit_chain . --lang en
 }
 ```
 
-- 键 `<caseID>.<CODE>`；`CONCLUSION` 是保留码，用于结论句。
-- 占位符 `{name}` 由 `args` 填充。**缺失的键原样保留**，便于发现漏填。
-- 结论句里的 `{verdict}` 会先经 `verdicts` 翻译，避免英文句子里夹一个中文词。
-- **英文缺失就不渲染**，回落到执行体自带原文 —— 不冒充已翻译。`check` 会因此报错。
+- Keys are `<caseID>.<CODE>`; `CONCLUSION` is reserved for the conclusion sentence.
+- `{name}` placeholders are filled from `args`. **A missing key is left as-is**, so an
+  unfilled slot is visible rather than silently empty.
+- `{verdict}` inside a conclusion is translated through `verdicts` first, so an English
+  sentence never contains a Chinese verdict word.
+- **If English is missing, nothing is rendered** and the executor's own text is used instead — we do
+  not pretend something is translated. `check` fails on such an entry.
+- `conclusion_code` lets an executor pick a *different message* based on the facts (for example
+  `spc_control`'s two conclusion shapes). The facts choose the code; the catalog still supplies the words.
 
-## 执行体要做什么
+## What an executor does
 
-发现里加 `args`，输出里加 `conclusion_args`：
+Add `args` to a finding and `conclusion_args` to the output:
 
 ```python
 findings.append({
     "level": "error", "code": "AC-01",
     "args": {"doc": did, "id": eid, "got": old[:12], "want": last_hash[did][:12]},
-    "message": "哈希链断裂：" + did,        # 兼容回退：老消费者只读 message
+    "message": "哈希链断裂：" + did,        # compatibility fallback: older consumers read only message
 })
 
 out["conclusion_args"] = {"verdict": verdict, "events": n, "docs": m, ...}
 ```
 
-`message` **保留**：规范里已有该字段，删掉是破坏性变更。带 `args` 时渲染层优先用
-`args` + 文案表；没有 `args` 时原样显示 `message`。
+`message` is **kept**: the field already exists in the specification, and removing it would be a
+breaking change. When `args` is present the renderer prefers `args` + the catalog; without it,
+`message` is shown verbatim.
 
-## 一个 code 只能有一种文案
+## One code, one message
 
-文案表是 `code → 模板` 的映射，所以**同一个 code 不能承载两种不同的话**。
+The catalog maps `code → template`, so **a single code must not carry two different sentences**.
 
-`audit_chain` 最初把「哈希链断裂」和「首次摄入却带 old_sha256」都记成 `AC-01` ——
-后者被渲染成前者的文案，**错得毫无征兆**。已拆成 `AC-01` 与 `AC-01F`。
+`audit_chain` originally recorded both "hash chain broken" and "first ingest carrying an
+old_sha256" under `AC-01` — the second was silently rendered with the first's wording, **wrongly and
+without any signal**. It is now split into `AC-01` and `AC-01F`.
+
+Six of the twelve scenarios had such a collision during migration. That is why this is written down as
+a rule rather than left to memory.

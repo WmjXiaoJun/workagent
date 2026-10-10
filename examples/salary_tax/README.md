@@ -1,12 +1,13 @@
-# 工资薪金个税测算
+# Payroll income tax
 
-**形态**：测算型 ｜ **复现等级**：L3（纯确定性，无 LLM）
+**Form**: estimation ｜ **Reproducibility**: L3 (fully deterministic, no LLM)
 
-## 规则来源
+## Rule source
 
-中国《个人所得税法》居民个人综合所得**累计预扣法**，7 级超额累进预扣率表：
+China's Individual Income Tax Law: the **cumulative withholding method** for resident comprehensive
+income, with the 7-bracket progressive withholding table:
 
-| 累计应纳税所得额 | 预扣率 | 速算扣除数 |
+| Cumulative taxable income | Rate | Quick deduction |
 |---|---|---|
 | ≤ 36,000 | 3% | 0 |
 | 36,000 ~ 144,000 | 10% | 2,520 |
@@ -16,20 +17,24 @@
 | 660,000 ~ 960,000 | 35% | 85,920 |
 | > 960,000 | 45% | 181,920 |
 
-基本减除费用 5,000 元/月。
+Standard deduction: 5,000 per month.
 
 ```text
-累计应纳税所得额 = 累计收入 - 5000×月数 - 累计专项扣除 - 累计专项附加扣除
-本期应预扣       = 累计应纳税额 - 累计已预扣
+cumulative taxable income = cumulative income
+                          - 5000 x months
+                          - cumulative special deductions
+                          - cumulative additional special deductions
+withholding this period   = cumulative tax - tax already withheld
 ```
 
-## 运行
+## Run
 
 ```bash
 workagent run --case salary_tax --input examples/salary_tax/input.json .
 workagent verify .
 ```
 
-## 为什么它可复现
+## Why it is reproducible
 
-无模型、无网络、无时间依赖 —— 同样的输入必然得到同样的结论摘要。这是 **L3**。
+No model, no network, no time dependence — the same input necessarily yields the same output digest.
+That is **L3**.

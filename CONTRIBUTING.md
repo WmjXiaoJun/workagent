@@ -1,48 +1,49 @@
-# 贡献指南
+# Contributing
 
-## 我们最需要什么
+## What we need most
 
-| 优先级 | 需要 | 说明 |
+| Priority | We want | Why |
 |---|---|---|
-| P0 | **真实场景的执行体** | 一个具体领域、能验真的最小场景，比十个通用 demo 有价值 |
-| P0 | **反例**：结论不可复现的案例 | 帮我们把"可复现"的门槛说清楚 |
-| P1 | 兼容性报告 | 你的包在某个老平台上跑起来了吗？哪些能力丢了？ |
-| P1 | 标准对齐的适配器 | Agent Plugins / A2A / 其它 |
-| P2 | 文档翻译 | README.zh-CN.md 的改进 |
+| P0 | **Executors for real scenarios** | One concrete, verifiable, minimal scenario is worth more than ten generic demos |
+| P0 | **Counter-examples**: cases whose conclusions are not reproducible | They help us state the reproducibility bar precisely |
+| P1 | Compatibility reports | Did your package run on some legacy platform? Which capabilities were lost? |
+| P1 | Adapters for standards | Agent Plugins / A2A / others |
+| P2 | Documentation translation | Improvements to README.zh-CN.md |
 
-## 我们**不收**什么
+## What we do **not** accept
 
-- 通用 AI 助手 / 聊天机器人
-- 平台、框架、编排引擎
-- 引入第三方依赖的核心工具（`go.mod` 必须保持无 require）
-- 无法验真的场景（结论对错说不清的领域）
+- General-purpose AI assistants / chatbots
+- Platforms, frameworks, orchestration engines
+- Core tooling that pulls in third-party dependencies (`go.mod` must stay free of `require`)
+- Scenarios that cannot be verified (domains where "right" is undecidable)
 
-## 提交前自检
+## Before you submit
 
 ```bash
 go build -o workagent ./cmd/workagent
 ./workagent check .
-./workagent run --input examples/bid_quote/input.json .
-./workagent verify .      # 必须 PASS
+./workagent run --all . --replay
+./workagent verify --all .      # must PASS
 ```
 
-**`verify` 不通过 = 不可复现 = 不允许合并。**
+**`verify` failing = not reproducible = not mergeable.**
 
-## 设计约束（改动前请先读）
+## Design constraints (read before changing anything)
 
-1. **真源唯一**：`agent.yaml`。`adapters/` 永远是生成物，不接受手改。
-2. **零第三方依赖**：`cmd/workagent/` 只用 Go 标准库，`go.mod` 不允许出现 require。
-3. **只加不改**：兼容性靠"新增目录"，不靠"修改已有字段"。
-4. **诚实**：没有私钥就不许写"已签名"；不确定就写"不确定"。
+1. **One source of truth**: `agent.yaml`. `adapters/` is always generated and never hand-edited.
+2. **Zero third-party dependencies**: `cmd/workagent/` uses only the Go standard library; `go.mod`
+   must not contain a `require`.
+3. **Add, never change**: compatibility comes from added directories, not from editing existing fields.
+4. **Honesty**: without a private key you may not write "signed"; when unsure, write "unsure".
 
-## 提交信息
+## Commit messages
 
+```text
+<type>: <one-line summary>
 ```
-<type>: <一句话说明>
-```
 
-type 取 `spec` / `tool` / `example` / `docs` / `compat` / `fix`。
+`type` is one of `spec` / `tool` / `example` / `docs` / `compat` / `fix`.
 
-## 许可
+## Licence
 
-贡献即表示你同意以 MIT 许可发布你的贡献。
+By contributing you agree to release your contribution under the MIT licence.

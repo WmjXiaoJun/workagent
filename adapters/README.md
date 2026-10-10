@@ -1,10 +1,11 @@
 # adapters/
 
-**生成物，不是真源。** 运行 `python tools/workagent.py adapt` 生成：
+**Generated, not a source of truth.** Produced by `workagent adapt`:
 
-| 文件 | 目标生态 | 说明 |
+| File | Target ecosystem | What it is |
 |---|---|---|
-| `plugin.json` | Agent Plugins 1.0（Vercel 牵头，OpenAI/AWS/GitHub/Microsoft 支持） | 可移植插件清单 |
-| `agent-card.json` | A2A（Agent2Agent） | Agent 能力与身份自描述，供发现 |
+| `plugin.json` | Agent Plugins 1.0 (led by Vercel; supported by OpenAI/AWS/GitHub/Microsoft) | a portable plugin manifest |
+| `agent-card.json` | A2A (Agent2Agent) | a capability and identity self-description, for discovery |
 
-真源永远是根目录的 `agent.yaml`。改适配层等于白改，下次生成会被覆盖。
+The source of truth is always `agent.yaml` at the package root. Editing the adapter layer is wasted
+work: the next generation overwrites it.

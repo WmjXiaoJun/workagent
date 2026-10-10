@@ -1,127 +1,140 @@
-# 行业怎么分：给个人开发者的切法
+# How to divide the industry: a slicing method for solo developers
 
-> 这篇回答一个具体问题：**我不知道该做哪个行业，怎么选？**
+> This answers one concrete question: **I do not know which industry to build for. How do I choose?**
 
-## 0. 先纠正一个思路
+[中文](VERTICALS.zh-CN.md) · **English**
 
-**不要按行业分**（金融 / 工程 / 医疗 / 法律）。行业是结果，不是选择依据。
+## 0. First, drop one assumption
 
-真正决定"适不适合做"的是三件事：
+**Do not divide by industry** (finance / engineering / healthcare / legal). Industry is an outcome,
+not a selection criterion.
 
-1. **结论能不能事后验真** —— 这是唯一的护城河，也是你唯一能积累的东西
-2. **判断能不能规则化** —— 能规则化的部分交给代码，模型只做边缘
-3. **输入能不能拿到** —— 结构化数据，或至少半结构化的文本
+Three things actually decide whether something is worth building:
 
-按这三条，行业会被重新切成**五种交付物形态**。
+1. **Can the conclusion be verified after the fact?** — this is the only moat, and the only thing
+   that accumulates
+2. **Can the judgement be written down as rules?** — whatever can be, give to code; the model only
+   handles the edges
+3. **Can you get the input?** — structured data, or at least semi-structured text
+
+By those three, the industry re-slices into **five delivery forms**.
 
 ---
 
-## 1. 五种交付物形态
+## 1. The five delivery forms
 
-| # | 形态 | 输入 → 输出 | 模型的角色 | 怎么验真 | 复现等级 | 个人适配 |
+| # | Form | Input → output | The model's role | How it is verified | Repro level | Fit for a solo dev |
 |---|---|---|---|---|---|---|
-| ① | **测算型** | 参数 → 数值 | 无，或只做抽取 | 与后续实际值对比 | **L3 / L2** | ★★★★★ |
-| ② | **核验型** | 一堆材料 → 通过 / 退回 + 原因 | 抽取 + 分类 | 人工复核作为基准 | **L2 / L1** | ★★★★★ |
-| ③ | **抽取型** | 非结构化文本 → 结构化数据 | **主角** | 与原文逐字段对照 | L1 | ★★★★ |
-| ④ | **排程型** | 约束 → 方案 | 辅助 | 约束满足性可验证 | L3 | ★★★ |
-| ⑤ | **推演型** | 条件 → 结论 / 建议 | **主角** | 弱，事后才知道 | L1 | ★★ |
+| ① | **Estimation** | parameters → numbers | none, or extraction only | compare against later actuals | **L3 / L2** | ★★★★★ |
+| ② | **Verification** | a pile of material → pass / return + reasons | extraction + classification | human review as the baseline | **L2 / L1** | ★★★★★ |
+| ③ | **Extraction** | unstructured text → structured data | **the lead** | field-by-field against the original | L1 | ★★★★ |
+| ④ | **Scheduling** | constraints → a plan | supporting | constraint satisfaction is checkable | L3 | ★★★ |
+| ⑤ | **Projection** | conditions → conclusions / advice | **the lead** | weak; only known afterwards | L1 | ★★ |
 
-### 核心规律
+### The governing rule
 
-> **模型越靠前（负责理解与抽取），可复现性越低；模型越靠后（只负责润色表达），越容易做。**
+> **The earlier the model sits in the pipeline (understanding, extracting), the less reproducible the
+> result; the later it sits (polishing the wording), the easier the whole thing is.**
 
-所以最佳落点是 **① 和 ②** —— 它们天然长成这个形状：
-
-```text
-非结构化输入 ──[模型抽取]──▶ 结构化中间表示 ──[确定性代码]──▶ 结论 + 证据
-                     ↑ 不可复现，录制后重放        ↑ 可复现，L3
-```
-
-**"模型只做翻译，判断交给代码"** —— 这一条能解决 80% 的可复现问题。
-
----
-
-## 2. 选象限：可验真性 × 模型依赖度
+So the best landing spots are **① and ②** — they naturally grow into this shape:
 
 ```text
-                模型依赖度 低  ←──────────────→  高
-可验真性 高   ┌──────────────────┬──────────────────┐
-              │  ① 测算型         │  ③ 抽取型         │
-              │  ② 核验型         │                  │
-   ↑          │  ★ 最佳落点        │  可做，但要录制     │
-              ├──────────────────┼──────────────────┤
-              │  ④ 排程型         │  ⑤ 推演型         │
-   低         │  能做，但价值窄     │  ✗ 别碰           │
-              └──────────────────┴──────────────────┘
+unstructured input ──[model extracts]──▶ structured IR ──[deterministic code]──▶ conclusion + evidence
+                          ↑ not reproducible, record and replay    ↑ reproducible, L3
 ```
 
-**右上角（高可验真 + 高模型依赖）是伪命题**：既要模型深度参与、又要结论可验真，目前技术上做不到。⑤ 之所以"别碰"，不是因为它不赚钱，而是因为**你做出来的东西无法证明是对的**——而"能证明"正是这个项目存在的理由。
+**"The model only translates; code decides."** That one rule settles 80% of reproducibility problems.
 
 ---
 
-## 3. 每个形态配几个具体例子
+## 2. Choosing a quadrant: verifiability × model dependence
 
-### ① 测算型
-- 工程量清单报价测算（本仓库示例）
-- 设备选型与全生命周期成本测算
-- 项目税负 / 现金流测算
-- 绩效奖金与提成测算
-- 物流运费与路线成本测算
+```text
+                model dependence  low  ←──────────────→  high
+verifiability high  ┌──────────────────┬──────────────────┐
+                    │  ① Estimation    │  ③ Extraction    │
+                    │  ② Verification  │                  │
+     ↑              │  ★ best landing  │  doable, but you │
+                    │                    │  must record    │
+                    ├──────────────────┼──────────────────┤
+                    │  ④ Scheduling    │  ⑤ Projection    │
+     low            │  narrow value    │  ✗ do not touch  │
+                    └──────────────────┴──────────────────┘
+```
 
-### ② 核验型
-- **报销单智能审核**（规则明确、量大、人人有体感）
-- 合同要素与内部标准符合性检查
-- 投标文件符合性 / 废标项检查
-- 采购"三单匹配"（订单-入库-发票）
-- 财务报表勾稽关系校验
-
-### ③ 抽取型
-- 合同关键要素抽取（金额、工期、违约条款、付款节点）
-- 发票 / 票据信息抽取
-- 简历结构化
-- 病历 / 检查报告字段抽取
-- 招标文件资格条件抽取
-
-### ④ 排程型
-- 施工进度排程与资源平衡
-- 产线排产
-- 巡检 / 配送路线
-- 值班排班
-
-### ⑤ 推演型
-- 可行性研究
-- 技术选型建议
-- 风险清单生成
-- 尽调结论
+**The top-right corner (highly verifiable + highly model-dependent) is a false premise**: deep model
+involvement *and* a verifiable conclusion is not technically possible today. ⑤ is "do not touch" not
+because it makes no money, but because **what you build cannot be shown to be right** — and "can be
+shown" is precisely why this project exists.
 
 ---
 
-## 4. 怎么挑第一个：四道筛子
+## 3. Concrete examples per form
 
-**必须全部通过**，缺一道就换方向：
+### ① Estimation
+- Bill-of-quantities pricing (this repository's example)
+- Equipment selection and whole-life cost
+- Project tax burden / cash flow
+- Performance bonus and commission
+- Freight and route cost
 
-| # | 筛子 | 通不过的信号 |
+### ② Verification
+- **Expense report review** (clear rules, high volume, everyone has felt the pain)
+- Contract terms against internal standards
+- Bid-document compliance / disqualifying clauses
+- Purchase three-way match (order – receipt – invoice)
+- Financial statement articulation checks
+
+### ③ Extraction
+- Contract key terms (amount, duration, penalty clauses, payment milestones)
+- Invoice / receipt fields
+- Résumé structuring
+- Medical record / lab report fields
+- Tender qualification conditions
+
+### ④ Scheduling
+- Construction schedule and resource levelling
+- Production line scheduling
+- Inspection / delivery routes
+- Shift rosters
+
+### ⑤ Projection
+- Feasibility studies
+- Technology selection advice
+- Risk registers
+- Due-diligence conclusions
+
+---
+
+## 4. Picking the first one: four sieves
+
+**All four must pass.** Fail one and change direction:
+
+| # | Sieve | The signal that it fails |
 |---|---|---|
-| 1 | **你能拿到真实结果做对照吗？** | "准不准只能靠感觉" → 换 |
-| 2 | **规则能写下来吗？** | "全靠经验没法说清" → 换（那就是纯模型，不可复现） |
-| 3 | **输入拿得到吗？** | "数据在客户系统里我碰不到" → 换 |
-| 4 | **单次交付值得对方付费或省时吗？** | "省 5 分钟" → 换（没人会为这个改变习惯） |
+| 1 | **Can you get real outcomes to compare against?** | "accuracy can only be judged by feel" → change |
+| 2 | **Can the rules be written down?** | "it is all experience, I cannot explain it" → change (that is a pure model, unreproducible) |
+| 3 | **Can you get the input?** | "the data lives in the client's system, I cannot reach it" → change |
+| 4 | **Is one delivery worth paying for, or worth the time saved?** | "saves 5 minutes" → change (nobody changes habits for that) |
 
-> 补一条**信任信号**：真正的验证不是"用户说好用"，而是
-> **用户愿不愿意把真实数据交给你处理**。他连续丢进来十几份真实单据，才是信号；
-> 只是试着玩一下，不是。
+> One more **trust signal**: real validation is not "the user says it is good", it is
+> **whether the user is willing to hand you real data to process**. When they drop a dozen real
+> documents in a row, that is a signal. Trying it once for fun is not.
 
 ---
 
-## 5. 本仓库示例的定位
+## 5. Where this repository's examples sit
 
-`examples/bid_quote/` 同时演示了形态 ① 和 ② 的骨架：
+`examples/bid_quote/` demonstrates the skeleton of both form ① and form ②:
 
-| 输入文件 | 路径 | 复现等级 |
+| Input file | Path | Repro level |
 |---|---|---|
-| `input.json` | 结构化参数 → 确定性计算 | **L3 完全可复现**，无需联网 |
-| `input.natural.json` | 自然语言 → 模型抽取 → 确定性计算 | **L2**（本地开权重 + temp 0）或 **L1**（云端模型，靠录制重放） |
+| `input.json` | structured parameters → deterministic computation | **L3, fully reproducible**, no network |
+| `input.natural.json` | natural language → model extraction → deterministic computation | **L2** (local open weights + temp 0) or **L1** (cloud model, replayed from a recording) |
 
-两条路径共用同一个执行体：**模型只负责把"120 吨钢材一吨 4850"变成结构化的 `{quantity:120, unit_cost:4850}`，钱怎么算是代码的事。**
+Both paths share one executor: **the model only turns "120 tonnes of steel at 4850 a tonne" into
+`{quantity: 120, unit_cost: 4850}`; how the money is computed is code's business.**
 
-换成你自己的场景时，只需要动三样：`executor.py`（换规则）、`extract.prompt.md`（换抽取目标）、`x-workagent/boundary.json`（换失效边界）。
+The repository now ships **12 scenarios across both forms** (5 estimation, 7 verification) — see
+`docs/EXAMPLES.md`. To build your own, change only three things: `executor.py` (the rules),
+the extraction prompt (the extraction target), and `boundary.json` (the failure boundary).

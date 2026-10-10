@@ -1,30 +1,32 @@
-# 引脚 / 中断 / DMA 资源冲突检测
+# Pin / IRQ / DMA resource conflicts
 
-**形态**：核验型 ｜ **复现等级**：L3（纯确定性）
+**Form**: verification ｜ **Reproducibility**: L3 (fully deterministic)
 
-## 检测项
+## Checks
 
-| 代号 | 检查 | 级别 |
+| Code | Check | Level |
 |---|---|---|
-| PIN-01 | 同一引脚被分配给两个不同信号 | error |
-| PIN-02 | 保留了调试口引脚却被占用 | error |
-| PIN-03 | 引脚命名不符合 `P<端口><序号>` | error |
-| IRQ-01 | 抢占优先级重复（本规则集要求唯一） | error |
-| IRQ-02 | 中断优先级超出 MCU 允许范围 | error |
-| DMA-01 | DMA 通道被重复声明 | warn |
-| DMA-02 | DMA 通道被分配给多个外设 | error |
+| PIN-01 | One pin assigned to two different signals | error |
+| PIN-02 | A reserved debug pin is in use | error |
+| PIN-03 | A pin name does not match `P<port><number>` | error |
+| IRQ-01 | Duplicate preemption priority (this rule set requires uniqueness) | error |
+| IRQ-02 | An interrupt priority is outside the MCU's allowed range | error |
+| DMA-01 | A DMA channel is declared twice | warn |
+| DMA-02 | A DMA channel is assigned to multiple peripherals | error |
 
-## 为什么这个场景值得做
+## Why this scenario is worth building
 
-**冲突就是 bug，编译期就能验真，而且规则完全确定。** 这类检查人工做几个项目就会漏，
-做成确定性工具之后，每次改硬件都跑一遍，成本是零。
+**A conflict is a bug, it is verifiable at compile time, and the rules are fully deterministic.**
+Doing this by hand misses things after a couple of projects; as a deterministic tool it runs on every
+hardware change at zero cost.
 
-## 运行
+## Run
 
 ```bash
 workagent run --case pin_conflict --input examples/pin_conflict/input.json .
 workagent verify .
 ```
 
-示例数据里有 4 个真实会发生的错误：PA9 被 USART1_TX 与 TIM1_CH2 抢、PA13 是调试口却被当 LED、
-优先级 5 被两个中断共用、优先级 20 超出 0~15；再加一个引脚名写错的 `P13`。
+The sample data contains four mistakes that really do happen: PA9 claimed by both USART1_TX and
+TIM1_CH2, PA13 used as an LED although it is a debug pin, priority 5 shared by two interrupts,
+priority 20 outside the 0~15 range, plus a pin named `P13`.
