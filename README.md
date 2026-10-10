@@ -2,9 +2,11 @@
 
 <img src="assets/logo.svg" width="112" height="112" alt="WorkAgent">
 
+**English** · [中文](README.zh-CN.md)
+
 # WorkAgent
 
-### 别人交付对话，我们交付可复现的结论。
+### Others ship conversations. We ship reproducible conclusions.
 
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
@@ -16,49 +18,49 @@
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 ![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
-[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#七个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.en.md)
+[Quickstart](#quickstart) · [Concepts](#core-concepts) · [Legacy compatibility](#legacy-platform-compatibility) · [CLI](#the-seven-commands) · [Download binaries](https://github.com/WmjXiaoJun/workagent/releases/latest) · [中文](README.zh-CN.md)
 
 </div>
 
 ---
 
-## 这是什么
+## What is this
 
-**一个能被验证的智能体交付包**：格式 + 零依赖工具链。
+**A verifiable agent delivery package**: a format, plus a zero-dependency toolchain.
 
-不是框架，不是平台，不是聊天机器人。就是一个文件夹——里面装着你的业务逻辑、你的隐含假设、你的失效边界、你的测试套件，和一个能证明"结论自生成后没有变过"的证据机制。
+Not a framework. Not a platform. Not a chatbot. It is a folder — carrying your business logic, your hidden assumptions, your failure boundaries, your test suite, and an evidence mechanism that proves *the conclusion has not changed since it was produced*.
 
-它只回答一个问题：
+It answers exactly one question:
 
-> **AI 给出的结论，凭什么信？**
+> **Why should anyone trust a conclusion produced by an AI?**
 
-今天的现实是：你能在 15 分钟里搭出一个 Agent，但你答不上来这三个问题——
+The reality today: you can build an agent in 15 minutes, but you cannot answer these three questions —
 
-| 问题 | 现状 | WorkAgent |
+| Question | Today | WorkAgent |
 |---|---|---|
-| 同样的输入，明天再跑一遍，结论还一样吗？ | 不知道 | `verify` 一键复现校验，摘要不一致直接 FAIL |
-| 这个结论依赖了哪些假设？假设失效会怎样？ | 散落在脑子里 | `provenance/assumptions.json` 强制显式固化 |
-| 什么情况下这个结论就不能用了？ | 没有定义 | `boundary.json` + `stop_condition`：越界**拒绝执行**，而不是硬算 |
-| 别人怎么确认你给我的包没被改过？ | 无法确认 | `seal` 全包摘要 + 文件级哈希清单 |
-| 在只支持老标准的平台上跑，会丢什么？ | 说不清 | `compat.json` **显式声明降级行为** |
+| Same input, run it again tomorrow — same conclusion? | Unknown | `verify` re-runs and compares digests; mismatch = FAIL |
+| Which assumptions does this conclusion rest on? What if they break? | In someone's head | `provenance/assumptions.json`, explicitly recorded |
+| When is this conclusion no longer valid? | Undefined | `boundary.json` + `stop_condition`: out-of-range input is **rejected**, not force-computed |
+| How do I know the package you sent me is unmodified? | No way to know | `seal` produces a file-level digest manifest |
+| What do I lose on an old platform? | Unclear | `compat.json` **declares the degradation explicitly** |
 
 ---
 
-## 30 秒上手
+## Quickstart
 
-**零第三方依赖。Go 1.21+。编译出一个静态二进制，对方不需要装任何运行时。**
+**Zero third-party dependencies. Go 1.21+. One static binary — no runtime needed on the receiving end.**
 
 ```bash
 git clone https://github.com/WmjXiaoJun/workagent.git
 cd workagent
 go build -o workagent ./cmd/workagent
 
-./workagent check .                                          # ① 结构与兼容声明校验
-./workagent run   --input examples/bid_quote/input.json .    # ② 执行，产出证据包
-./workagent verify .                                         # ③ 复现校验（关键一步）
+./workagent check .                                          # 1. structure + compatibility check
+./workagent run   --input examples/bid_quote/input.json .    # 2. execute, produce evidence bundle
+./workagent verify .                                         # 3. reproducibility check (the important one)
 ```
 
-三平台交叉编译（`make release` 一次产出五个）：
+Cross-compile for three platforms (or `make release` for all five):
 
 ```bash
 GOOS=linux   GOARCH=amd64 go build -o dist/workagent-linux-amd64     ./cmd/workagent
@@ -66,123 +68,124 @@ GOOS=darwin  GOARCH=arm64 go build -o dist/workagent-darwin-arm64    ./cmd/worka
 GOOS=windows GOARCH=amd64 go build -o dist/workagent-windows-amd64.exe ./cmd/workagent
 ```
 
-真实运行输出（不是示意，是仓库里跑出来的）：
+Real output — this is the repo actually running, not an illustration:
 
 ```text
 $ ./workagent run --input examples/bid_quote/input.json .
-run —— 执行完成
-  [OK]   证据包编号 6723c555d11c0a3e
-  [OK]   结论: 建议报价 CNY 1,229,437.44（直接成本 968,000.00，利润率 12%）
-  [OK]   输出摘要 8e38afbabb710b00
-  [--]   证据目录 .../out/evidence/6723c555d11c0a3e
+run —— done
+  [OK]   evidence id 6723c555d11c0a3e
+  [OK]   conclusion: recommended price CNY 1,229,437.44 (direct cost 968,000.00, margin 12%)
+  [OK]   output digest 8e38afbabb710b00
+  [--]   evidence dir .../out/evidence/6723c555d11c0a3e
 
 $ ./workagent verify .
-verify —— 复现校验，证据包 6723c555d11c0a3e
-  期望摘要 8e38afbabb710b001ed63b6fbdd7a22d
-  重放摘要 8e38afbabb710b001ed63b6fbdd7a22d
-结果: PASS —— 同输入产出同结论，可复现。
+verify —— replaying evidence bundle 6723c555d11c0a3e
+  expected digest 8e38afbabb710b001ed63b6fbdd7a22d
+  replay digest   8e38afbabb710b001ed63b6fbdd7a22d
+result: PASS — same input, same conclusion. Reproducible.
 ```
 
-越界输入不会被硬算，而是被拒绝：
+An out-of-bounds input is rejected rather than silently computed:
 
 ```text
 $ echo '{"project":"x","line_items":[]}' > bad.json
 $ ./workagent run --input bad.json .
-执行体失败 (exit 2): BOUNDARY_VIOLATION: line_items 为空或不是数组
+executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an array
 ```
 
 ---
 
-## 七个命令
+## The seven commands
 
-| 命令 | 做什么 | 为什么存在 |
+| Command | What it does | Why it exists |
 |---|---|---|
-| `models` | 列出 22 家内置模型服务商、端点、所需环境变量与可用状态 | 不用记各家的 API 格式，有 key 就能跑 |
-| `check` | 校验包结构、JSON 可解析性、兼容声明、边界与测试套件 | 交付前最后一道门 |
-| `adapt` | 从 `agent.yaml` 生成 `adapters/`（Agent Plugins 1.0 `plugin.json` + A2A `agent-card.json`） | 一次编写，多生态可用，且不污染真源 |
-| `attest` | 计算 **Attestation Closure** 摘要 | 让"可复现"有可核对的证据，而不是一句承诺 |
-| `run` | 执行执行体，产出证据包 + 摘要 + 溯源记录 | 结论必须带着证据一起走 |
-| `verify` | 重放并比对结论摘要，PASS / FAIL | **本项目的核心**。不可复现 = 不可交付 |
-| `seal` | 生成全包文件级摘要 `signature/agent.sig` | 证明内容自生成后未变 |
+| `models` | Lists all 22 built-in providers, endpoints, required env keys and availability | No need to memorise each vendor's API shape |
+| `check` | Validates package structure, JSON parseability, compatibility declaration, boundary and test suite | The last gate before delivery |
+| `adapt` | Generates `adapters/` from `agent.yaml` (Agent Plugins 1.0 `plugin.json` + A2A `agent-card.json`) | One source, many ecosystems, no sync cost |
+| `attest` | Computes the **Attestation Closure** digests | Makes "reproducible" checkable rather than a promise |
+| `run` | Executes the agent, emits an evidence bundle, summary and trace | A conclusion must travel with its evidence |
+| `verify` | Replays and compares conclusion digests; PASS / FAIL | **The core of this project.** Not reproducible = not deliverable |
+| `seal` | Produces the whole-package digest `signature/agent.sig` | Proves content is unchanged since sealing |
 
 ---
 
-## 模型适配与复现等级
+## Model support and reproducibility levels
 
-**22 家内置服务商，零第三方依赖。** `workagent models` 一条命令看清全部：
+**22 built-in providers, zero third-party dependencies.** One command shows them all:
 
 ```text
 $ workagent models
-PROVIDER     PROTOCOL   端点                                 密钥环境变量              状态
-ollama       openai     http://127.0.0.1:11434/v1           (无需)                    本地可用
-openai       openai     https://api.openai.com/v1            OPENAI_API_KEY            缺少密钥
-anthropic    anthropic  https://api.anthropic.com/v1         ANTHROPIC_API_KEY         缺少密钥
-deepseek     openai     https://api.deepseek.com/v1          DEEPSEEK_API_KEY          缺少密钥
-qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY         缺少密钥
-...（共 22 家）
+PROVIDER     PROTOCOL    endpoint                              env key                   status
+ollama       openai     http://127.0.0.1:11434/v1             (none)                    local, ready
+openai       openai     https://api.openai.com/v1             OPENAI_API_KEY            key missing
+anthropic    anthropic  https://api.anthropic.com/v1          ANTHROPIC_API_KEY         key missing
+deepseek     openai     https://api.deepseek.com/v1           DEEPSEEK_API_KEY          key missing
+qwen         openai     https://dashscope.aliyuncs.com/...    DASHSCOPE_API_KEY         key missing
+... (22 in total)
 ```
 
-覆盖 OpenAI / Anthropic / Gemini / Mistral / xAI / Groq / Together / OpenRouter，
-国内 DeepSeek / 通义千问 / Kimi / 智谱 GLM / 豆包 / 混元 / 百川 / MiniMax / 星火 / 硅基流动，
-以及本地 Ollama / vLLM / LM Studio。**任何 OpenAI 兼容端点**用 `custom` 就能接入。
+OpenAI / Anthropic / Gemini / Mistral / xAI / Groq / Together / OpenRouter,
+plus DeepSeek / Qwen / Kimi / Zhipu GLM / Doubao / Hunyuan / Baichuan / MiniMax / Spark / SiliconFlow,
+plus local Ollama / vLLM / LM Studio. **Any OpenAI-compatible endpoint** works via the `custom` profile.
 
-### 但模型不可复现，怎么办
+### But models are not reproducible — so what
 
-这是本项目的核心矛盾。解法是**把一次 LLM 调用拆成两半**：
+That is the central tension of this project. The resolution is to **split one LLM call into two halves**:
 
 ```text
-非结构化输入 ──[模型抽取]──▶ 结构化中间表示 ──[确定性代码]──▶ 结论 + 证据
-                     ↑ 不可复现 → 录制成档案         ↑ 完全可复现
+unstructured input ──[model extracts]──▶ structured IR ──[deterministic code]──▶ conclusion + evidence
+                          ^ not reproducible → recorded       ^ fully reproducible
 ```
 
-**模型只做翻译，判断交给代码。** 然后：
+**The model translates; the code decides.** Then:
 
-| 命令 | 行为 |
+| Command | Behaviour |
 |---|---|
-| `run` | 真实调用模型，把**原始响应**录进 `provenance/llm/` |
-| `run --replay` | 用录制响应，**离线**跑通，不需要 key、不需要网络 |
-| `verify` | 重放录制，校验裁决过程 —— CI 里跑的就是这条 |
-| `verify --live` | **重新真实调用模型**，测量它到底复现不复现 |
+| `run` | Calls the model for real and records the **raw response** into `provenance/llm/` |
+| `run --replay` | Uses the recorded response — **offline**, no key, no network |
+| `verify` | Replays the record and checks the decision path — this is what CI runs |
+| `verify --live` | **Calls the model again** to measure whether it actually reproduces |
 
-### 复现等级（如实标注，绝不冒充）
+### Reproducibility levels (labelled honestly, never inflated)
 
-| 等级 | 含义 | 触发条件 |
+| Level | Meaning | Condition |
 |---|---|---|
-| **L3** | 完全可复现 | 纯确定性，无 LLM |
-| **L2** | 决策可复现 | 本地开权重 + `temperature=0` + 固定 seed → 实测逐字节一致 |
-| **L1** | 记录可复现 | 云端模型本身不可复现，但裁决过程可重放 |
-| **L0** | 不可复现 | `temperature>0`，只是一次调用记录 |
+| **L3** | Fully reproducible | Pure determinism, no LLM |
+| **L2** | Decision reproducible | Local open weights + `temperature=0` + fixed seed → byte-identical in measurement |
+| **L1** | Record reproducible | Cloud model is not reproducible, but the decision path can be replayed |
+| **L0** | Not reproducible | `temperature>0` — a call log, nothing more |
 
-等级会写进 `evidence.json`。**我们不把 L1 说成 L2。**
+The level is written into `evidence.json`. **We never call L1 an L2.**
 
-> **实测**：本地 `ollama / qwen2.5:7b`、`temperature=0`、`seed=42`，
-> 三次独立调用返回**逐字节相同**的响应（`response_digest 4d6abc79490d3241…`）→ 该路径达到 **L2**。
-> 这是测出来的，不是声称的。
+> **Measured**: local `ollama / qwen2.5:7b`, `temperature=0`, `seed=42` —
+> three independent calls returned a **byte-identical** response (`response_digest 4d6abc79490d3241…`),
+> so this path reaches **L2**. Measured, not claimed.
 
 ---
 
-## 十个可验证场景，按交付形态分
+## Ten verifiable scenarios, grouped by delivery form
 
-**不按行业分，按交付形态分。** 行业是结果不是依据——为什么这样切见 `docs/VERTICALS.md`。
-一个包承载多个场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
+**Not by industry — by delivery form.** Industry is an outcome, not a criterion; see
+`docs/VERTICALS.md` for why. One package carries many scenarios sharing the same
+infrastructure (compatibility declaration, provenance, evidence bundles, reproducibility checks).
 
 ```text
 $ workagent cases .
-WorkAgent cases —— 按交付形态分组
+WorkAgent cases —— grouped by delivery form
 
-【测算型】5 个
-  bid_quote       L2/L1    投标报价测算
-  salary_tax      L3       工资薪金个税测算
-  loan_dscr       L3       项目贷款偿债能力测算
-  modbus_poll     L3       通信负载与轮询周期测算
-  firmware_budget L3       固件资源预算测算
+[Estimation] 5
+  bid_quote       L2/L1    Bid pricing
+  salary_tax      L3       Payroll income tax
+  loan_dscr       L3       Loan debt-service coverage
+  modbus_poll     L3       Modbus polling load and cycle time
+  firmware_budget L3       Firmware Flash / RAM / stack budget
 
-【核验型】5 个
-  expense_audit   L2/L1    报销单合规审核
-  lab_report      L2/L1    检验报告异常判定
-  point_table     L2/L1    通信点表核对
-  spc_control     L3       SPC 控制图判异
-  pin_conflict    L3       引脚 / 中断 / DMA 资源冲突检测
+[Verification] 5
+  expense_audit   L2/L1    Expense compliance
+  lab_report      L2/L1    Lab result flagging
+  point_table     L2/L1    Modbus point-table audit
+  spc_control     L3       SPC control-chart rules
+  pin_conflict    L3       Pin / IRQ / DMA resource conflicts
 ```
 
 ```bash
@@ -190,64 +193,64 @@ workagent run --case spc_control --input examples/spc_control/input.json .
 workagent verify --all .
 ```
 
-| 场景 | 做什么 | 规则来源 |
+| Scenario | What it does | Rules from |
 |---|---|---|
-| `salary_tax` | 累计预扣法逐月算个税 + 实际税负率 | 《个人所得税法》7 级累进预扣率表 |
-| `loan_dscr` | DSCR 与利息保障倍数，阈值**写在输入里**不写死在代码里 | DSCR 标准公式 |
-| `spc_control` | 8 条判异准则，指出**哪一点违反哪条** | Western Electric / Nelson |
-| `pin_conflict` | 引脚复用 / 中断优先级 / DMA 通道冲突 | MCU 资源一致性规则集 |
-| `bid_quote` | 结构化或自然语言两种入口，共用同一执行体 | 工程造价惯例 |
-| `expense_audit` | 单笔限额、类别限额、时限、发票号、合计一致性 | 企业报销制度（示例阈值） |
-| `lab_report` | 按性别区分的参考区间 + 危急值 | 成人常见参考区间（示例值） |
-| `point_table` | 地址重叠、数据类型、量程、越界 + **Modbus 参考地址归一化** | Modbus 寻址规则 |
+| `salary_tax` | Cumulative withholding, month by month, plus effective tax rate | PRC Individual Income Tax Law, 7 brackets |
+| `loan_dscr` | DSCR and interest coverage; thresholds come from **input**, not hard-coded | Standard DSCR formula |
+| `spc_control` | 8 rule violations, naming **which point broke which rule** | Western Electric / Nelson rules |
+| `pin_conflict` | Pin muxing / IRQ priority / DMA channel conflicts | MCU resource consistency rules |
+| `bid_quote` | Structured or natural-language input, same executor | Construction estimating practice |
+| `expense_audit` | Per-item and per-category limits, deadlines, invoice numbers, totals | Corporate expense policy (sample) |
+| `lab_report` | Sex-specific reference intervals plus critical values | Adult reference intervals (sample) |
+| `point_table` | Address overlap, data types, ranges, out-of-bounds, **Modbus reference-address normalisation** | Modbus addressing rules |
 
-**四个 L3 场景完全不依赖模型**——同样输入，任何机器任何时间，结论摘要都一样。
+**Four L3 scenarios do not use a model at all** — same input, same digest, on any machine at any time.
 
-> 详细说明见 `docs/EXAMPLES.md` ｜ 模型适配见 `docs/PROVIDERS.md`。
-> ⚠️ 医疗场景的参考区间为示例值，**不构成医学诊断**。
+> See `docs/EXAMPLES.md` and `docs/PROVIDERS.md`.
+> The healthcare reference intervals are samples and **do not constitute a diagnosis**.
 
 ---
 
-## 核心概念
+## Core concepts
 
-### 1. 真源与适配层
+### 1. Single source of truth, plus adapters
 
-`agent.yaml` 是**唯一真源**。`adapters/` 永远是**生成物**。
+`agent.yaml` is the **only** source of truth. `adapters/` is always **generated**.
 
 ```text
-agent.yaml  ──adapt──▶  adapters/plugin.json      (Agent Plugins 1.0 客户端)
-   │        ──adapt──▶  adapters/agent-card.json  (A2A 客户端发现)
-   └── 永远不生成、不覆盖、不修改
+agent.yaml  ──adapt──▶  adapters/plugin.json      (Agent Plugins 1.0 clients)
+   │        ──adapt──▶  adapters/agent-card.json  (A2A discovery)
+   └── never generated, never overwritten, never modified
 ```
 
-改适配层等于白改，下次生成会被覆盖。**一个真源，多个生态，零同步成本。**
+Editing the adapter layer is wasted work — the next generation overwrites it.
 
-### 2. 证据包
+### 2. Evidence bundle
 
-每次 `run` 产出一个带编号的证据目录：
+Every `run` produces a numbered evidence directory:
 
 ```text
 out/evidence/6723c555d11c0a3e/
-├── input.json      输入快照
-├── output.json     标准化结论
-├── summary.md      人工可读、可签字、可归档的摘要
-└── evidence.json   摘要、执行体、版本、时间
+├── input.json      input snapshot
+├── output.json     normalized conclusion
+├── summary.md      human-readable, signable, archivable
+└── evidence.json   digests, executor, versions, timestamps
 ```
 
-结论和证据是**同一个东西的两面**——引用结论时必须同时引用 `evidence_id`。
+A conclusion and its evidence are two faces of one thing — cite the `evidence_id` whenever you cite the conclusion.
 
-### 3. 复现校验（核心）
+### 3. Reproducibility check (the core)
 
-`verify` 会拿原始输入**重新执行一遍**，比对结论摘要。
+`verify` **re-executes** from the original input and compares conclusion digests.
 
-- 一致 → `PASS`，结论可交付。
-- 不一致 → `FAIL`，**结论禁止对外使用**。
+- Match → `PASS`. Deliverable.
+- Mismatch → `FAIL`. **The conclusion must not be used.**
 
-这让"可复现"从一句形容词变成一个**可执行的门禁**——CI 里跑不过就不许合并。
+This turns "reproducible" from an adjective into an **executable gate** — if CI can't pass it, it doesn't merge.
 
-### 4. Attestation Closure（计算闭包）
+### 4. Attestation Closure
 
-只写一个 `Dockerfile` 不足以证明"结论可复现"。`attest/closure.json` 记录覆盖推理函数**完整计算闭包**的摘要：
+A `Dockerfile` alone cannot prove reproducibility. `attest/closure.json` records digests covering the **complete computational closure** of the inference function:
 
 ```text
 executor_digest · inputs_schema_digest · workflow_digest · manifest_digest
@@ -256,161 +259,161 @@ model_weights_digest · tokenizer_digest · chat_template_digest
 engine_build_digest  · decoding_config
 ```
 
-> 原则：**任何落在被证明集合之外的组件，都是一条伪造通道。**
+> Principle: **any component left outside the attested set is a forgery channel.**
 >
-> 本项目示例是纯确定性执行，不含 LLM；一旦你启用 LLM 步骤，上述模型字段**必须**填写，否则不允许声称"结论可复现"。
+> The bundled example is pure deterministic computation with no LLM. The moment you enable an LLM step, those model fields **must** be filled in — otherwise you are not allowed to claim the conclusion is reproducible.
 
-### 5. 边界即代码
+### 5. Boundaries as code
 
-`boundary.json` 里的 `invalid_when` 不是文档，是**运行时会触发拒绝的条件**。命中即报错退出，绝不输出结论。
+`invalid_when` in `boundary.json` is not documentation — it is a **runtime rejection condition**. When hit, the agent exits with an error and never emits a conclusion.
 
 ---
 
-## 兼容老平台（这是本项目的重点）
+## Legacy platform compatibility
 
-很多团队的真实约束是：**新能力要上，但老平台不能坏。**
+Many teams face the same real constraint: **ship new capability without breaking the old platform.**
 
-WorkAgent 的策略只有一句话：**新增只加目录，不改字段。**
+WorkAgent's entire strategy is one sentence: **add directories, never change fields.**
 
-`x-workagent/` 是扩展区。只支持 APS 基础字段的老平台读到它会**直接忽略**，包照样能跑、照样出结论。
+`x-workagent/` is the extension area. A legacy platform that only understands the base APS fields will **silently ignore it**, and the package still runs and still produces a conclusion.
 
-但"照样能跑"和"没损失"是两件事。所以我们把损失**显式写进 `compat.json`**：
+But "still runs" and "nothing lost" are different things. So the loss is written explicitly into `compat.json`:
 
-| 能力 | 老平台上 |
+| Capability | On a legacy platform |
 |---|---|
-| 读取清单、输入输出校验、工作流执行、输出 `summary.md` | **保留** |
-| 失效边界校验 | **丢失** |
-| 回归基准比对 | **丢失** |
-| 结论可复现校验 | **丢失** |
-| 包完整性验签 | **丢失** |
+| Reading the manifest, input/output validation, workflow execution, `summary.md` | **preserved** |
+| Failure-boundary enforcement | **lost** |
+| Regression baseline comparison | **lost** |
+| Reproducibility verification | **lost** |
+| Package integrity verification | **lost** |
 
-并且带一句明确声明：
+With an explicit statement attached:
 
-> 在仅支持 APS 基础字段的平台上，本包可以运行并产出结论；但该结论**不可复现校验、不可验签、不受失效边界保护**。请勿据此结论做高风险决策。
+> On a platform that supports only the base APS fields, this package still runs and produces a conclusion — but that conclusion **cannot be reproduced, cannot be verified, and is not boundary-checked**. Do not use it for high-stakes decisions.
 
-**大多数项目不说这句话。我们认为说出来才是专业。**
+**Most projects never say this. We think saying it is what professionalism looks like.**
 
 ---
 
-## 包结构
+## Repository layout
 
 ```text
 workagent/
-├── agent.yaml                     # ★ 唯一真源（APS 基础字段 + x-workagent 扩展区）
-├── compat.json                    # ★ 兼容降级声明
-├── inputs.schema.json             # 输入标准化校验
+├── agent.yaml                     # single source of truth (base APS fields + x-workagent)
+├── compat.json                    # explicit compatibility / degradation declaration
+├── inputs.schema.json             # input validation
 ├── execution/
-│   ├── workflow.yml               # 工作流编排（确定性优先）
-│   └── runtime.dockerfile         # 环境固化
+│   ├── workflow.yml               # workflow (deterministic first)
+│   └── runtime.dockerfile         # frozen runtime
 ├── artifacts/
-│   ├── summary.md                 # 人工可读摘要（生成）
-│   ├── summary.template.md        # 摘要模板
-│   └── output_schema.json         # 输出标准化定义
-├── provenance/                    # 溯源层
-│   ├── trace.json                 #   执行记录（verify 据此重放）
-│   ├── data_sources.json          #   数据源版本与哈希
-│   └── assumptions.json           #   隐含假设 + 排除场景
-├── attest/closure.json            # ★ Attestation Closure 计算闭包摘要
-├── x-workagent/                   # ★ 扩展层（老平台忽略它）
-│   ├── boundary.json              #   失效边界 + 置信度 + stop_condition
-│   └── test_suite/                #   unit / regression / sensitivity / stress
-├── adapters/                      # 生成物：plugin.json + agent-card.json
-├── signature/agent.sig            # 全包摘要
-├── cmd/workagent/                 # 零依赖 CLI（Go）
+│   ├── summary.md                 # human-readable summary (generated)
+│   ├── summary.template.md        # summary template
+│   └── output_schema.json         # output contract
+├── provenance/
+│   ├── trace.json                 # execution record (verify replays from this)
+│   ├── data_sources.json          # data source versions and hashes
+│   └── assumptions.json           # explicit assumptions + exclusions
+├── attest/closure.json            # Attestation Closure digests
+├── x-workagent/                   # extension layer (ignored by legacy platforms)
+│   ├── boundary.json              # validity boundary + confidence + stop_condition
+│   └── test_suite/                # unit / regression / sensitivity / stress
+├── adapters/                      # generated: plugin.json + agent-card.json
+├── signature/agent.sig            # whole-package digest
+├── cmd/workagent/                 # zero-dependency CLI (Go)
 │   ├── main.go
 │   └── yaml.go
-├── go.mod                         # 零第三方依赖
-├── Makefile                       # make release 一次产出五平台二进制
-└── examples/bid_quote/            # 可运行示例
+├── go.mod                         # zero third-party dependencies
+├── Makefile                       # make release builds all five binaries
+└── examples/bid_quote/            # runnable example
 ```
 
 ---
 
-## 设计原则
+## Design principles
 
-**三个"只"**——这是给个人开发者的，不是给平台的：
+**Three "only"s — written for individual developers, not for platforms:**
 
-1. **只做一个细分场景。** 通用助手你要跟平台比参数，必输；窄场景里你比的是领域规则，平台进不来。
-2. **只做能被验真的结论。** 这是唯一的护城河。选领域有个硬标准：**结论事后能被证真或证伪**。
-3. **只做敢署名的交付。** 真人署名 + 可追溯，是"全民 agent"时代最稀缺的东西。
+1. **Only one narrow scenario.** Competing on general capability means competing with platforms on parameters, and you lose. In a narrow scenario you compete on domain rules, where platforms cannot follow.
+2. **Only verifiable conclusions.** This is the only moat. Choose a domain where the conclusion can be **proven right or wrong after the fact**.
+3. **Only deliverables you would sign your name to.** A named human plus traceability is the scarcest thing in the age of ubiquitous agents.
 
-**三条工程铁律：**
+**Three engineering rules:**
 
-1. **确定性优先。** 能写成代码的，不要交给模型。LLM 只放在真正需要判断的关节上，并登记闭包摘要。
-2. **只加不改。** 兼容性靠新增目录，不靠修改已有字段。
-3. **诚实原则。** 没有私钥就只出摘要，不写"已签名"；不确定就写"不确定"。`seal` 的 `scheme` 字段会如实标明 `digest-only`。
-
----
-
-## 为什么不用别的
-
-| 你可能想问 | 回答 |
-|---|---|
-| 为什么不用 LangGraph / CrewAI / AutoGen？ | 它们是**运行时**，WorkAgent 是**交付物格式**。不冲突——你用它们跑，用 WorkAgent 交付。 |
-| 为什么不直接用 Agent Plugins 1.0？ | 它管**打包分发**，不管可复现。本项目 `adapt` 会生成合规的 `plugin.json`，你两边都占。 |
-| 为什么不直接用 Docker？ | Docker 固化**环境**，不固化**结论**。两者互补：`runtime.dockerfile` + `attest/closure.json`。 |
-| 为什么不用 A2A / MCP？ | 它们管**互操作**。WorkAgent 生成 A2A `agent-card.json`，可直接被 A2A 生态发现。 |
-| 为什么不接那些"身份 / 溯源"标准？ | 那些是企业级基础设施（KYA、WIMSE、AP2…），个人接不动也不需要。我们把其中**个人做得到的那一小块**（可复现 + 显式假设 + 边界 + 摘要）做扎实。 |
+1. **Deterministic first.** Anything expressible as code should not be delegated to a model. Keep LLM calls at the joints that genuinely need judgement, and record their closure digests.
+2. **Add, never change.** Compatibility comes from new directories, not from modifying existing fields.
+3. **Honesty rule.** With no private key, emit a digest only — never write "signed". The `scheme` field in `seal` reports `digest-only` truthfully.
 
 ---
 
-## 与现有标准的关系（诚实说明）
+## Why not just use X
 
-| 标准 | 关系 |
+| You might ask | Answer |
 |---|---|
-| APS 基础字段结构 | **兼容**：`agent.yaml` 保留原字段结构不动 |
-| Agent Plugins 1.0（Vercel 牵头，OpenAI/AWS/GitHub/Microsoft 支持） | **适配**：`adapt` 生成其 `plugin.json`；本规范**不声称遵循**其全部要求 |
-| A2A（Agent2Agent，现由 AAIF 托管） | **适配**：`adapt` 生成 `agent-card.json` |
-| IETF AAT（`draft-sharif-agent-audit-trail`） | **参考**：`trace.json` 字段设计参考其思路，不声称遵循 |
-| IETF GAR（`draft-sato-soos-gar`） | **参考**：审计包思路参考，不声称遵循 |
-| OWASP AISVS C9.4 | **参考**：边界与溯源设计参考其要求，不声称合规 |
+| Why not LangGraph / CrewAI / AutoGen? | Those are **runtimes**; WorkAgent is a **delivery format**. Not in conflict — run on them, deliver with WorkAgent. |
+| Why not just use Agent Plugins 1.0? | It covers **packaging and distribution**, not reproducibility. `adapt` generates a compliant `plugin.json`, so you get both. |
+| Why not just use Docker? | Docker freezes the **environment**, not the **conclusion**. Complementary: `runtime.dockerfile` + `attest/closure.json`. |
+| Why not A2A / MCP? | Those cover **interoperability**. WorkAgent emits an A2A `agent-card.json` and is discoverable by that ecosystem. |
+| Why not adopt the enterprise identity/audit standards? | Those are enterprise infrastructure (KYA, WIMSE, AP2, …). An individual cannot and need not adopt them. We do the small slice an individual *can* do: reproducibility, explicit assumptions, boundaries, digests. |
 
-> ⚠️ 以上 GAR / AAT **均为个人 Internet-Draft，无 IETF 正式地位**；AAIF 是托管基金会，非协议本身。本项目不冒用任何标准的名义。
+---
+
+## Relationship to existing standards (honest disclosure)
+
+| Standard | Relationship |
+|---|---|
+| Base APS field structure | **Compatible**: field structure preserved in `agent.yaml` |
+| Agent Plugins 1.0 (led by Vercel; supported by OpenAI/AWS/GitHub/Microsoft) | **Adapted**: `adapt` emits its `plugin.json`; this spec does **not claim conformance** |
+| A2A / Agent2Agent (now hosted by AAIF) | **Adapted**: `adapt` emits `agent-card.json` |
+| IETF AAT (`draft-sharif-agent-audit-trail`) | **Referenced**: `trace.json` field design is informed by it; no conformance claimed |
+| IETF GAR (`draft-sato-soos-gar`) | **Referenced**: audit-package thinking informed the design; no conformance claimed |
+| OWASP AISVS C9.4 | **Referenced**: boundary and provenance design informed by it; no compliance claimed |
+
+> ⚠️ Both GAR and AAT are **individual Internet-Drafts with no formal IETF standing**; AAIF is a hosting foundation, not a protocol. This project does not borrow the authority of any standard.
 
 ---
 
 ## Roadmap
 
-- [x] **v0.3** 个人可验证版：真源 + 兼容声明 + 计算闭包 + 复现校验 + 适配层
-- [ ] **v0.4** `--sign`：接入 GPG / Ed25519 真签名（取代 digest-only）
-- [ ] **v0.4** JSON Schema 真实校验（当前为结构声明，未做运行时校验）
-- [ ] **v0.5** 测试套件执行器：现有 unit/regression/sensitivity/stress 仅为声明，需要跑起来
-- [ ] **v0.5** 公开记录页：把每个证据包编号变成可查的历史
-- [ ] **v0.6** 多 agent 编排的全局一致性校验（防"每个都对、整体错"）
-- [ ] **v1.0** 冻结规范
+- [x] **v0.3** individual verifiable edition: source of truth + compat declaration + closure + verify + adapters
+- [ ] **v0.4** `--sign`: real GPG / Ed25519 signing (replacing digest-only)
+- [ ] **v0.4** real JSON Schema validation (currently structural declaration only)
+- [ ] **v0.5** test-suite runner: unit/regression/sensitivity/stress are declarations today; make them execute
+- [ ] **v0.5** public record page: turn every evidence id into searchable history
+- [ ] **v0.6** global consistency checks for multi-agent orchestration (against "every part right, the whole wrong")
+- [ ] **v1.0** spec freeze
 
 ---
 
 ## FAQ
 
-**Q：这跟"写个 README 说我的 AI 很准"有什么区别？**
-A：区别是 `verify` 会 FAIL。形容词不会。
+**How is this different from a README claiming "our AI is accurate"?**
+The difference is that `verify` can FAIL. Adjectives cannot.
 
-**Q：我的场景用了 LLM，还能用吗？**
-A：能。但你要么接受"结论不可复现"（那就诚实标注），要么登记完整的模型闭包摘要（`attest/closure.json` 已经预留字段）。没有第三条路。
+**My scenario uses an LLM. Can I still use this?**
+Yes. Either accept that the conclusion is not reproducible (and say so honestly), or record the full model closure — `attest/closure.json` already reserves the fields. There is no third option.
 
-**Q：为什么用 Go，不用 Python / Rust？**
-A：Go 编译出**单个静态二进制**，还能秒级交叉编译三平台——收到包的人不装任何运行时就能验证。Rust 同样能，但要引入 `serde@@ / `sha2@@ 等 crate，**违背"零第三方依赖"这条铁律**；Python 的问题不在语言，而在分发（对方没装 Python 就用不了）。
-**执行体**可以是任何语言——CLI 只要求它遵守契约：读 `argv[1]`，向 stdout 输出 `{"output": {...}}`。
+**Why Go rather than Python or Rust?**
+Go compiles to **a single static binary** and cross-compiles for three platforms in seconds — whoever receives a package can verify it without installing any runtime. Rust can do the same, but it pulls in `serde@@ / `sha2@@ and friends, **breaking the zero-third-party-dependency rule**. Python's problem is not the language, it is distribution (no Python installed, no tool).
+The **executor** can be in any language — the CLI only requires the contract: read `argv[1]`, print `{"output": {...}}` to stdout.
 
-**Q：适合什么场景？**
-A：需要**逻辑论证、数据推演、结果核验**的场景：工程测算、量化预测、科研论证、项目评估、风控审查。不适合纯文案、通知、闲聊。
+**What scenarios fit?**
+Anything requiring **reasoning, data derivation, or result verification**: engineering estimation, quantitative forecasting, research argumentation, project appraisal, risk review. Not for copywriting, notifications or chit-chat.
 
-**Q：为什么叫 WorkAgent？**
-A：因为它交付的是**工作成果**，不是对话。
-
----
-
-## 参与
-
-最有价值的贡献：**一个真实场景的执行体**，或**一个"结论不可复现"的反例**。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-`verify` 跑不过的 PR 不会被合并。这不是苛刻，这就是本项目存在的意义。
+**Why the name WorkAgent?**
+Because it delivers **work product**, not conversation.
 
 ---
 
-## 许可与免责
+## Contributing
 
-[MIT](LICENSE) © 2026 WorkAgent contributors。
+The most valuable contributions are **a real-world executor** or **a counterexample where the conclusion turned out not to be reproducible**. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**免责**：本项目提供的是**可验证性的工具与格式**，不是业务结论。任何由本工具产出的结论，其正确性由该包的作者与签字人负责。请务必阅读每个包的 `x-workagent/boundary.json` 与 `compat.json`。
+Pull requests that fail `verify` will not be merged. That is not strictness — that is the entire point of this project.
+
+---
+
+## License & disclaimer
+
+[MIT](LICENSE) © 2026 WorkAgent contributors.
+
+**Disclaimer**: this project provides **tooling and a format for verifiability**, not business conclusions. The correctness of any conclusion produced with it is the responsibility of that package's author and signer. Always read a package's `x-workagent/boundary.json` and `compat.json`.

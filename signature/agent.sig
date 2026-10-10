@@ -19,7 +19,7 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "a78fb5e7f3d5db8b43447921da777f35603fcc0525b97dc6d73e3d31e7b9c061"
+      "sha256": "28e99904e72274b55af69ebd1ec1ce3e5b1eaa59b2b364ef0d43ac43b9817474"
     },
     {
       "path": "LICENSE",
@@ -30,12 +30,12 @@
       "sha256": "ce716f414d9bf3721fbde8b14303de275e0437b24bfdbbf987deb1a4e6a88c18"
     },
     {
-      "path": "README.en.md",
-      "sha256": "7e20ac2ed96bd93fd98b95c5016310bf47a140b1f5e0bd23c06503de26485d9a"
+      "path": "README.md",
+      "sha256": "bb43382a7562bf870921293f5e53ea951c1afddceff9fdd8acb9c6dc5bd4dbbc"
     },
     {
-      "path": "README.md",
-      "sha256": "5fd6c30133948e5b7ef1eff4633bf610f499431cd3b1017ac3babb226f36be26"
+      "path": "README.zh-CN.md",
+      "sha256": "c17e85ba74b627e5658987080324bc471f26d66d202c7cc237cb14db101860cc"
     },
     {
       "path": "agent.yaml",
@@ -378,9 +378,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:11:53+08:00",
+  "generated_at": "2026-10-10T21:20:01+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "f1be852c0052aa4ebdbf2d25a6c39007b00e64ff51d61184d574347941406510",
+  "package_digest": "80da3fa812826bc82b919d89be12a0270a3f474cd62606b2c2735db6ccb3d9f0",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",
