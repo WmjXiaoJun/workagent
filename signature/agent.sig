@@ -23,7 +23,7 @@
     },
     {
       "path": "LICENSE",
-      "sha256": "e3077e939e2ce7feeab670d6ecabe70d65e5369811beb50ba89b261542e3294e"
+      "sha256": "20306f7aa434174fa168134adaa364c52f5f43726923c18c65cf832891cfd1d7"
     },
     {
       "path": "Makefile",
@@ -31,15 +31,15 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "6fc96ba7f6e0bf797eae7f674b0487e13eedeb061cd409c5bff19397427d139c"
+      "sha256": "8131b714f9588394918251b0ca8289afc9d321f96b59d3cddaaaf63121aa7392"
     },
     {
       "path": "README.md",
-      "sha256": "18edc16a16a6157cb6096041bba06e0f68fc135f4b66e375efa24ff96afdbb05"
+      "sha256": "93e654c8421eb1a7c4af6570922cc7eada3d9edc74d962e5100b20ab2a99ad3a"
     },
     {
       "path": "agent.yaml",
-      "sha256": "25302aa2b85e10a255c7498efaab3df641e986529e5494e680cefbe101772cf6"
+      "sha256": "2beddb3cd4e0ed35adc2698db936898876fe03cfec2b98f51a3444430f8b51f1"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "4d4296e05453576591ef1f0fa54b3371d8a766c1a07ed7e9b1405ba0e7d4f48e"
+      "sha256": "dbe785434bc4835730d18043f346d13ec88a4cb1338ae740dfeeba2ba56e949a"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -55,7 +55,7 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "0a0e0bad61ae38d606b8c4be7a46d0925caa27b4143ba04055a9711b4ed9b660"
+      "sha256": "66ae28aba3fe67d30e29313bdc5f3513bb83a2f49fb801fe0a146807d8d4076d"
     },
     {
       "path": "cmd/workagent/main.go",
@@ -99,7 +99,7 @@
     },
     {
       "path": "go.mod",
-      "sha256": "c17b9cfc350de46744978d03245f3a1284af851578f681b180fce592aab5f0a7"
+      "sha256": "1af87d0a2e7f61145914929ae135e9d3a8d3535ea25e6708134d42a983ac6dfd"
     },
     {
       "path": "inputs.schema.json",
@@ -115,7 +115,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "46603d56dd0d0ebfcca988f70ad18bc7e8a0ea1818ed93c8d8c0245dc4561177"
+      "sha256": "466416f174390c6504bc10663fe8c6ecee3831edd9f970efe12e0d0ee8f40ba3"
     },
     {
       "path": "signature/README.md",
@@ -123,7 +123,7 @@
     },
     {
       "path": "workagent.exe",
-      "sha256": "06e6514bc8b287e4d1a20ef8a192d5d30b06071f5758d6bd741ba50a0fed74e0"
+      "sha256": "4e6e52a249e3bb06370dc08d8751db93eef5e834e8335df5bf21490c4ed0dc8f"
     },
     {
       "path": "x-workagent/boundary.json",
@@ -146,9 +146,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T18:35:16+08:00",
+  "generated_at": "2026-10-10T18:40:22+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "a2a2eff41aac33b384ac9d52c0088f110f4dbbadeee3bf112b64b86a0a274e72",
+  "package_digest": "b4272bda37a5f29f107d60bccd9070e0d7509d4c0d87e529b550ce72aec8f1d1",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

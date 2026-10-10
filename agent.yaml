@@ -9,7 +9,7 @@
 aps_version: "0.2"
 spec_version: "0.3.0"
 
-id: "io.github.example/workagent"
+id: "io.github.xiaojun/workagent"
 name: "workagent"
 display_name: "WorkAgent"
 display_name_en: "WorkAgent"
@@ -19,8 +19,8 @@ summary: "别人交付对话，我们交付可复现的结论。"
 summary_en: "Others ship conversations. We ship reproducible conclusions."
 
 author:
-  name: "Your Name"
-  contact: "you@example.com"
+  name: "xiaojun"
+  contact: "261235953@qq.com"
   responsibility: "对规则、假设、数据源与逻辑框架负责"
 
 inputs: "inputs.schema.json"
