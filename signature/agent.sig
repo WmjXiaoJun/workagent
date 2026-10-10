@@ -1,5 +1,5 @@
 {
-  "file_count": 109,
+  "file_count": 123,
   "files": [
     {
       "path": ".gitattributes",
@@ -15,7 +15,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "129e4f993cac9fd3f6ca6b6501165c2a51374b585ab67bb3cc2c9071872f0e79"
+      "sha256": "f00b62da3b791c96882d4ff3855b7a8a246f0db95ee30b66461b6f43c57c8f8d"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -31,11 +31,11 @@
     },
     {
       "path": "README.md",
-      "sha256": "1493b36e31cbd178f32614523e9054523f4c590bd43a3247a295060b7e29fff1"
+      "sha256": "d22b74a2ce0c397dc6d6c86e2547f12eba123ed44c875d0c30fd6f62bc039d19"
     },
     {
       "path": "README.zh-CN.md",
-      "sha256": "f6ac2f4afde5d49e92bdf0d93b6cc6fea944bc963174a586cd6b9c7be66b2767"
+      "sha256": "cd7613fc592743a7b69e577d0ec2556cb3eeb1fa0b03f3a0804cb1a9318f4975"
     },
     {
       "path": "agent.yaml",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "9a25adb542d42984dab94dc8b549247f4b86d6b3b80740410cb3a0fdbbad5d05"
+      "sha256": "647a47e28063b5e5bbf724f745364ce615c1296a7bb8d035e6a931a2416e798f"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -71,11 +71,15 @@
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "864406cdb1768ac7d0c87d567c318cd975e68a36c5f8f86452e0caa02a725f8e"
+      "sha256": "907a19c033057c9dcf9bb09c678312591fc1b3af6c91f5d30c19696f531f25c9"
     },
     {
       "path": "cmd/workagent/mcp.go",
       "sha256": "bd15460c486c73a6e54a9642a041f2abe38a28dc5b1321f5bc525ee5f45893ca"
+    },
+    {
+      "path": "cmd/workagent/record.go",
+      "sha256": "1fc69d71e3b31f7265883b96ce6e81c3e7203bda99d27aeb236801c9fc7d8bb7"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -383,7 +387,7 @@
     },
     {
       "path": "provenance/llm/bid_quote/index.json",
-      "sha256": "32fac10089b2e6fa77b67577e6c1bdcc00be498ed758e18a1b3f6f190a3b1b59"
+      "sha256": "d70277fcacd3cba61bacdd07c866f7045086510458533dd21f7aed16eeaa4804"
     },
     {
       "path": "provenance/llm/expense_audit/extract.json",
@@ -411,7 +415,59 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "67b83c2c03b0491e952db53395e536b5a05d03673d72660ddfb999c358acc18f"
+      "sha256": "76e7ff369b76236435e61b92f2c30622b1ef8ac1edbd4719d57e73ff11d063a1"
+    },
+    {
+      "path": "records/0001-bid_quote-20261010.md",
+      "sha256": "124ae78b2407320f6b2f34db32ec750fa6458dd9d71d7e6ab9993ca87e772dc9"
+    },
+    {
+      "path": "records/0002-expense_audit-20261010.md",
+      "sha256": "45b4d1a31e43c77a27c6ce3c93f572e2cbbf480783781e63f10176ca381f6d31"
+    },
+    {
+      "path": "records/0003-lab_report-20261010.md",
+      "sha256": "91583a4450a560e67a031ff31c278a7e6499241112dde96ca555257725e061cb"
+    },
+    {
+      "path": "records/0004-point_table-20261010.md",
+      "sha256": "7e0ac6823dd38ab3ba8c62f307c09e05583034edaed59ca8cdb45b458c9f4b7d"
+    },
+    {
+      "path": "records/0005-spc_control-20261010.md",
+      "sha256": "79f0f0e4c03503d3977961fafac5cc26570c89da74648235005af4e20cdf12c4"
+    },
+    {
+      "path": "records/0006-pin_conflict-20261010.md",
+      "sha256": "dac4c71c0bdc8eb7e462dfd3472dc72cf657b8e9535becb5c5fe1de0ef5d8afa"
+    },
+    {
+      "path": "records/0007-salary_tax-20261010.md",
+      "sha256": "b4e0a6abe2fcbe2f3a5d553adbc02f6956a6156b2e523acfa4d2b3755b6031fe"
+    },
+    {
+      "path": "records/0008-loan_dscr-20261010.md",
+      "sha256": "6d112d7c17c0e5a9de655c767d5f60c13e4282787f6b63a2bfe56466e8284790"
+    },
+    {
+      "path": "records/0009-modbus_poll-20261010.md",
+      "sha256": "0f7b6ffda0c320341459b4d62658e4845b9f531299b58d2095e811cfb67527cc"
+    },
+    {
+      "path": "records/0010-firmware_budget-20261010.md",
+      "sha256": "11dd8ae05eb13b988969568dc650acc3d7f3a49fc4cf0a8b6088544ff2aaba26"
+    },
+    {
+      "path": "records/0011-points_reconcile-20261010.md",
+      "sha256": "8c9cd0f348d598080e407bffbd179905c442b3f8f7fae9e033e40ce60fdc40cc"
+    },
+    {
+      "path": "records/0012-audit_chain-20261010.md",
+      "sha256": "0fc8e578ec74576d3184b1fd6179010f582a43dbc0062fbfb457c6015cec25d4"
+    },
+    {
+      "path": "records/INDEX.md",
+      "sha256": "40c8dabd2586fd373e95e293df1998399e78a40a7195814c7f1902c0830cbf66"
     },
     {
       "path": "signature/README.md",
@@ -438,9 +494,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:39:41+08:00",
+  "generated_at": "2026-10-10T21:53:35+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "736a0c14d1c7496d534cacaafed7baaa15518d338cacb2c78889b25318f8936b",
+  "package_digest": "b8153080475db7fc9ccdb024dc166b9f2211f87fb259602b0a088c0a7056b384",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

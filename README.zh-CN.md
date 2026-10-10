@@ -18,7 +18,7 @@
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 ![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
-[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#八个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.md)
+[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#九个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.md)
 
 </div>
 
@@ -95,7 +95,7 @@ $ ./workagent run --input bad.json .
 
 ---
 
-## 八个命令
+## 九个命令
 
 | 命令 | 做什么 | 为什么存在 |
 |---|---|---|
@@ -105,6 +105,7 @@ $ ./workagent run --input bad.json .
 | `attest` | 计算 **Attestation Closure** 摘要 | 让"可复现"有可核对的证据，而不是一句承诺 |
 | `run` | 执行执行体，产出证据包 + 摘要 + 溯源记录 | 结论必须带着证据一起走 |
 | `verify` | 重放并比对结论摘要，PASS / FAIL | **本项目的核心**。不可复现 = 不可交付 |
+| `record` | 跑一次场景，把结论 + 证据摘要归档到 `records/` | **唯一会随时间增值的资产** |
 | `mcp` | 把交付包本身作为 **MCP server** 提供（stdio） | 任何 MCP 客户端都能把"跑场景拿可复现结论"当工具调用 |
 | `seal` | 生成全包文件级摘要 `signature/agent.sig` | 证明内容自生成后未变 |
 
@@ -122,6 +123,22 @@ workagent mcp .          # stdio MCP server，不需要端口，也不需要常�
 
 > ⚠️ **MCP server 侧已验证**（握手、`tools/list`、`tools/call`、未知工具报错都实测过）；
 > **Cordis 装载侧未验证** —— 原因见 `dsh-plugin/README.md`。
+
+### 公开记录 —— 唯一会增值的资产
+
+```bash
+workagent record --case points_reconcile .
+# → records/0013-points_reconcile-20261010.md
+# → records/INDEX.md（自动重建）
+```
+
+每一次结论都带着摘要归档，编号、**只增不改、从不重写**。
+
+**原始输入不进仓库，只进它的 sha256。** 这正是记录可以公开的原因：
+它证明"当时得出了什么结论"，并让任何人都能复现，却不泄露数据本身。
+
+`records/` 自带覆盖全部场景的 12 条基线。**半年后回来跑一次 `verify --all` 与这些摘要比对**，
+"可复现"就从一句承诺变成了一个可核对的事实。
 
 ---
 

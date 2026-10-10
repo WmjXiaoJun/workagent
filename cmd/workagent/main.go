@@ -7,6 +7,7 @@
 //	workagent attest [path]                  计算 Attestation Closure 摘要
 //	workagent run    --input FILE [path]     执行并产出证据包
 //	workagent verify [path]                  复现校验：同输入是否产出同结论
+//	workagent record --case ID [--input F]   跑一次并把结论+证据公开留档
 //	workagent mcp    [path]                  以 MCP server 方式暴露本包（stdio）
 //	workagent seal   [path]                  生成全包摘要
 //
@@ -527,12 +528,17 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		return 2
 	}
 	if inputArg == "" {
-		// 没给 --input 就用场景自带的样例，便于 run --all 与快速试用
-		if c.SampleInput == "" {
-			fmt.Fprintln(os.Stderr, "run 需要 --input 参数（场景 "+c.ID+" 未声明 sample_input）")
+		// 没给 --input 就用场景自带的样例：结构化优先，其次自然语言。
+		// 只带 sample_natural 的场景（有模型抽取的那些）以前会直接报错。
+		switch {
+		case c.SampleInput != "":
+			inputArg = c.SampleInput
+		case c.SampleNatural != "":
+			inputArg = c.SampleNatural
+		default:
+			fmt.Fprintln(os.Stderr, "run 需要 --input 参数（场景 "+c.ID+" 未声明样例输入）")
 			return 2
 		}
-		inputArg = c.SampleInput
 	}
 	inputPath := inputArg
 	if !filepath.IsAbs(inputPath) {
@@ -996,6 +1002,7 @@ func usage() {
 		"  workagent models                        列出内置模型服务商与可用状态\n" +
 		"  workagent verify [path]                 复现校验：同输入是否产出同结论\n" +
 		"  workagent verify [path] --live          重新真实调用模型，测量其是否可复现\n" +
+		"  workagent record --case ID [--input F]  跑一次并把结论+证据公开留档\n" +
 		"  workagent mcp    [path]                 以 MCP server 方式暴露本包（stdio）\n" +
 		"  workagent seal   [path]                 生成全包摘要\n" +
 		"\npath 默认为当前目录。")
@@ -1118,6 +1125,45 @@ func main() {
 			verifyRoot = resolveRoot(vpos[0])
 		}
 		code = cmdVerify(verifyRoot, live)
+	case "record":
+		var caseID, inputArg, note string
+		recLive := false
+		var recPos []string
+		for i := 0; i < len(args); i++ {
+			a := args[i]
+			switch {
+			case a == "--case" || a == "-case":
+				if i+1 < len(args) {
+					caseID = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--case="):
+				caseID = strings.TrimPrefix(a, "--case=")
+			case a == "--input" || a == "-input":
+				if i+1 < len(args) {
+					inputArg = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--input="):
+				inputArg = strings.TrimPrefix(a, "--input=")
+			case a == "--live" || a == "-live":
+				recLive = true
+			case a == "--note" || a == "-note":
+				if i+1 < len(args) {
+					note = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--note="):
+				note = strings.TrimPrefix(a, "--note=")
+			case !strings.HasPrefix(a, "-"):
+				recPos = append(recPos, a)
+			}
+		}
+		recRoot := resolveRoot(".")
+		if len(recPos) > 0 {
+			recRoot = resolveRoot(recPos[0])
+		}
+		code = cmdRecord(recRoot, caseID, inputArg, note, recLive)
 	case "mcp":
 		code = cmdMCP(pathArg(args))
 	case "seal":

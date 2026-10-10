@@ -95,7 +95,7 @@ executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an arra
 
 ---
 
-## The eight commands
+## The nine commands
 
 | Command | What it does | Why it exists |
 |---|---|---|
@@ -122,6 +122,23 @@ this MCP server to the Harness. It works with any MCP client, not just DSH.
 
 > ⚠️ The **MCP server side is verified** (handshake, `tools/list`, `tools/call`, unknown-tool errors).
 > The **Cordis loading side is not** — see `dsh-plugin/README.md` for why.
+
+### Public records — the only asset that compounds
+
+```bash
+workagent record --case points_reconcile .
+# → records/0013-points_reconcile-20261010.md
+# → records/INDEX.md  (rebuilt automatically)
+```
+
+Every conclusion is archived with its digests, numbered, **append-only, never rewritten**.
+
+**Raw inputs never enter the repository — only their sha256.** That is exactly why the records
+can be public: they prove what was concluded and let anyone reproduce it, without publishing the data.
+
+`records/` ships with a 12-entry baseline covering every scenario. Coming back in six months
+and running `verify --all` against those digests is what turns "reproducible" from a promise
+into a checkable fact.
 
 ---
 
