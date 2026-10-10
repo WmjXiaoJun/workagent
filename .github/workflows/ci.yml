@@ -36,8 +36,10 @@ jobs:
             gofmt -d ./cmd ./internal || true
           fi
 
-      - name: 构建
-        run: go build -o workagent ./cmd/workagent
+      - name: 构建（静态二进制，与 make release 保持一致）
+        env:
+          CGO_ENABLED: "0"
+        run: go build -trimpath -o workagent ./cmd/workagent
 
       - name: 列出模型服务商（无需密钥）
         run: ./workagent models
