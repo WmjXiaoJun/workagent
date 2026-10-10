@@ -1,115 +1,124 @@
-# WorkAgent — DeepSeek Harness 插件
+# WorkAgent — DeepSeek Harness plugin
 
-把一个 WorkAgent 交付包作为 **MCP 工具**暴露给 Harness。装好之后，
-你在对话里就能直接说"跑一下积分对账"，agent 会调用它并拿到**可复现的结论**。
+Exposes a WorkAgent delivery package to the Harness as **MCP tools**. Once installed you can just say
+"run the points reconciliation" in a conversation, and the agent calls it and gets back a
+**reproducible conclusion**.
 
-## 它做什么
+[中文](README.zh-CN.md) · **English**
 
-插件本身**不含逻辑**——它只是一段 5 行的配置，把 `workagent mcp`
-这个 stdio MCP server 接到 Harness 上。真正的能力在交付包里。
+## What it does
 
-| 工具 | 作用 |
+The plugin itself **contains no logic** — it is five lines of configuration that connect the
+`workagent mcp` stdio server to the Harness. The capability lives in the delivery package.
+
+| Tool | Purpose |
 |---|---|
-| `workagent_cases` | 列出交付包里的场景，按**交付形态**分组 |
-| `workagent_run` | 跑一个场景，返回结论 + 证据包编号 |
-| `workagent_verify` | 复现校验：全部场景 PASS 才说明可交付 |
+| `workagent_cases` | List the package's scenarios, grouped by **delivery form** |
+| `workagent_run` | Run one scenario and return its conclusion plus the evidence bundle id |
+| `workagent_verify` | Reproducibility check: all scenarios must PASS for the package to be deliverable |
 
-## 为什么走 MCP 而不是写 Cordis 插件
+## Why MCP rather than a Cordis plugin
 
-因为 **MCP 的服务端可以离线自测**，而 Cordis 宿主插件必须在真实 Harness 里才能验证。
-而且走 MCP 还能顺带支持 Claude Desktop、Cursor 等任何 MCP 客户端——
-一次实现，多处可用。
+Because **an MCP server can be tested offline**, while a Cordis host plugin can only be verified inside
+a live Harness. Going through MCP also gives you Claude Desktop, Cursor and any other MCP client for
+free — one implementation, many consumers.
 
-## 前置条件
+## Prerequisites
 
 ```bash
-# 1) 有 workagent 可执行文件（单文件静态二进制，无依赖）
+# 1) the workagent binary (a single static file, no dependencies)
 workagent --help
 
-# 2) 自测 MCP server 是否正常
+# 2) sanity-check the MCP server
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | workagent mcp .
 ```
 
-## 安装
+## Install
 
-### 方式一：从 npm 装（推荐）
+### From npm (recommended)
 
-DSH 的 `plugin_manager.installBundle` **本来就支持 npm registry**
-（还带 npmmirror 兜底），所以发包到 npm 就是 DSH 生态的正规分发路径：
+`plugin_manager.installBundle` already resolves **npm registries** (with an npmmirror
+fallback), so publishing to npm *is* the DSH ecosystem distribution path:
 
 ```text
 plugin_manager  action: install_bundle
                 target: dsh-plugin-workagent
 ```
 
-### 方式二：从本地目录装
+### From a local directory
 
-target 指向**本目录的绝对路径**（适合开发与改配置）：
+Point `target` at the **absolute path of this directory** (handy while developing or editing the
+config):
 
 ```text
 plugin_manager  action: install_bundle
-                target: <本目录绝对路径>
+                target: <absolute path to this directory>
 ```
 
-### 方式三：从 GitHub 装
+### From GitHub
 
-`installBundle` 会先用 `git ls-remote` 检查仓库再交给 pnpm：
+`installBundle` checks a repository with `git ls-remote` before handing it to pnpm:
 
 ```text
 plugin_manager  action: install_bundle
                 target: github:WmjXiaoJun/workagent#path:dsh-plugin
 ```
 
-> 具体 spec 写法以你所用版本的 `plugin_manager` 为准；前两种是实测存在的路径。
+> The exact spec syntax depends on your `plugin_manager` version; the first two are the paths we
+> have actually verified.
 
-## 配置
+## Configuration
 
-改 `cordis.patch.yml`：
+Edit `cordis.patch.yml`:
 
-| 字段 | 说明 |
+| Field | Meaning |
 |---|---|
-| `command` | `workagent` 可执行文件；PATH 里没有就写绝对路径 |
-| `args` | `["mcp", "."]` —— 第二个参数是交付包根目录，改成你的包路径 |
-| `cwd` | 可选，指定工作目录 |
+| `command` | the `workagent` executable; use an absolute path if it is not on `PATH` |
+| `args` | `["mcp", "."]` — the second argument is the package root; point it at your own package |
+| `cwd` | optional working directory |
 
-## 发布到 npm
+## Publishing to npm
 
-包已配置为可发布（`private` 已移除、补了 license/author/repository/keywords/files`）。
+The package is already configured for publication (`private` removed, license / author /
+repository / keywords / files in place).
 
 ```bash
 cd dsh-plugin
-npm login                       # 需要你自己的 npm 账号
-npm publish --access public     # 无作用域包可省略 --access
+npm login                       # your own npm account
+npm publish --access public     # --access is unnecessary for unscoped packages
 ```
 
-发布前自检（都不需要登录）：
+Self-checks that need no login:
 
 ```bash
-npm pack --dry-run              # 看实际会打进去哪些文件
-npm publish --dry-run           # 走完发布流程但不真发
+npm pack --dry-run              # see exactly which files would be packed
+npm publish --dry-run           # run the whole publication flow without publishing
 ```
 
-### ⚠️ 一个必须知道的前提
+### ⚠️ One prerequisite you must know
 
-**这个包只含配置，不含 `workagent` 可执行文件。**
-DSH 安装依赖时会**默认拦截包的安装脚本**（pnpm 11 的 `pendingBuilds` 机制），
-所以它**无法在安装时自动下载二进制**。
+**This package contains configuration only, not the `workagent` executable.**
+DSH **blocks package install scripts by default** (pnpm 11's `pendingBuilds` mechanism), so it cannot
+download a binary during installation.
 
-装完插件后 `workagent` 必须在 `PATH` 上，否则 MCP server 起不来
-（`failOnStartupError: true` 会**明确报错**，而不是静默失效——这是故意的）。
+After installing the plugin, `workagent` must be on `PATH`, or the MCP server will not start.
+`failOnStartupError: true` makes it **fail loudly** rather than silently doing nothing — that is
+deliberate.
 
 ```bash
-# 从 GitHub Releases 取对应平台的静态二进制
+# fetch the static binary for your platform from GitHub Releases
 # https://github.com/WmjXiaoJun/workagent/releases/latest
 workagent --help
 ```
 
-## ⚠️ 验证状态
+## ⚠️ Verification status
 
-- ✅ **MCP server 侧已验证**：握手、`tools/list`、`tools/call`、未知工具报错，全部实测通过
-- ⚠️ **Cordis 装载侧未验证**：我没有 `plugin_manager` 工具，无法在本机安装，
-  所以**"装上去以后 Harness 里能用"这件事我无法声称**。装完请自行确认一次。
+- ✅ **The MCP server side is verified**: handshake, `tools/list`, `tools/call` and unknown-tool
+  errors were all exercised.
+- ⚠️ **The Cordis loading side is not.** There is no `plugin_manager` tool available here, so it
+  could not be installed locally — therefore "it works inside the Harness once installed" is
+  **not something we can claim**. Please confirm it yourself after installing.
 
-## 卸载
+## Uninstall
 
-`plugin_manager` 的 `remove_bundle`。
+`plugin_manager`"s `remove_bundle`.
