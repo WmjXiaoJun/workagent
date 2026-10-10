@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo.svg" width="112" height="112" alt="WorkAgent">
+
 # WorkAgent
 
 ### Others ship conversations. We ship reproducible conclusions.

@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo.svg" width="112" height="112" alt="WorkAgent">
+
 # WorkAgent
 
 ### 别人交付对话，我们交付可复现的结论。
