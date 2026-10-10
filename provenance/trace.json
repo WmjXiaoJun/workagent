@@ -183,6 +183,26 @@
       "output_digest": "a2392e6e631a5919701d1a5ef35082618d7c49ed57c9abdd51d8a28feb2955ca",
       "seq": 18,
       "step": "run"
+    },
+    {
+      "at": "2026-10-10T19:44:15+08:00",
+      "evidence_id": "380f206044845411",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
+      "output_digest": "49d3956df0ac64e946b8877e94da18b99376b3d777d24702dbc207d6b2902e14",
+      "seq": 19,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T19:44:15+08:00",
+      "evidence_id": "0c248e9945b71f39",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "8d870746a52cea2c9aed677e4c4395449ab3c9fb165be20696f94a2bfe12f7ee",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.natural.json",
+      "output_digest": "a2392e6e631a5919701d1a5ef35082618d7c49ed57c9abdd51d8a28feb2955ca",
+      "seq": 20,
+      "step": "run"
     }
   ]
 }

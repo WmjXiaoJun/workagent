@@ -35,20 +35,29 @@ func llmStepsOf(m map[string]any) []any {
 
 // ---------------------------------------------------------------- models
 
-func cmdModels() int {
+// cmdModels 只做一件事：把内置服务商打成一张表。
+// 默认**不发起任何网络请求** —— 打印表格的命令不该因为网络行为而失败。
+// 需要探测本地端点时显式加 --probe。
+func cmdModels(probe bool) int {
 	fmt.Println("WorkAgent models —— 内置模型服务商（零第三方依赖）")
 	fmt.Println("")
 	fmt.Printf("%-12s %-10s %-34s %-24s %s\n", "PROVIDER", "PROTOCOL", "端点", "密钥环境变量", "状态")
 	fmt.Println(strings.Repeat("-", 118))
 	for _, p := range llm.Profiles() {
-		status := "就绪"
-		if p.KeyEnv == "" {
-			if reachable(p.Endpoint()) {
-				status = "本地可用"
-			} else {
-				status = "未启动"
+		var status string
+		switch {
+		case p.KeyEnv == "":
+			status = "本地（无需密钥）"
+			if probe {
+				if reachable(p.Endpoint()) {
+					status = "本地可用"
+				} else {
+					status = "未探测到"
+				}
 			}
-		} else if !p.KeyPresent() {
+		case p.KeyPresent():
+			status = "密钥已配置"
+		default:
 			status = "缺少密钥"
 		}
 		keyEnv := p.KeyEnv
@@ -58,6 +67,10 @@ func cmdModels() int {
 		fmt.Printf("%-12s %-10s %-34s %-24s %s\n", p.Name, p.Kind, truncate(p.Endpoint(), 33), keyEnv, status)
 	}
 	fmt.Println("")
+	if !probe {
+		fmt.Println("提示：加 --probe 可探测本地端点是否在跑（默认不发起任何网络请求）")
+		fmt.Println("")
+	}
 	fmt.Println("用法:")
 	fmt.Println("  workagent run --input <file> [--provider NAME] [--model NAME] [--replay]")
 	fmt.Println("  workagent run --input <file> --provider deepseek --model deepseek-chat")

@@ -834,7 +834,13 @@ func main() {
 	case "attest":
 		code = cmdAttest(pathArg(args))
 	case "models":
-		code = cmdModels()
+		probe := false
+		for _, a := range args {
+			if a == "--probe" || a == "-probe" {
+				probe = true
+			}
+		}
+		code = cmdModels(probe)
 	case "run":
 		// 手工解析：Go 的 flag 包遇到第一个位置参数就停止解析，
 		// 于是 run --input X . --replay 会**静默忽略** --replay —— 那太危险了。
