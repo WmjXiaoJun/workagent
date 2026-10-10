@@ -8,15 +8,14 @@
 
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
-![spec](https://img.shields.io/badge/spec-v0.3.0-blue)
+![spec](https://img.shields.io/badge/spec-v0.5.4-blue)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
-![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 ![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
-[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#六个命令) · [English](README.en.md)
+[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#七个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.en.md)
 
 </div>
 
