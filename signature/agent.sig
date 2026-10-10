@@ -1,13 +1,17 @@
 {
   "schema": "workagent/signature/1",
-  "generated_at": "2026-10-10T18:26:58+08:00",
+  "generated_at": "2026-10-10T18:27:08+08:00",
   "spec_version": "0.3.0",
   "scheme": "digest-only",
   "signer": null,
   "public_key": null,
-  "package_digest": "8c9623b9580e28909564a135d3b3812cff5c5013838df3d816a0db45c8bed0f8",
-  "file_count": 31,
+  "package_digest": "777d3b218211ea3f95e66d1686872b0124e7fcf342773eefccfe54f0f7276394",
+  "file_count": 32,
   "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "62e43b31272189f60a50734bfda6b63639e8a2f2ac0b5bdec7e412e579dac903"
+    },
     {
       "path": ".github/workflows/ci.yml",
       "sha256": "2d762a39725c2659a0d3adcdb65afa79cb91e322143d260d13cdb39c88ad3290"
