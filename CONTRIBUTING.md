@@ -20,9 +20,10 @@
 ## 提交前自检
 
 ```bash
-python tools/workagent.py check .
-python tools/workagent.py run --input examples/bid_quote/input.json .
-python tools/workagent.py verify .      # 必须 PASS
+go build -o workagent ./cmd/workagent
+./workagent check .
+./workagent run --input examples/bid_quote/input.json .
+./workagent verify .      # 必须 PASS
 ```
 
 **`verify` 不通过 = 不可复现 = 不允许合并。**
@@ -30,7 +31,7 @@ python tools/workagent.py verify .      # 必须 PASS
 ## 设计约束（改动前请先读）
 
 1. **真源唯一**：`agent.yaml`。`adapters/` 永远是生成物，不接受手改。
-2. **零依赖**：`tools/workagent.py` 只用 Python 标准库。
+2. **零第三方依赖**：`cmd/workagent/` 只用 Go 标准库，`go.mod` 不允许出现 require。
 3. **只加不改**：兼容性靠"新增目录"，不靠"修改已有字段"。
 4. **诚实**：没有私钥就不许写"已签名"；不确定就写"不确定"。
 

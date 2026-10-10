@@ -19,7 +19,7 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "5b091531c71421906ae7d2ea9821df48650c17b474c8f8e53ac1c48b9f74d631"
+      "sha256": "f29530bb0343e4351a8200e5db9515795d72d3b29af1eae34a98ebc359ccad47"
     },
     {
       "path": "LICENSE",
@@ -146,9 +146,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T18:34:30+08:00",
+  "generated_at": "2026-10-10T18:34:41+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "afc181a7748c76aa1c7442d47fc9a4e05f446f53bffef7e77a252b8c5ab56838",
+  "package_digest": "8b701c35c2bd3bc8cb650b6ad1c110f7220ad24b73cb897afb5492f27104251b",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",
