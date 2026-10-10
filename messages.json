@@ -1,0 +1,108 @@
+{
+  "schema": "workagent/messages/1",
+  "note": "执行体只输出 code + args；这里是文案。zh/en 并排，缺哪条一眼可见。渲染不参与哈希。",
+  "verdicts": {
+    "audit_chain": {
+      "不一致": {
+        "zh": "不一致",
+        "en": "inconsistent"
+      },
+      "有告警": {
+        "zh": "有告警",
+        "en": "warnings"
+      },
+      "一致": {
+        "zh": "一致",
+        "en": "consistent"
+      }
+    },
+    "points_reconcile": {
+      "不平": {
+        "zh": "不平",
+        "en": "out of balance"
+      },
+      "有告警": {
+        "zh": "有告警",
+        "en": "warnings"
+      },
+      "平": {
+        "zh": "平",
+        "en": "balanced"
+      }
+    }
+  },
+  "messages": {
+    "audit_chain.CONCLUSION": {
+      "zh": "核验判定「{verdict}」：事件 {events} 条 / 文档 {docs} 个，错误 {errors} 项、告警 {warns} 项",
+      "en": "Audit verdict \"{verdict}\": {events} events / {docs} documents, {errors} error(s), {warns} warning(s)"
+    },
+    "audit_chain.AC-01": {
+      "zh": "哈希链断裂：doc={doc} id={id} old_sha256={got}… 应为上一条 new_sha256={want}…",
+      "en": "Hash chain broken: doc={doc} id={id} old_sha256={got}... expected the previous new_sha256={want}..."
+    },
+    "audit_chain.AC-01F": {
+      "zh": "首次摄入却带 old_sha256：doc={doc} id={id}",
+      "en": "First ingest but carries an old_sha256: doc={doc} id={id}"
+    },
+    "audit_chain.AC-02": {
+      "zh": "标称源已变更但哈希未变：doc={doc} id={id} sha={sha}…",
+      "en": "source_changed is true but the hash did not change: doc={doc} id={id} sha={sha}..."
+    },
+    "audit_chain.AC-03": {
+      "zh": "标记语义过期但状态未更新：doc={doc} id={id} semantic_status={status}",
+      "en": "Marked semantically stale but the status was not updated: doc={doc} id={id} semantic_status={status}"
+    },
+    "audit_chain.AC-04": {
+      "zh": "行数异常下降：doc={doc} id={id} 上次 {prev} 行 → 本次 {cur} 行（降幅 {pct}%）",
+      "en": "Line count dropped abnormally: doc={doc} id={id} {prev} lines -> {cur} lines ({pct}% drop)"
+    },
+    "audit_chain.AC-05": {
+      "zh": "时间戳倒退：doc={doc} id={id} 上一条 ts={prev_ts} 本条 ts={cur_ts}",
+      "en": "Timestamp went backwards: doc={doc} id={id} previous ts={prev_ts} this ts={cur_ts}"
+    },
+    "audit_chain.AC-06": {
+      "zh": "引用了未经摄入建立的文档：doc={doc} 事件={event} id={id}",
+      "en": "References a document that was never established: doc={doc} event={event} id={id}"
+    },
+    "audit_chain.AC-OK": {
+      "zh": "事件 {events} 条、文档 {docs} 个，六项核验全部通过",
+      "en": "{events} events, {docs} documents; all six checks passed"
+    },
+    "points_reconcile.CONCLUSION": {
+      "zh": "对账判定「{verdict}」：账本 {ledger} 条 / 账户 {accounts} 个，错误 {errors} 项、告警 {warns} 项；可用合计 {available}，冻结合计 {frozen}",
+      "en": "Reconciliation verdict \"{verdict}\": {ledger} ledger entries / {accounts} accounts, {errors} error(s), {warns} warning(s); {available} available, {frozen} frozen"
+    },
+    "points_reconcile.PR-01": {
+      "zh": "账本断链：user={user} id={id} 上笔余额={prev} {entry_type} 金额={amount} 记录余额={balance} 期望={expect}",
+      "en": "Ledger chain broken: user={user} id={id} previous balance={prev} {entry_type} amount={amount} recorded={balance} expected={expect}"
+    },
+    "points_reconcile.PR-02": {
+      "zh": "账户余额与账本末笔不符：user={user} 账户可用={avail} 账本末笔={last}",
+      "en": "Account balance disagrees with the last ledger entry: user={user} account available={avail} ledger last={last}"
+    },
+    "points_reconcile.PR-03": {
+      "zh": "账户恒等式不成立：user={user} 可用+冻结={lhs} 累计授予-累计消费={rhs}",
+      "en": "Account identity does not hold: user={user} available+frozen={lhs} lifetime_granted-lifetime_spent={rhs}"
+    },
+    "points_reconcile.PR-04": {
+      "zh": "幂等键重复：「{key}」出现在 id={id1} 与 id={id2}",
+      "en": "Duplicate idempotency key: \"{key}\" appears at id={id1} and id={id2}"
+    },
+    "points_reconcile.PR-05": {
+      "zh": "已支付订单未入账：order={order} user={user} 积分={points}",
+      "en": "Paid order has no ledger entry: order={order} user={user} points={points}"
+    },
+    "points_reconcile.PR-06": {
+      "zh": "预扣未结清：user={user} reference={reference} 未结清笔数={n}",
+      "en": "Reservation not settled: user={user} reference={reference} open count={n}"
+    },
+    "points_reconcile.PR-07": {
+      "zh": "未知 entry_type「{entry_type}」（id={id}），按原符号处理",
+      "en": "Unknown entry_type \"{entry_type}\" (id={id}); treated with its own sign"
+    },
+    "points_reconcile.PR-OK": {
+      "zh": "账本 {ledger} 条、账户 {accounts} 个、订单 {orders} 笔，七项不变量全部成立",
+      "en": "{ledger} ledger entries, {accounts} accounts, {orders} orders; all seven invariants hold"
+    }
+  }
+}

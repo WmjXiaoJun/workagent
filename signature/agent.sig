@@ -1,5 +1,5 @@
 {
-  "file_count": 126,
+  "file_count": 128,
   "files": [
     {
       "path": ".gitattributes",
@@ -19,7 +19,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "76c2ef4459b27ad904bada343d6358e0ea5040e910820696ee3c3325965adea2"
+      "sha256": "7d56449765e980dc42010852d1e08b2b5a661c1a87f3a9f6325bad19ca7f4f13"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -43,7 +43,7 @@
     },
     {
       "path": "agent.yaml",
-      "sha256": "aca43aca71e7402d5d28db7c131490f027f0413ade6070a767ef22bdd9eec91c"
+      "sha256": "7bc7732db874d1a3ca1746b307ab532fc39a5dcc6fa02d6949f55ea909588380"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -51,7 +51,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "297597965fdccf0c46cf51403282a71bafd4c0d0a5239dac4ab66c46680b5513"
+      "sha256": "b261970cf9b6aae5ba2f591d00de3dd8537c452b590e8c1fba1b3ca9dac5b5ba"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -75,7 +75,7 @@
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "8bec6855cf3e700b06c8017b3de9678159300c9736bb20f9fe94265714ecc5bd"
+      "sha256": "a4420c2dd82a262b0976c620a6da58a2dfe2fe7139ba6421c2b2d6d435bad339"
     },
     {
       "path": "cmd/workagent/mcp.go",
@@ -83,7 +83,7 @@
     },
     {
       "path": "cmd/workagent/record.go",
-      "sha256": "d6ebe93833d3f28dc3c34b4e20a35cd492d4f9aebc3377b8dc42c645488efdf3"
+      "sha256": "758aafd522745bde8fce66e85229caf7ea5cd8a150c75f997ab99bfd13fc5ce9"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -100,6 +100,10 @@
     {
       "path": "docs/EXAMPLES.md",
       "sha256": "666dd8dee29c36f995b9ffe1b315e68753f3589f8085a6c4991896c1bf1067db"
+    },
+    {
+      "path": "docs/MESSAGES.md",
+      "sha256": "ea856703687be5e2932d71fefff0c9a48bdc5b7b6d3d953675042a08ab28feac"
     },
     {
       "path": "docs/PROVIDERS.md",
@@ -147,7 +151,7 @@
     },
     {
       "path": "examples/audit_chain/executor.py",
-      "sha256": "57da4457a08b75049f7ab567a488a392cc7a609fbb92ee66dadf5e2a20ed4948"
+      "sha256": "2619f047c53eb04bd2dab0a49888c69dfaaa14c0da5a625c7138f4299a7b831b"
     },
     {
       "path": "examples/audit_chain/input.json",
@@ -311,7 +315,7 @@
     },
     {
       "path": "examples/points_reconcile/executor.py",
-      "sha256": "a2f30cd84254b3719b7de5f3337912bae28206fbdca55b38b040fa33ba72f461"
+      "sha256": "a836f3179c21289238dec5d3d930f7b1e8b7d0eeb6faf02a9d7fddef75cbc361"
     },
     {
       "path": "examples/points_reconcile/input.json",
@@ -382,6 +386,14 @@
       "sha256": "042a2fa765b6e1e205b51940c26f6113c722cc72dbcf152bd018f21bad94f896"
     },
     {
+      "path": "internal/render/render.go",
+      "sha256": "a7d815fa661b0c469cb452186be76570a079e4b20239528cc8315785ad736229"
+    },
+    {
+      "path": "messages.json",
+      "sha256": "f6322f17875e45eac0a688bdeee71e732d19f35e66b5ed6b26809c01cfb82088"
+    },
+    {
       "path": "provenance/assumptions.json",
       "sha256": "7c501ee14a61f97ab528549f223cd23715b9f1146f8d0555ca07afa767bb918d"
     },
@@ -423,63 +435,59 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "9071bf1bf23a1d9333b4334ab1fed2f38f2efe5c4be20f29c5be6ceea1baebce"
+      "sha256": "5f0cc05fb6ca2827a5d1d7a95b973febc959730e05dc80baa7c71f344b46170e"
     },
     {
       "path": "records/0001-bid_quote-20261010.md",
-      "sha256": "124ae78b2407320f6b2f34db32ec750fa6458dd9d71d7e6ab9993ca87e772dc9"
+      "sha256": "986b7c555bd22eefed8f0a47dcdfc62a0e2f45dbaa002dd514afc2fb156e5879"
     },
     {
       "path": "records/0002-expense_audit-20261010.md",
-      "sha256": "45b4d1a31e43c77a27c6ce3c93f572e2cbbf480783781e63f10176ca381f6d31"
+      "sha256": "7500a8f8cb511d2701a1920d4c35931abd5bd8c8f43c15141d02304695915da7"
     },
     {
       "path": "records/0003-lab_report-20261010.md",
-      "sha256": "91583a4450a560e67a031ff31c278a7e6499241112dde96ca555257725e061cb"
+      "sha256": "d5f066dd36a5cf92b9b63cb8c032ace92eff154ba5c8707e42f5e83381c9359b"
     },
     {
       "path": "records/0004-point_table-20261010.md",
-      "sha256": "7e0ac6823dd38ab3ba8c62f307c09e05583034edaed59ca8cdb45b458c9f4b7d"
+      "sha256": "f4722247833582e53273bc1ee898b2893a2ea543e171ddb41871b3097e6e4273"
     },
     {
       "path": "records/0005-spc_control-20261010.md",
-      "sha256": "79f0f0e4c03503d3977961fafac5cc26570c89da74648235005af4e20cdf12c4"
+      "sha256": "31cf83895ad595af3f3f2b9f8f5a3e5edfa2cee17bf8dde3cd4e23c2749cfbd5"
     },
     {
       "path": "records/0006-pin_conflict-20261010.md",
-      "sha256": "dac4c71c0bdc8eb7e462dfd3472dc72cf657b8e9535becb5c5fe1de0ef5d8afa"
+      "sha256": "3caf5cb1f26730940691d7b1926165b9a6955e9256c4da5672a2fede2384ad41"
     },
     {
       "path": "records/0007-salary_tax-20261010.md",
-      "sha256": "b4e0a6abe2fcbe2f3a5d553adbc02f6956a6156b2e523acfa4d2b3755b6031fe"
+      "sha256": "d25332a11b4fc2bfac3cfda700758d13e989b51abf6376958201a5c503e31e82"
     },
     {
       "path": "records/0008-loan_dscr-20261010.md",
-      "sha256": "6d112d7c17c0e5a9de655c767d5f60c13e4282787f6b63a2bfe56466e8284790"
+      "sha256": "a778041c30a398a94c50536d96d03511ccc54cfb0cbb6b7fe496831329740c74"
     },
     {
       "path": "records/0009-modbus_poll-20261010.md",
-      "sha256": "0f7b6ffda0c320341459b4d62658e4845b9f531299b58d2095e811cfb67527cc"
+      "sha256": "37c4f8f0942e05aa617cfb79d24082d6aaaf0ba92aecc8553c4b733347b7be9e"
     },
     {
       "path": "records/0010-firmware_budget-20261010.md",
-      "sha256": "11dd8ae05eb13b988969568dc650acc3d7f3a49fc4cf0a8b6088544ff2aaba26"
+      "sha256": "d957add2b7ce46be354a375624aa4da43e68c06971a6d1f50773b5af13494ff5"
     },
     {
       "path": "records/0011-points_reconcile-20261010.md",
-      "sha256": "8c9cd0f348d598080e407bffbd179905c442b3f8f7fae9e033e40ce60fdc40cc"
+      "sha256": "ce9e7dfbf9fef1c556907b8a8dd6c37c8dbbb657c636a5e752596078bb408e96"
     },
     {
       "path": "records/0012-audit_chain-20261010.md",
-      "sha256": "0fc8e578ec74576d3184b1fd6179010f582a43dbc0062fbfb457c6015cec25d4"
-    },
-    {
-      "path": "records/0013-spc_control-20261010.md",
-      "sha256": "14ef21bef7b916165c7c4d9ece2cbeca3cd3f33dbe9ed61e10f87560160bcd0c"
+      "sha256": "a6f1e449554f872ea59f079612d5024cfbf6c2875a8d5e60d3d4c45860e2c103"
     },
     {
       "path": "records/INDEX.md",
-      "sha256": "3754442ceaed32ab7c1bbc841fe0a03ca1fceadf1003120e8e7bf4549a85a382"
+      "sha256": "3af3636fe2cac3df5d960648da6c6f7943876df52f41f05341a9331e28e3d124"
     },
     {
       "path": "signature/README.md",
@@ -506,9 +514,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T22:25:44+08:00",
+  "generated_at": "2026-10-10T22:37:24+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "e4e97a8382338476b7340144f7402ce1afad8c40a810c8ec2a92d2f1b555e104",
+  "package_digest": "dc3fa95ac60d3e33ce4065c5716a15ab3c4fa6470244032e08ed90e1a4af4aa8",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

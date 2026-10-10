@@ -2,6 +2,37 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.12.0] - 2026-10-10
+
+**执行体不再写人话：只输出 code + args，文案集中到 `messages.json`。** 详见 `docs/MESSAGES.md`。
+
+### Added
+- `messages.json`：包级文案表，`zh` / `en` 并排。键是 `<caseID>.<CODE>`，
+  `CONCLUSION` 为保留码。
+- `internal/render`：按 `--lang` 把结构化事实渲染成人话；缺英文就**不渲染**、回落原文，不冒充已翻译。
+- `check` 新增 **[6/6] 文案表**：有 zh 没 en 会**报错**，而不是等英文模式静默显示中文。
+- `audit_chain` / `points_reconcile` 两个执行体已迁移为 code + args（其余 10 个待迁移）。
+
+### 铁律：渲染绝不参与哈希
+
+`output_digest` 取自执行体的**原始**结构化输出，渲染在取摘要**之后**。实测：
+
+```text
+$ workagent run --case audit_chain .            证据包编号 ed6532b74aec41d1
+$ workagent run --case audit_chain . --lang en  Evidence bundle id ed6532b74aec41d1   ← 同一个
+```
+
+若渲染进了哈希，中文跑一次、英文跑一次会得到两个摘要，`verify` 直接失效。
+
+### Fixed
+- **同一个 code 不能有两种文案**：`audit_chain` 把「哈希链断裂」与「首次摄入却带 old_sha256」
+  都记成 `AC-01`，后者会被渲染成前者的文案。已拆为 `AC-01` / `AC-01F`。
+- 归档重建：两个场景的输出摘要因新增 `args` 而变化，旧记录已失效，故 12 条记录在 0.12.0 整体重生成。
+
+### 兼容性
+`findings[].message` **保留**（规范已有该字段），新增 `args`；无 `args` 时原样显示。
+纯增量，不破坏老消费者。
+
 ## [0.11.0] - 2026-10-10
 
 **CLI 双语：`--lang en` / `WORKAGENT_LANG=en`。**

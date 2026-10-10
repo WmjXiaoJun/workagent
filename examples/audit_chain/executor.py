@@ -67,16 +67,19 @@ def main():
 
         # AC-05 时间戳单调
         if did and did in last_ts and ts < last_ts[did]:
+            # 事实用 args 表达；message 保留为兼容回退（老消费者只读 message）。
             findings.append({"level": "warn", "code": "AC-05",
-                             "message": "时间戳倒退：doc=" + did + " id=" + eid
-                                        + " 上一条 ts=%.3f 本条 ts=%.3f" % (last_ts[did], ts)})
+                             "args": {"doc": did, "id": eid,
+                                      "prev_ts": "%.3f" % last_ts[did], "cur_ts": "%.3f" % ts},
+                             "message": "时间戳倒退：" + did})
         if did:
             last_ts[did] = max(ts, last_ts.get(did, ts))
 
         # AC-06 未知文档引用
         if did and did not in known_docs and et != "kb.ingest":
             findings.append({"level": "warn", "code": "AC-06",
-                             "message": "引用了未经摄入建立的文档：doc=" + did + " 事件=" + et + " id=" + eid})
+                             "args": {"doc": did, "event": et, "id": eid},
+                             "message": "引用了未经摄入建立的文档：" + did})
 
         if et != "kb.ingest":
             # 非摄入事件同样携带 new_sha256 / line_count 时更新基线，供后续比对
@@ -95,26 +98,30 @@ def main():
         if did in last_hash:
             if old != last_hash[did]:
                 findings.append({"level": "error", "code": "AC-01",
-                                 "message": "哈希链断裂：doc=" + did + " id=" + eid
-                                            + " old_sha256=" + str(old)[:12] + "… 应为上一条 new_sha256="
-                                            + str(last_hash[did])[:12] + "…"})
+                                 "args": {"doc": did, "id": eid,
+                                          "got": str(old)[:12], "want": str(last_hash[did])[:12]},
+                                 "message": "哈希链断裂：" + did})
         elif old is not None:
-            findings.append({"level": "info", "code": "AC-01",
-                             "message": "首次摄入却带 old_sha256：doc=" + did + " id=" + eid})
+            # 同一个 code 不能承载两种文案（文案表是 code → 模板），所以拆码。
+            findings.append({"level": "info", "code": "AC-01F",
+                             "args": {"doc": did, "id": eid},
+                             "message": "首次摄入却带 old_sha256：" + did})
 
         # AC-02 source_changed 语义
         if e.get("source_changed") is True:
             if did in last_hash and new == last_hash[did]:
                 findings.append({"level": "error", "code": "AC-02",
-                                 "message": "标称源已变更但哈希未变：doc=" + did + " id=" + eid + " sha=" + str(new)[:12] + "…"})
+                                 "args": {"doc": did, "id": eid, "sha": str(new)[:12]},
+                                 "message": "标称源已变更但哈希未变：" + did})
 
         # AC-03 semantic_stale 与 status 一致
         if e.get("semantic_stale") is True:
             st = str(e.get("semantic_status") or "").lower()
             if st not in STALE_STATUS:
                 findings.append({"level": "warn", "code": "AC-03",
-                                 "message": "标记语义过期但状态未更新：doc=" + did + " id=" + eid
-                                            + " semantic_status=" + repr(e.get("semantic_status"))})
+                                 "args": {"doc": did, "id": eid,
+                                          "status": repr(e.get("semantic_status"))},
+                                 "message": "标记语义过期但状态未更新：" + did})
 
         # AC-04 行数突降
         lc = e.get("line_count")
@@ -122,9 +129,9 @@ def main():
             prev = last_lines[did]
             if lc < prev * (1 - drop_ratio):
                 findings.append({"level": "error", "code": "AC-04",
-                                 "message": "行数异常下降：doc=" + did + " id=" + eid
-                                            + " 上次 " + str(int(prev)) + " 行 → 本次 " + str(int(lc)) + " 行（降幅 %.0f%%）"
-                                            % ((1 - lc / prev) * 100)})
+                                 "args": {"doc": did, "id": eid, "prev": int(prev), "cur": int(lc),
+                                          "pct": int(round((1 - lc / prev) * 100))},
+                                 "message": "行数异常下降：" + did})
         if isinstance(lc, (int, float)):
             last_lines[did] = lc
 
@@ -137,7 +144,8 @@ def main():
     info = [f for f in findings if f["level"] == "info"]
     if not errors and not warns:
         findings = [{"level": "info", "code": "AC-OK",
-                     "message": "事件 %d 条、文档 %d 个，六项核验全部通过" % (len(evs), len(known_docs))}]
+                     "args": {"events": len(evs), "docs": len(known_docs)},
+                     "message": "六项核验全部通过"}]
     else:
         findings = errors + warns + info
 
@@ -146,6 +154,9 @@ def main():
         "verdict": verdict,
         "conclusion": "核验判定「" + verdict + "」：事件 %d 条 / 文档 %d 个，错误 %d 项、告警 %d 项"
                       % (len(evs), len(known_docs), len(errors), len(warns)),
+        # 结论句的参数化事实：渲染层据此生成中/英文，执行体本身不含语言。
+        "conclusion_args": {"verdict": verdict, "events": len(evs), "docs": len(known_docs),
+                            "errors": len(errors), "warns": len(warns)},
         "findings": findings,
         "metrics": {"events": len(evs), "documents": len(known_docs),
                     "errors": len(errors), "warnings": len(warns),

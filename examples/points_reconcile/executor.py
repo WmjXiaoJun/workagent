@@ -81,16 +81,18 @@ def main():
             signed = amt if et in POSITIVE else (-amt if et in NEGATIVE else amt)
             if et not in POSITIVE and et not in NEGATIVE:
                 findings.append({"level": "warn", "code": "PR-07",
-                                 "message": "未知 entry_type「" + et + "」（id=" + str(e.get("id")) + "），按原符号处理"})
+                                 "args": {"entry_type": et, "id": str(e.get("id"))},
+                                 "message": "未知 entry_type：" + et})
             if prev is not None:
                 expect = round(prev + signed, 6)
                 if abs(bal - expect) > 1e-6:
                     chain_bad += 1
                     findings.append({"level": "error", "code": "PR-01",
-                                     "message": "账本断链：user=" + uid[:8] + " id=" + str(e.get("id"))
-                                                + " 上笔余额=" + ("%.2f" % prev) + " " + et
-                                                + " 金额=" + ("%.2f" % amt) + " 记录余额=" + ("%.2f" % bal)
-                                                + " 期望=" + ("%.2f" % expect)})
+                                     "args": {"user": uid[:8], "id": str(e.get("id")),
+                                              "prev": "%.2f" % prev, "entry_type": et,
+                                              "amount": "%.2f" % amt, "balance": "%.2f" % bal,
+                                              "expect": "%.2f" % expect},
+                                     "message": "账本断链：" + uid[:8]})
             prev = bal
 
     # PR-02 / PR-03
@@ -105,14 +107,14 @@ def main():
             last = num(rows[-1].get("balance_after"), "balance_after")
             if abs(last - avail) > 1e-6:
                 findings.append({"level": "error", "code": "PR-02",
-                                 "message": "账户余额与账本末笔不符：user=" + uid[:8]
-                                            + " 账户可用=" + ("%.2f" % avail) + " 账本末笔=" + ("%.2f" % last)})
+                                 "args": {"user": uid[:8], "avail": "%.2f" % avail, "last": "%.2f" % last},
+                                 "message": "账户余额与账本末笔不符：" + uid[:8]})
         lhs = avail + frozen
         rhs = granted - spent
         if abs(lhs - rhs) > 1e-6:
             findings.append({"level": "error", "code": "PR-03",
-                             "message": "账户恒等式不成立：user=" + uid[:8]
-                                        + " 可用+冻结=" + ("%.2f" % lhs) + " 累计授予-累计消费=" + ("%.2f" % rhs)})
+                             "args": {"user": uid[:8], "lhs": "%.2f" % lhs, "rhs": "%.2f" % rhs},
+                             "message": "账户恒等式不成立：" + uid[:8]})
 
     # PR-04 幂等键唯一
     seen = {}
@@ -123,7 +125,8 @@ def main():
         k = str(k)
         if k in seen:
             findings.append({"level": "error", "code": "PR-04",
-                             "message": "幂等键重复：「" + k + "」出现在 id=" + str(seen[k]) + " 与 id=" + str(e.get("id"))})
+                             "args": {"key": k, "id1": str(seen[k]), "id2": str(e.get("id"))},
+                             "message": "幂等键重复：" + k})
         else:
             seen[k] = e.get("id")
 
@@ -135,8 +138,9 @@ def main():
         st = str(o.get("status", "")).lower()
         if st in ("paid", "success", "succeeded") and str(o.get("id")) not in refs:
             findings.append({"level": "error", "code": "PR-05",
-                             "message": "已支付订单未入账：order=" + str(o.get("id")) + " user=" + str(o.get("user_id"))[:8]
-                                        + " 积分=" + str(o.get("points"))})
+                             "args": {"order": str(o.get("id")), "user": str(o.get("user_id"))[:8],
+                                      "points": str(o.get("points"))},
+                             "message": "已支付订单未入账：" + str(o.get("id"))})
 
     # PR-06 reserve 必须被结清
     for uid, rows in per_user.items():
@@ -152,8 +156,8 @@ def main():
         for rid, n in open_res.items():
             if n > 0:
                 findings.append({"level": "warn", "code": "PR-06",
-                                 "message": "预扣未结清：user=" + uid[:8] + " reference=" + (rid or "(无)")
-                                            + " 未结清笔数=" + str(n)})
+                                 "args": {"user": uid[:8], "reference": (rid or "-"), "n": str(n)},
+                                 "message": "预扣未结清：" + uid[:8]})
 
     errors = [f for f in findings if f["level"] == "error"]
     warns = [f for f in findings if f["level"] == "warn"]
@@ -163,14 +167,18 @@ def main():
     total_frozen = sum(num(a.get("frozen_points"), "frozen_points") for a in accounts)
     if not findings:
         findings.append({"level": "info", "code": "PR-OK",
-                         "message": "账本 %d 条、账户 %d 个、订单 %d 笔，七项不变量全部成立"
-                                    % (len(ledger), len(accounts), len(orders))})
+                         "args": {"ledger": len(ledger), "accounts": len(accounts), "orders": len(orders)},
+                         "message": "七项不变量全部成立"})
 
     out = {
         "subject": str(data.get("system", "积分账本")) + " 一致性对账",
         "verdict": verdict,
         "conclusion": "对账判定「" + verdict + "」：账本 %d 条 / 账户 %d 个，错误 %d 项、告警 %d 项；可用合计 %.2f，冻结合计 %.2f"
                       % (len(ledger), len(accounts), len(errors), len(warns), total_available, total_frozen),
+        # 结论句的参数化事实：渲染层据此生成中/英文，执行体本身不含语言。
+        "conclusion_args": {"verdict": verdict, "ledger": len(ledger), "accounts": len(accounts),
+                            "errors": len(errors), "warns": len(warns),
+                            "available": "%.2f" % total_available, "frozen": "%.2f" % total_frozen},
         "findings": findings,
         "metrics": {
             "ledger_entries": len(ledger), "accounts": len(accounts), "orders": len(orders),

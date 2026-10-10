@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"github.com/WmjXiaoJun/workagent/internal/i18n"
+	"github.com/WmjXiaoJun/workagent/internal/render"
 )
 
 const (
@@ -333,6 +334,25 @@ func cmdCheck(root string) int {
 		}
 	}
 
+	// 文案表覆盖：一条消息有 zh 却没有 en，英文模式会静默回落中文 ——
+	// 那正是"改了一半看不出来"的典型，所以在交付前报出来。
+	fmt.Println(i18n.T("\n[6/6] 文案表（messages.json）", "\n[6/6] Message catalog (messages.json)"))
+	if cat := render.Load(root); cat != nil {
+		missing, total := cat.Coverage()
+		switch {
+		case total == 0:
+			info(i18n.T("未提供 messages.json —— 文案由执行体自带，英文模式会沿用其原文",
+				"no messages.json — text comes from the executors, and English mode reuses it verbatim"))
+		case len(missing) == 0:
+			ok(i18n.Tf("文案表 %d 条，中英齐全", "message catalog: %d entries, zh and en both complete", total))
+		default:
+			bad(i18n.Tf("文案表 %d 条，其中 %d 条缺一种语言: %s",
+				"message catalog: %d entries, %d missing a language: %s",
+				total, len(missing), strings.Join(missing, ", ")))
+			failures++
+		}
+	}
+
 	fmt.Println("")
 	if failures > 0 {
 		fmt.Print(i18n.Tf("结果: 不通过，共 %d 项问题\n", "Result: FAILED, %d problem(s)\n", failures))
@@ -598,7 +618,17 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	if b, rerr := os.ReadFile(filepath.Join(root, "artifacts", "summary.template.md")); rerr == nil {
 		tpl = string(b)
 	}
+	// 显示/存档用**副本**：文案在这里按 --lang 渲染。
+	// 原始 outputObj 已经参与过摘要计算，且证据包里的 output.json 保持原样 ——
+	// 一旦渲染结果进了哈希，中文跑一次、英文跑一次就会得到不同摘要，verify 立刻失效。
 	outMap := asMap(outputObj)
+	if cat := render.Load(root); cat != nil {
+		if r := cat.Apply(i18n.Lang(), c.ID, outMap); r != nil {
+			if rm, isMap := r.(map[string]any); isMap {
+				outMap = rm
+			}
+		}
+	}
 	conf := asMap(outMap["confidence"])
 	var riskLines []string
 	for _, r := range asList(outMap["risks"]) {

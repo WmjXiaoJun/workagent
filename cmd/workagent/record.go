@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/WmjXiaoJun/workagent/internal/i18n"
+	"github.com/WmjXiaoJun/workagent/internal/render"
 )
 
 var recordNameRe = regexp.MustCompile(`^(\d{4})-(.+)-(\d{8})\.md$`)
@@ -196,6 +197,14 @@ func cmdRecord(root, caseID, inputArg, note string, live bool) int {
 	// 读证据包里的结论
 	outPath := filepath.Join(root, "out", "evidence", evidenceID, "output.json")
 	out := readJSONMap(outPath)
+	// 记录是给人看的，走渲染副本；证据包里的原始输出不动。
+	if cat := render.Load(root); cat != nil {
+		if r := cat.Apply(i18n.Lang(), caseID, out); r != nil {
+			if rm, isMap := r.(map[string]any); isMap {
+				out = rm
+			}
+		}
+	}
 	verdict := asString(out["verdict"])
 	conclusion := asString(out["conclusion"])
 	frac, _ := out["findings"].([]any)
