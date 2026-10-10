@@ -30,6 +30,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
 )
 
 const (
@@ -190,12 +192,12 @@ func mustManifest(root string) map[string]any {
 	p := filepath.Join(root, "agent.yaml")
 	b, err := os.ReadFile(p)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "找不到 agent.yaml —— 请确认这是 WorkAgent 包根目录")
+		fmt.Fprintln(os.Stderr, i18n.T("找不到 agent.yaml —— 请确认这是 WorkAgent 包根目录", "agent.yaml not found — confirm this is a WorkAgent package root"))
 		os.Exit(2)
 	}
 	m, isMap := parseYAML(string(b)).(map[string]any)
 	if !isMap {
-		fmt.Fprintln(os.Stderr, "agent.yaml 解析失败")
+		fmt.Fprintln(os.Stderr, i18n.T("agent.yaml 解析失败", "failed to parse agent.yaml"))
 		os.Exit(2)
 	}
 	return m
@@ -233,17 +235,17 @@ func cmdCheck(root string) int {
 	fmt.Println("WorkAgent check —— " + root)
 	failures := 0
 
-	fmt.Println("\n[1/4] 必需文件")
+	fmt.Println(i18n.T("\n[1/4] 必需文件", "\n[1/4] Required files"))
 	for _, rel := range requiredFiles {
 		if fileExists(filepath.Join(root, filepath.FromSlash(rel))) {
 			ok(rel)
 		} else {
-			bad(rel + " 缺失")
+			bad(rel + i18n.T(" 缺失", " missing"))
 			failures++
 		}
 	}
 
-	fmt.Println("\n[2/4] JSON 可解析性")
+	fmt.Println(i18n.T("\n[2/4] JSON 可解析性", "\n[2/4] JSON parseability"))
 	for _, rel := range requiredFiles {
 		if !strings.HasSuffix(rel, ".json") {
 			continue
@@ -256,7 +258,7 @@ func cmdCheck(root string) int {
 		}
 	}
 
-	fmt.Println("\n[3/4] 兼容声明")
+	fmt.Println(i18n.T("\n[3/4] 兼容声明", "\n[3/4] Compatibility declaration"))
 	compatRaw, err := readJSON(filepath.Join(root, "compat.json"))
 	if err != nil {
 		bad("compat.json -> " + err.Error())
@@ -270,30 +272,30 @@ func cmdCheck(root string) int {
 				lost = append(lost, asString(asMap(c)["capability"]))
 			}
 		}
-		ok(fmt.Sprintf("compat.json 已声明 %d 项能力", len(matrix)))
+		ok(i18n.Tf("compat.json 已声明 %d 项能力", "compat.json declares %d capabilities", len(matrix)))
 		if len(lost) > 0 {
-			info("旧平台将丢失: " + strings.Join(lost, ", "))
+			info(i18n.T("旧平台将丢失: ", "Legacy platforms will lose: ") + strings.Join(lost, ", "))
 		} else {
-			info("旧平台将丢失: 无")
+			info(i18n.T("旧平台将丢失: 无", "Legacy platforms will lose: nothing"))
 		}
 		if len(asMap(compat["degradation"])) == 0 {
-			bad("缺少 degradation 段：无法说明降级行为")
+			bad(i18n.T("缺少 degradation 段：无法说明降级行为", "missing the degradation section: cannot state what legacy platforms lose"))
 			failures++
 		} else {
-			ok("已显式声明降级行为")
+			ok(i18n.T("已显式声明降级行为", "degradation behaviour is declared explicitly"))
 		}
 	}
 
-	fmt.Println("\n[4/5] 边界与测试套件")
+	fmt.Println(i18n.T("\n[4/5] 边界与测试套件", "\n[4/5] Boundary and test suites"))
 	boundaryRaw, err := readJSON(filepath.Join(root, "x-workagent", "boundary.json"))
 	if err != nil {
 		bad("boundary.json -> " + err.Error())
 		failures++
 	} else if asString(asMap(boundaryRaw)["stop_condition"]) == "" {
-		bad("boundary.json 缺 stop_condition")
+		bad(i18n.T("boundary.json 缺 stop_condition", "boundary.json is missing stop_condition"))
 		failures++
 	} else {
-		ok("boundary.json 含 stop_condition")
+		ok(i18n.T("boundary.json 含 stop_condition", "boundary.json declares stop_condition"))
 	}
 	suites, _ := filepath.Glob(filepath.Join(root, "x-workagent", "test_suite", "*.json"))
 	names := make([]string, 0, len(suites))
@@ -301,9 +303,9 @@ func cmdCheck(root string) int {
 		names = append(names, strings.TrimSuffix(filepath.Base(s), ".json"))
 	}
 	sort.Strings(names)
-	ok(fmt.Sprintf("测试套件 %d 个: %s", len(names), strings.Join(names, ", ")))
+	ok(i18n.Tf("测试套件 %d 个: %s", "Test suites (%d): %s", len(names), strings.Join(names, ", ")))
 
-	fmt.Println("\n[5/5] 场景（cases）")
+	fmt.Println(i18n.T("\n[5/5] 场景（cases）", "\n[5/5] Scenarios (cases)"))
 	for _, cc := range casesOf(mustManifest(root)) {
 		var missing []string
 		if len(cc.Executor) > 1 && !fileExists(filepath.Join(root, filepath.FromSlash(cc.Executor[1]))) {
@@ -324,19 +326,19 @@ func cmdCheck(root string) int {
 			}
 		}
 		if len(missing) > 0 {
-			bad(cc.ID + " 缺少: " + strings.Join(missing, ", "))
+			bad(cc.ID + i18n.T(" 缺少: ", " missing: ") + strings.Join(missing, ", "))
 			failures++
 		} else {
-			ok(cc.ID + "  (" + cc.Shape + ")")
+			ok(cc.ID + "  (" + i18n.Shape(cc.Shape) + ")")
 		}
 	}
 
 	fmt.Println("")
 	if failures > 0 {
-		fmt.Printf("结果: 不通过，共 %d 项问题\n", failures)
+		fmt.Print(i18n.Tf("结果: 不通过，共 %d 项问题\n", "Result: FAILED, %d problem(s)\n", failures))
 		return 1
 	}
-	fmt.Println("结果: 通过。本包结构完整、兼容声明齐备。")
+	fmt.Println(i18n.T("结果: 通过。本包结构完整、兼容声明齐备。", "Result: PASS. Package structure complete and compatibility declaration present."))
 	return 0
 }
 
@@ -374,7 +376,7 @@ func cmdAdapt(root string) int {
 			"manifest": "agent.yaml",
 			"compat":   "compat.json",
 			"boundary": "x-workagent/boundary.json",
-			"note":     "生成物。真源为根目录 agent.yaml。",
+			"note":     i18n.T("生成物。真源为根目录 agent.yaml。", "Generated artifact. The source of truth is agent.yaml at the package root."),
 		},
 	}
 	if err := writeJSON(filepath.Join(root, "adapters", "plugin.json"), plugin); err != nil {
@@ -400,7 +402,7 @@ func cmdAdapt(root string) int {
 		"x-workagent": map[string]any{
 			"manifest": "agent.yaml",
 			"evidence": evidenceDir,
-			"note":     "生成物。真源为根目录 agent.yaml。",
+			"note":     i18n.T("生成物。真源为根目录 agent.yaml。", "Generated artifact. The source of truth is agent.yaml at the package root."),
 		},
 	}
 	if err := writeJSON(filepath.Join(root, "adapters", "agent-card.json"), card); err != nil {
@@ -408,10 +410,10 @@ func cmdAdapt(root string) int {
 		return 1
 	}
 
-	fmt.Println("adapt —— 已生成适配层")
+	fmt.Println(i18n.T("adapt —— 已生成适配层", "adapt — adapter layer generated"))
 	ok("adapters/plugin.json      -> Agent Plugins 1.0")
 	ok("adapters/agent-card.json  -> A2A Agent Card")
-	info("真源未改动：agent.yaml")
+	info(i18n.T("真源未改动：agent.yaml", "Source of truth untouched: agent.yaml"))
 	return 0
 }
 
@@ -450,7 +452,7 @@ func cmdAttest(root string) int {
 	closure := map[string]any{
 		"schema":       "workagent/attest/closure/1",
 		"generated_at": nowISO(),
-		"principle":    "摘要必须覆盖推理函数的完整计算闭包。任何落在被证明集合之外的组件，都是一条伪造通道。",
+		"principle":    i18n.T("摘要必须覆盖推理函数的完整计算闭包。任何落在被证明集合之外的组件，都是一条伪造通道。", "The digest must cover the full computational closure of the inference function. Any component outside the proven set is a forgery channel."),
 		"closure": map[string]any{
 			"executor_digest":      execDigest,
 			"executor_command":     strings.Join(cmd, " "),
@@ -472,15 +474,15 @@ func cmdAttest(root string) int {
 			"decoding_config":      nil,
 		},
 		"llm_used": llmUsed,
-		"note":     "确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。",
+		"note":     i18n.T("确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。", "A deterministic executor has no model closure. Once an LLM step is enabled, the model/tokenizer/chat_template/engine/decoding fields must be filled in, otherwise the conclusion cannot be called reproducible. The executor's own runtime version (Python/Node) is the executor author's responsibility to record."),
 	}
 	if err := writeJSON(filepath.Join(root, "attest", "closure.json"), closure); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	fmt.Println("attest —— 计算闭包摘要已写入 attest/closure.json")
-	ok(fmt.Sprintf("场景数 %d（执行体摘要逐场景记录）", len(all)))
+	fmt.Println(i18n.T("attest —— 计算闭包摘要已写入 attest/closure.json", "attest — closure digests written to attest/closure.json"))
+	ok(i18n.Tf("场景数 %d（执行体摘要逐场景记录）", "%d scenarios (executor digest recorded per scenario)", len(all)))
 	ok("executor_digest      " + short(execDigest))
 	ok("inputs_schema_digest " + short(schemaDigest))
 	ok("workflow_digest      " + short(wfDigest))
@@ -495,7 +497,7 @@ func cmdAttest(root string) int {
 func runExecutor(root string, c Case, inputPath string) (any, []string, error) {
 	cmd := resolveExecCommand(c.Executor)
 	if len(cmd) == 0 {
-		return nil, nil, fmt.Errorf("场景 %s 未声明 executor", c.ID)
+		return nil, nil, fmt.Errorf(i18n.T("场景 %s 未声明 executor", "scenario %s declares no executor"), c.ID)
 	}
 	args := append(append([]string{}, cmd[1:]...), inputPath)
 	proc := exec.Command(cmd[0], args...)
@@ -504,13 +506,13 @@ func runExecutor(root string, c Case, inputPath string) (any, []string, error) {
 	proc.Stdout = &stdout
 	proc.Stderr = &stderr
 	if err := proc.Run(); err != nil {
-		return nil, cmd, fmt.Errorf("执行体失败 (%v): %s", err, strings.TrimSpace(stderr.String()))
+		return nil, cmd, fmt.Errorf(i18n.T("执行体失败 (%v): %s", "executor failed (%v): %s"), err, strings.TrimSpace(stderr.String()))
 	}
 	dec := json.NewDecoder(bytes.NewReader(stdout.Bytes()))
 	dec.UseNumber()
 	var payload any
 	if err := dec.Decode(&payload); err != nil {
-		return nil, cmd, fmt.Errorf("执行体输出不是合法 JSON: %v", err)
+		return nil, cmd, fmt.Errorf(i18n.T("执行体输出不是合法 JSON: %v", "executor output is not valid JSON: %v"), err)
 	}
 	if pm, isMap := payload.(map[string]any); isMap {
 		if out, exists := pm["output"]; exists {
@@ -524,7 +526,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	m := mustManifest(root)
 	c, found := findCase(m, caseID)
 	if !found {
-		fmt.Fprintln(os.Stderr, "找不到场景: "+caseID+"（用 workagent cases 查看全部）")
+		fmt.Fprintln(os.Stderr, i18n.T("找不到场景: ", "Scenario not found: ")+caseID+i18n.T("（用 workagent cases 查看全部）", " (see all with: workagent cases)"))
 		return 2
 	}
 	if inputArg == "" {
@@ -536,7 +538,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		case c.SampleNatural != "":
 			inputArg = c.SampleNatural
 		default:
-			fmt.Fprintln(os.Stderr, "run 需要 --input 参数（场景 "+c.ID+" 未声明样例输入）")
+			fmt.Fprintln(os.Stderr, i18n.T("run 需要 --input 参数（场景 ", "run needs --input (scenario ")+c.ID+i18n.T(" 未声明样例输入）", " declares no sample input)"))
 			return 2
 		}
 	}
@@ -545,13 +547,13 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		inputPath = filepath.Join(root, filepath.FromSlash(inputArg))
 	}
 	if !fileExists(inputPath) {
-		fmt.Fprintln(os.Stderr, "找不到输入文件: "+inputPath)
+		fmt.Fprintln(os.Stderr, i18n.T("找不到输入文件: ", "Input file not found: ")+inputPath)
 		return 2
 	}
 
 	inputObj, err := readJSON(inputPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "输入不是合法 JSON: "+err.Error())
+		fmt.Fprintln(os.Stderr, i18n.T("输入不是合法 JSON: ", "Input is not valid JSON: ")+err.Error())
 		return 2
 	}
 	inCanon, _ := canonicalJSON(inputObj)
@@ -574,7 +576,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		}
 	}
 
-	fmt.Println("场景: " + c.ID + "  " + c.Title)
+	fmt.Println(i18n.T("场景: ", "Scenario: ") + c.ID + "  " + c.DisplayTitle())
 	outputObj, cmd, err := runExecutor(root, c, execInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -602,7 +604,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	for _, r := range asList(outMap["risks"]) {
 		riskLines = append(riskLines, "- "+asString(r))
 	}
-	riskText := "- （无）"
+	riskText := i18n.T("- （无）", "- (none)")
 	if len(riskLines) > 0 {
 		riskText = strings.Join(riskLines, "\n")
 	}
@@ -627,7 +629,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		}
 		findLines = append(findLines, "- **"+lv+"** "+msg)
 	}
-	findText := "- （无）"
+	findText := i18n.T("- （无）", "- (none)")
 	if len(findLines) > 0 {
 		findText = strings.Join(findLines, "\n")
 	}
@@ -696,16 +698,16 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		"output":          outputObj,
 	})
 
-	fmt.Println("run —— 执行完成")
-	ok("证据包编号 " + evidenceID)
-	ok("结论: " + asString(outMap["conclusion"]))
-	ok("输出摘要 " + outputDigest[:16])
-	ok("复现等级 " + overallLevel(llmDescriptors))
+	fmt.Println(i18n.T("run —— 执行完成", "run — completed"))
+	ok(i18n.T("证据包编号 ", "Evidence bundle id ") + evidenceID)
+	ok(i18n.T("结论: ", "Conclusion: ") + asString(outMap["conclusion"]))
+	ok(i18n.T("输出摘要 ", "Output digest ") + outputDigest[:16])
+	ok(i18n.T("复现等级 ", "Reproducibility level ") + overallLevel(llmDescriptors))
 	if len(llmDescriptors) > 0 {
 		info("证据包含模型响应留档；verify 默认重放记录而非重放模型")
 	}
-	info("证据目录 " + evDir)
-	info("摘要文件 " + filepath.Join(root, "artifacts", "summary.md"))
+	info(i18n.T("证据目录 ", "Evidence directory ") + evDir)
+	info(i18n.T("摘要文件 ", "Summary file ") + filepath.Join(root, "artifacts", "summary.md"))
 	return 0
 }
 
@@ -726,17 +728,17 @@ func cmdVerify(root string, live bool) int {
 		}
 	}
 	if last == nil {
-		fmt.Println("verify —— 没有可复现的记录，请先运行 workagent run")
+		fmt.Println(i18n.T("verify —— 没有可复现的记录，请先运行 workagent run", "verify — no reproducible record yet; run `workagent run` first"))
 		return 1
 	}
-	fmt.Println("verify —— 复现校验，证据包 " + asString(last["evidence_id"]))
+	fmt.Println(i18n.T("verify —— 复现校验，证据包 ", "verify — reproducibility check, evidence bundle ") + asString(last["evidence_id"]))
 
 	inputFile := resolveInputPath(root, asString(last["input_file"]))
 	if !fileExists(inputFile) {
 		inputFile = filepath.Join(root, evidenceDir, asString(last["evidence_id"]), "input.json")
 	}
 	if !fileExists(inputFile) {
-		bad("找不到原始输入，无法复现")
+		bad(i18n.T("找不到原始输入，无法复现", "original input not found; cannot reproduce"))
 		return 1
 	}
 
@@ -744,7 +746,7 @@ func cmdVerify(root string, live bool) int {
 	lastCase := asString(asMap(traceRaw)["last_case"])
 	vc, okc := findCase(m, lastCase)
 	if !okc {
-		fmt.Fprintln(os.Stderr, "trace 中的场景无法解析: "+lastCase)
+		fmt.Fprintln(os.Stderr, i18n.T("trace 中的场景无法解析: ", "scenario in trace could not be parsed: ")+lastCase)
 		return 1
 	}
 	// 含 LLM 步骤时：默认重放已录制的模型响应（离线、可复现）；
@@ -769,7 +771,7 @@ func cmdVerify(root string, live bool) int {
 			}
 			enriched, descs, lerr := runLLMSteps(root, vc.ID, vc.LLMSteps, inObj, false, "", "", false)
 			if lerr != nil {
-				fmt.Fprintln(os.Stderr, "live 调用失败: "+lerr.Error())
+				fmt.Fprintln(os.Stderr, i18n.T("live 调用失败: ", "live call failed: ")+lerr.Error())
 				return 1
 			}
 			if enriched != "" {
@@ -780,20 +782,20 @@ func cmdVerify(root string, live bool) int {
 				old := oldDigests[sid]
 				neu := asString(d["response_digest"])
 				if old == "" {
-					fmt.Println("  [!!]   " + sid + " 没有历史录制，无法比较模型是否复现")
+					fmt.Println("  [!!]   " + sid + i18n.T(" 没有历史录制，无法比较模型是否复现", " has no recorded response; cannot check whether the model reproduces"))
 					continue
 				}
 				if old == neu {
-					fmt.Println("  [OK]   " + sid + " 模型本次响应与录制**逐字节一致**（" + short(neu) + "）")
+					fmt.Println("  [OK]   " + sid + i18n.T(" 模型本次响应与录制**逐字节一致**（", " the model response is byte-identical to the recording (") + short(neu) + ")")
 				} else {
 					liveDiffers = true
-					fmt.Println("  [!!]   " + sid + " 模型本次响应与录制不同")
-					fmt.Println("         录制 " + short(old) + "  ≠  本次 " + short(neu))
-					fmt.Println("         —— 该模型在 temperature=0/seed 固定下**仍然不可复现**")
+					fmt.Println("  [!!]   " + sid + i18n.T(" 模型本次响应与录制不同", " the model response differs from the recording"))
+					fmt.Println(i18n.T("         录制 ", "         recorded ") + short(old) + "  !=  " + i18n.T("本次 ", "this run ") + short(neu))
+					fmt.Println(i18n.T("         —— 该模型在 temperature=0/seed 固定下**仍然不可复现**", "         — this model is NOT reproducible even with temperature=0 and a fixed seed"))
 				}
 			}
 		} else {
-			fmt.Println("  [--]   LLM 步骤：重放已录制响应（未联网）")
+			fmt.Println(i18n.T("  [--]   LLM 步骤：重放已录制响应（未联网）", "  [--]   LLM step: replaying the recorded response (offline)"))
 			enriched, _, lerr := runLLMSteps(root, vc.ID, vc.LLMSteps, inObj, true, "", "", false)
 			if lerr != nil {
 				fmt.Fprintln(os.Stderr, lerr.Error())
@@ -814,17 +816,17 @@ func cmdVerify(root string, live bool) int {
 	replay := sha256Bytes(canon)
 	expected := asString(last["output_digest"])
 	if live && liveDiffers {
-		fmt.Println("结果: FAIL（live）—— 模型本次未复现，因此该结论不可复现。请用 replay 模式交付。")
+		fmt.Println(i18n.T("结果: FAIL（live）—— 模型本次未复现，因此该结论不可复现。请用 replay 模式交付。", "Result: FAIL (live) — the model did not reproduce, so the conclusion is not reproducible. Deliver it in replay mode."))
 		return 1
 	}
 
-	fmt.Println("  期望摘要 " + expected)
-	fmt.Println("  重放摘要 " + replay)
+	fmt.Println(i18n.T("  期望摘要 ", "  Expected digest ") + expected)
+	fmt.Println(i18n.T("  重放摘要 ", "  Replay digest   ") + replay)
 	if replay == expected {
-		fmt.Println("结果: PASS —— 同输入产出同结论，可复现。")
+		fmt.Println(i18n.T("结果: PASS —— 同输入产出同结论，可复现。", "Result: PASS — same input, same conclusion. Reproducible."))
 		return 0
 	}
-	fmt.Println("结果: FAIL —— 结论不可复现，禁止对外交付该结论。")
+	fmt.Println(i18n.T("结果: FAIL —— 结论不可复现，禁止对外交付该结论。", "Result: FAIL — the conclusion is not reproducible. Do not deliver it."))
 	return 1
 }
 
@@ -853,16 +855,16 @@ func cmdVerifyAll(root string) int {
 		lastByCase[cid] = sm
 	}
 	if len(order) == 0 {
-		fmt.Println("verify --all —— trace 里没有 run 记录")
+		fmt.Println(i18n.T("verify --all —— trace 里没有 run 记录", "verify --all — no run records in the trace"))
 		return 1
 	}
-	fmt.Printf("verify --all —— 共 %d 个场景\n", len(order))
+	fmt.Print(i18n.Tf("verify --all —— 共 %d 个场景\n", "verify --all — %d scenarios\n", len(order)))
 	failures := 0
 	for _, cid := range order {
 		st := lastByCase[cid]
 		c, found := findCase(m, cid)
 		if !found {
-			bad(cid + " 场景无法解析")
+			bad(cid + i18n.T(" 场景无法解析", ": scenario could not be parsed"))
 			failures++
 			continue
 		}
@@ -871,7 +873,7 @@ func cmdVerifyAll(root string) int {
 			inputFile = filepath.Join(root, evidenceDir, asString(st["evidence_id"]), "input.json")
 		}
 		if !fileExists(inputFile) {
-			bad(cid + " 找不到原始输入")
+			bad(cid + i18n.T(" 找不到原始输入", ": original input not found"))
 			failures++
 			continue
 		}
@@ -879,13 +881,13 @@ func cmdVerifyAll(root string) int {
 		if len(c.LLMSteps) > 0 {
 			inObj, ierr := readJSON(inputFile)
 			if ierr != nil {
-				bad(cid + " 输入读取失败: " + ierr.Error())
+				bad(cid + i18n.T(" 输入读取失败: ", ": failed to read input: ") + ierr.Error())
 				failures++
 				continue
 			}
 			enriched, _, lerr := runLLMSteps(root, c.ID, c.LLMSteps, inObj, true, "", "", false)
 			if lerr != nil {
-				bad(cid + " 重放失败: " + lerr.Error())
+				bad(cid + i18n.T(" 重放失败: ", ": replay failed: ") + lerr.Error())
 				failures++
 				continue
 			}
@@ -895,7 +897,7 @@ func cmdVerifyAll(root string) int {
 		}
 		outputObj, _, rerr := runExecutor(root, c, execInput)
 		if rerr != nil {
-			bad(cid + " 执行失败: " + rerr.Error())
+			bad(cid + i18n.T(" 执行失败: ", ": execution failed: ") + rerr.Error())
 			failures++
 			continue
 		}
@@ -905,16 +907,16 @@ func cmdVerifyAll(root string) int {
 		if got == want {
 			ok(fmt.Sprintf("%-14s PASS  %s", cid, got[:16]))
 		} else {
-			bad(fmt.Sprintf("%-14s FAIL  期望 %s 实际 %s", cid, short(want), got[:16]))
+			bad(i18n.Tf("%-16s FAIL  expected %s got %s", "%-16s FAIL  expected %s got %s", cid, short(want), got[:16]))
 			failures++
 		}
 	}
 	fmt.Println("")
 	if failures > 0 {
-		fmt.Printf("结果: %d 个场景未通过，禁止对外交付。\n", failures)
+		fmt.Print(i18n.Tf("结果: %d 个场景未通过，禁止对外交付。\n", "Result: %d scenario(s) failed. Do not deliver this package.\n", failures))
 		return 1
 	}
-	fmt.Printf("结果: 全部 %d 个场景复现通过。\n", len(order))
+	fmt.Print(i18n.Tf("结果: 全部 %d 个场景复现通过。\n", "Result: all %d scenarios reproduce.\n", len(order)))
 	return 0
 }
 
@@ -975,37 +977,64 @@ func cmdSeal(root string) int {
 		"package_digest": packageDigest,
 		"file_count":     len(entries),
 		"files":          entries,
-		"honesty_note":   "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
+		"honesty_note":   i18n.T("digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。", "digest-only proves only that the content is unchanged since it was generated. It does not prove who signed it. For non-repudiation, sign package_digest separately with GPG/Ed25519 and put the public key under signature/."),
 	}
 	if err := writeJSON(filepath.Join(root, "signature", "agent.sig"), sig); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
 	}
 
-	fmt.Println("seal —— 全包摘要已生成")
+	fmt.Println(i18n.T("seal —— 全包摘要已生成", "seal — whole-package digest generated"))
 	ok("package_digest " + packageDigest)
-	ok(fmt.Sprintf("文件数 %d", len(entries)))
-	info("scheme = digest-only（未冒充密码学签名）")
+	ok(i18n.Tf("文件数 %d", "%d files", len(entries)))
+	info(i18n.T("scheme = digest-only（未冒充密码学签名）", "scheme = digest-only (no claim of a cryptographic signature)"))
 	return 0
 }
 
 // ---------------------------------------------------------------- main
 
+// versionOf 读指定交付包的版本，读不到才回落到编译期常量。
+// （toolVersion 常量曾长期写死 0.3.0，而 manifest 早已是 0.9.x —— 打印错版本比不打印更糟。）
+func versionOf(root string) string {
+	if m := mustManifest(root); m != nil {
+		if v := asString(m["version"]); v != "" {
+			return v
+		}
+	}
+	return toolVersion
+}
+
+// currentVersion 读当前目录交付包的版本。
+func currentVersion() string { return versionOf(resolveRoot(".")) }
+
 func usage() {
-	fmt.Println("WorkAgent 包工具链 v" + toolVersion + "\n\n" +
-		"用法:\n" +
-		"  workagent check  [path]                 校验包结构与兼容声明\n" +
-		"  workagent adapt  [path]                 从 agent.yaml 生成适配层\n" +
-		"  workagent attest [path]                 计算 Attestation Closure 摘要\n" +
-		"  workagent run    --input FILE [path]    执行并产出证据包\n" +
-		"  workagent run    --input FILE --replay  使用已录制的模型响应（离线）\n" +
-		"  workagent models                        列出内置模型服务商与可用状态\n" +
-		"  workagent verify [path]                 复现校验：同输入是否产出同结论\n" +
-		"  workagent verify [path] --live          重新真实调用模型，测量其是否可复现\n" +
-		"  workagent record --case ID [--input F]  跑一次并把结论+证据公开留档\n" +
-		"  workagent mcp    [path]                 以 MCP server 方式暴露本包（stdio）\n" +
-		"  workagent seal   [path]                 生成全包摘要\n" +
-		"\npath 默认为当前目录。")
+	fmt.Println(i18n.T("WorkAgent 包工具链 v", "WorkAgent package toolchain v") + currentVersion() + "\n\n" +
+		i18n.T(
+			"用法:\n"+
+				"  workagent check  [path]                 校验包结构与兼容声明\n"+
+				"  workagent adapt  [path]                 从 agent.yaml 生成适配层\n"+
+				"  workagent attest [path]                 计算 Attestation Closure 摘要\n"+
+				"  workagent run    --input FILE [path]    执行并产出证据包\n"+
+				"  workagent run    --input FILE --replay  使用已录制的模型响应（离线）\n"+
+				"  workagent models                        列出内置模型服务商与可用状态\n"+
+				"  workagent verify [path]                 复现校验：同输入是否产出同结论\n"+
+				"  workagent verify [path] --live          重新真实调用模型，测量其是否可复现\n"+
+				"  workagent record --case ID [--input F]  跑一次并把结论+证据公开留档\n"+
+				"  workagent mcp    [path]                 以 MCP server 方式暴露本包（stdio）\n"+
+				"  workagent seal   [path]                 生成全包摘要",
+			"Usage:\n"+
+				"  workagent check  [path]                 validate package structure and compatibility\n"+
+				"  workagent adapt  [path]                 generate the adapter layer from agent.yaml\n"+
+				"  workagent attest [path]                 compute Attestation Closure digests\n"+
+				"  workagent run    --input FILE [path]    execute and emit an evidence bundle\n"+
+				"  workagent run    --input FILE --replay  use recorded model responses (offline)\n"+
+				"  workagent models                        list built-in providers and availability\n"+
+				"  workagent verify [path]                 reproducibility check: same input, same conclusion?\n"+
+				"  workagent verify [path] --live          call the model again for real to measure reproducibility\n"+
+				"  workagent record --case ID [--input F]  run once and archive the conclusion publicly\n"+
+				"  workagent mcp    [path]                 expose this package as an MCP server (stdio)\n"+
+				"  workagent seal   [path]                 produce the whole-package digest") + "\n\n" +
+		i18n.T("path 默认为当前目录。", "path defaults to the current directory."))
 }
 
 func pathArg(args []string) string {
@@ -1018,18 +1047,24 @@ func pathArg(args []string) string {
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	// 语言必须在**任何输出之前**定下来，而且要在**完整参数**上解析 ——
+	// `workagent --lang en` 里 --lang 落在 os.Args[1]，只看 args（os.Args[2:]）会漏掉。
+	raw := os.Args[1:]
+	i18n.SetLang(i18n.Resolve(i18n.EnvLang(), raw))
+	// 把 --lang 摘掉，否则它的取值会被当成位置参数或命令名。
+	raw = i18n.StripLang(raw)
+	if len(raw) == 0 {
 		usage()
 		os.Exit(0)
 	}
-	switch os.Args[1] {
+	switch raw[0] {
 	case "-v", "--version", "version":
-		fmt.Println("workagent " + toolVersion)
+		fmt.Println("workagent " + currentVersion())
 		return
 	}
 	var code int
-	args := os.Args[2:]
-	switch os.Args[1] {
+	args := raw[1:]
+	switch raw[0] {
 	case "check":
 		code = cmdCheck(pathArg(args))
 	case "adapt":

@@ -1,5 +1,5 @@
 {
-  "file_count": 123,
+  "file_count": 126,
   "files": [
     {
       "path": ".gitattributes",
@@ -10,12 +10,16 @@
       "sha256": "420e64927c2b40ad822da879a315d52883e92e900e81cbd1b62ab52e63dc2cd6"
     },
     {
+      "path": ".github/workflows/publish-npm.yml",
+      "sha256": "3438f76984d4e7ab8415adc6732b71e03f52351384eda8911157dcd171fd1b78"
+    },
+    {
       "path": ".gitignore",
-      "sha256": "e62b192d630e31fd6ab07f6a7d449fecc8338647f04601abaf2df9cd08b7bcec"
+      "sha256": "bdc4bcf0b9e09528959bc1ea6bc9ec77184276cca4bb2ef4b86c0fd31c27cea9"
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "f00b62da3b791c96882d4ff3855b7a8a246f0db95ee30b66461b6f43c57c8f8d"
+      "sha256": "76c2ef4459b27ad904bada343d6358e0ea5040e910820696ee3c3325965adea2"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -31,15 +35,15 @@
     },
     {
       "path": "README.md",
-      "sha256": "d22b74a2ce0c397dc6d6c86e2547f12eba123ed44c875d0c30fd6f62bc039d19"
+      "sha256": "e9394e7eee16a891f5181412a114c1961e3678eb3a3188209f0d13e8a8f338ec"
     },
     {
       "path": "README.zh-CN.md",
-      "sha256": "cd7613fc592743a7b69e577d0ec2556cb3eeb1fa0b03f3a0804cb1a9318f4975"
+      "sha256": "2ed326f056b4c5e5ea2db7dc4a83424f87140cf8e5474123f81e0b031603bedb"
     },
     {
       "path": "agent.yaml",
-      "sha256": "27718abfc45dc58005288ec0eb08057aa458d36181fe3e4c2776e54e54adb040"
+      "sha256": "aca43aca71e7402d5d28db7c131490f027f0413ade6070a767ef22bdd9eec91c"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -47,7 +51,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "647a47e28063b5e5bbf724f745364ce615c1296a7bb8d035e6a931a2416e798f"
+      "sha256": "297597965fdccf0c46cf51403282a71bafd4c0d0a5239dac4ab66c46680b5513"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -59,27 +63,27 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "98eb11acd969ddc1d9ddffdeb615b118d0df2e6aa2d815e85bf77ab42d730654"
+      "sha256": "677a0b9e2a7ac723c0cb8ef743d5f66f01e350f1e3b234e74f3907726d2a4187"
     },
     {
       "path": "cmd/workagent/cases.go",
-      "sha256": "ad91054c3ce56e0400a0b2eb17d73022b0a46c6116ada352db8144040dcea2a3"
+      "sha256": "7e474762a18777774f1dd7fe78554f1cfafb48a7293f234cc63b3ccc35d92224"
     },
     {
       "path": "cmd/workagent/llmcmd.go",
-      "sha256": "94a9099ab081489dce4949eb13a2fcf4136474f9067ad6acb19543a10ea68e0a"
+      "sha256": "bd39030f0610ac5b80ff4628ced518f8cf6c982b1ab54328c93a00be6fd3abf6"
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "907a19c033057c9dcf9bb09c678312591fc1b3af6c91f5d30c19696f531f25c9"
+      "sha256": "8bec6855cf3e700b06c8017b3de9678159300c9736bb20f9fe94265714ecc5bd"
     },
     {
       "path": "cmd/workagent/mcp.go",
-      "sha256": "bd15460c486c73a6e54a9642a041f2abe38a28dc5b1321f5bc525ee5f45893ca"
+      "sha256": "a4bc227191e701581bb56a61bbfdac27775c9f35d482cb69bcc57f2c7779c32f"
     },
     {
       "path": "cmd/workagent/record.go",
-      "sha256": "1fc69d71e3b31f7265883b96ce6e81c3e7203bda99d27aeb236801c9fc7d8bb7"
+      "sha256": "d6ebe93833d3f28dc3c34b4e20a35cd492d4f9aebc3377b8dc42c645488efdf3"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -111,7 +115,7 @@
     },
     {
       "path": "dsh-plugin/README.md",
-      "sha256": "8606ccb34b10788214928b4bdb5524220d4cdd50e709042ea4d794cef02deb4d"
+      "sha256": "9808a05f522f400a10b30033b44a236881833a98a95b73020525c11862fd81c3"
     },
     {
       "path": "dsh-plugin/cordis.patch.yml",
@@ -131,7 +135,7 @@
     },
     {
       "path": "dsh-plugin/package.json",
-      "sha256": "8403fed3e8f15ea4c155985873f42f759bc01b1c61c043ff16d9bd9bb6f04861"
+      "sha256": "c82fc0383724ad9e8f4a5f47d7cf90342920e0a87eb7b2dcd9a5d2635bcc3277"
     },
     {
       "path": "examples/audit_chain/README.md",
@@ -362,8 +366,12 @@
       "sha256": "0a4c7a3f0ec14d929af49761a83eddfb71d43f6af6747c716f69d30f0f35e326"
     },
     {
+      "path": "internal/i18n/i18n.go",
+      "sha256": "4203d7161340ab41a2a0eb92705008a49f351ef7b4e938b51094554a4d9f69b8"
+    },
+    {
       "path": "internal/llm/client.go",
-      "sha256": "78152696dabbbb67c3251d9a2cedb792e7dc5b8e68ec8ca68a48dcac467ac6d3"
+      "sha256": "1eb4386ac786253ccc6192b6f2c3aae3cc75eec31716bf76223a1440fef6bd3a"
     },
     {
       "path": "internal/llm/client_test.go",
@@ -371,7 +379,7 @@
     },
     {
       "path": "internal/llm/profile.go",
-      "sha256": "2e178bcaab4e4beda3e9d3b66788fb92e2eaa000c4b2b48715c36035bf9e7b78"
+      "sha256": "042a2fa765b6e1e205b51940c26f6113c722cc72dbcf152bd018f21bad94f896"
     },
     {
       "path": "provenance/assumptions.json",
@@ -415,7 +423,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "76e7ff369b76236435e61b92f2c30622b1ef8ac1edbd4719d57e73ff11d063a1"
+      "sha256": "9071bf1bf23a1d9333b4334ab1fed2f38f2efe5c4be20f29c5be6ceea1baebce"
     },
     {
       "path": "records/0001-bid_quote-20261010.md",
@@ -466,8 +474,12 @@
       "sha256": "0fc8e578ec74576d3184b1fd6179010f582a43dbc0062fbfb457c6015cec25d4"
     },
     {
+      "path": "records/0013-spc_control-20261010.md",
+      "sha256": "14ef21bef7b916165c7c4d9ece2cbeca3cd3f33dbe9ed61e10f87560160bcd0c"
+    },
+    {
       "path": "records/INDEX.md",
-      "sha256": "40c8dabd2586fd373e95e293df1998399e78a40a7195814c7f1902c0830cbf66"
+      "sha256": "3754442ceaed32ab7c1bbc841fe0a03ca1fceadf1003120e8e7bf4549a85a382"
     },
     {
       "path": "signature/README.md",
@@ -494,9 +506,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:53:35+08:00",
+  "generated_at": "2026-10-10T22:25:44+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "b8153080475db7fc9ccdb024dc166b9f2211f87fb259602b0a088c0a7056b384",
+  "package_digest": "e4e97a8382338476b7340144f7402ce1afad8c40a810c8ec2a92d2f1b555e104",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

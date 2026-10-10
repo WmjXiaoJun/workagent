@@ -108,6 +108,24 @@ executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an arra
 | `mcp` | Serves the package itself as an **MCP server** over stdio | Any MCP client can call "run a scenario, get a reproducible conclusion" as a tool |
 | `seal` | Produces the whole-package digest `signature/agent.sig` | Proves content is unchanged since sealing |
 
+### Output language
+
+The CLI speaks Chinese by default and English on demand — same strings, one switch:
+
+```bash
+workagent cases .                 # 中文
+workagent cases . --lang en       # English
+WORKAGENT_LANG=en workagent cases .
+```
+
+The switch can go **before or after** the command. Scenario titles come from `agent.yaml`
+(`title` / `title_en`), because titles are content and the manifest is their source of truth;
+the delivery-form vocabulary is fixed by the spec, so it lives in `internal/i18n`.
+
+> **Honest note:** the Go CLI is bilingual. **The Python scenario executors are not yet** — the
+> `conclusion` / `findings` text they emit is still Chinese-only. That is the next step,
+> listed here rather than hidden.
+
 ### Distribution: MCP first
 
 ```bash

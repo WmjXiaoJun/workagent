@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # WorkAgent Package Manifest —— 唯一真源 (Single Source of Truth)
 # ============================================================================
 # 兼容策略：APS 基础字段结构保持不变；所有自定义能力置于 x-workagent 扩展区。
@@ -7,13 +7,13 @@
 # ----------------------------------------------------------------------------
 
 aps_version: "0.2"
-spec_version: "0.8.0"
+spec_version: "0.11.0"
 
 id: "io.github.wmjxiaojun/workagent"
 name: "workagent"
 display_name: "WorkAgent"
 display_name_en: "WorkAgent"
-version: "0.8.0"
+version: "0.11.0"
 license: "MIT"
 summary: "别人交付对话，我们交付可复现的结论。"
 summary_en: "Others ship conversations. We ship reproducible conclusions."
@@ -46,6 +46,7 @@ execution:
   cases:
     - id: "bid_quote"
       title: "投标报价测算"
+      title_en: "Bid pricing"
       shape: "测算型"
       executor: ["python", "examples/bid_quote/executor.py"]
       boundary: "examples/bid_quote/boundary.json"
@@ -63,6 +64,7 @@ execution:
 
     - id: "expense_audit"
       title: "报销单合规审核"
+      title_en: "Expense compliance review"
       shape: "核验型"
       executor: ["python", "examples/expense_audit/executor.py"]
       boundary: "examples/expense_audit/boundary.json"
@@ -79,6 +81,7 @@ execution:
 
     - id: "lab_report"
       title: "检验报告异常判定"
+      title_en: "Lab report flagging"
       shape: "核验型"
       executor: ["python", "examples/lab_report/executor.py"]
       boundary: "examples/lab_report/boundary.json"
@@ -95,6 +98,7 @@ execution:
 
     - id: "point_table"
       title: "通信点表核对"
+      title_en: "Modbus point-table audit"
       shape: "核验型"
       executor: ["python", "examples/point_table/executor.py"]
       boundary: "examples/point_table/boundary.json"
@@ -111,6 +115,7 @@ execution:
 
     - id: "spc_control"
       title: "SPC 控制图判异"
+      title_en: "SPC control-chart rules"
       shape: "核验型"
       executor: ["python", "examples/spc_control/executor.py"]
       boundary: "examples/spc_control/boundary.json"
@@ -118,6 +123,7 @@ execution:
 
     - id: "pin_conflict"
       title: "引脚 / 中断 / DMA 资源冲突检测"
+      title_en: "Pin / IRQ / DMA resource conflicts"
       shape: "核验型"
       executor: ["python", "examples/pin_conflict/executor.py"]
       boundary: "examples/pin_conflict/boundary.json"
@@ -125,6 +131,7 @@ execution:
 
     - id: "salary_tax"
       title: "工资薪金个税测算"
+      title_en: "Payroll income tax"
       shape: "测算型"
       executor: ["python", "examples/salary_tax/executor.py"]
       boundary: "examples/salary_tax/boundary.json"
@@ -132,6 +139,7 @@ execution:
 
     - id: "loan_dscr"
       title: "项目贷款偿债能力测算"
+      title_en: "Loan debt-service coverage"
       shape: "测算型"
       executor: ["python", "examples/loan_dscr/executor.py"]
       boundary: "examples/loan_dscr/boundary.json"
@@ -139,6 +147,7 @@ execution:
 
     - id: "modbus_poll"
       title: "通信负载与轮询周期测算"
+      title_en: "Modbus polling load and cycle time"
       shape: "测算型"
       executor: ["python", "examples/modbus_poll/executor.py"]
       boundary: "examples/modbus_poll/boundary.json"
@@ -146,6 +155,7 @@ execution:
 
     - id: "firmware_budget"
       title: "固件资源预算测算"
+      title_en: "Firmware Flash / RAM / stack budget"
       shape: "测算型"
       executor: ["python", "examples/firmware_budget/executor.py"]
       boundary: "examples/firmware_budget/boundary.json"
@@ -153,6 +163,7 @@ execution:
 
     - id: "points_reconcile"
       title: "积分账本一致性对账"
+      title_en: "Points ledger reconciliation"
       shape: "核验型"
       executor: ["python", "examples/points_reconcile/executor.py"]
       boundary: "examples/points_reconcile/boundary.json"
@@ -160,6 +171,7 @@ execution:
 
     - id: "audit_chain"
       title: "知识库摄入审计核验"
+      title_en: "Knowledge-base audit-log integrity"
       shape: "核验型"
       executor: ["python", "examples/audit_chain/executor.py"]
       boundary: "examples/audit_chain/boundary.json"
@@ -178,7 +190,7 @@ signature:
 
 x-workagent:
   namespace: "x-workagent"
-  version: "0.8.0"
+  version: "0.11.0"
   compat: "compat.json"
   boundary: "x-workagent/boundary.json"
   test_suite: "x-workagent/test_suite"

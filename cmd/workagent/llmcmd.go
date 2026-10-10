@@ -21,6 +21,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
 	"github.com/WmjXiaoJun/workagent/internal/llm"
 )
 
@@ -35,44 +36,44 @@ const (
 // 默认**不发起任何网络请求** —— 打印表格的命令不该因为网络行为而失败。
 // 需要探测本地端点时显式加 --probe。
 func cmdModels(probe bool) int {
-	fmt.Println("WorkAgent models —— 内置模型服务商（零第三方依赖）")
+	fmt.Println(i18n.T("WorkAgent models —— 内置模型服务商（零第三方依赖）", "WorkAgent models — built-in providers (zero third-party dependencies)"))
 	fmt.Println("")
-	fmt.Printf("%-12s %-10s %-34s %-24s %s\n", "PROVIDER", "PROTOCOL", "端点", "密钥环境变量", "状态")
+	fmt.Printf("%-12s %-10s %-34s %-24s %s\n", "PROVIDER", "PROTOCOL", i18n.T("端点", "ENDPOINT"), i18n.T("密钥环境变量", "API KEY ENV"), i18n.T("状态", "STATUS"))
 	fmt.Println(strings.Repeat("-", 118))
 	for _, p := range llm.Profiles() {
 		var status string
 		switch {
 		case p.KeyEnv == "":
-			status = "本地（无需密钥）"
+			status = i18n.T("本地（无需密钥）", "local (no key needed)")
 			if probe {
 				if reachable(p.Endpoint()) {
-					status = "本地可用"
+					status = i18n.T("本地可用", "local, reachable")
 				} else {
-					status = "未探测到"
+					status = i18n.T("未探测到", "not detected")
 				}
 			}
 		case p.KeyPresent():
-			status = "密钥已配置"
+			status = i18n.T("密钥已配置", "key configured")
 		default:
-			status = "缺少密钥"
+			status = i18n.T("缺少密钥", "key missing")
 		}
 		keyEnv := p.KeyEnv
 		if keyEnv == "" {
-			keyEnv = "(无需)"
+			keyEnv = i18n.T("(无需)", "(none)")
 		}
 		fmt.Printf("%-12s %-10s %-34s %-24s %s\n", p.Name, p.Kind, truncate(p.Endpoint(), 33), keyEnv, status)
 	}
 	fmt.Println("")
 	if !probe {
-		fmt.Println("提示：加 --probe 可探测本地端点是否在跑（默认不发起任何网络请求）")
+		fmt.Println(i18n.T("提示：加 --probe 可探测本地端点是否在跑（默认不发起任何网络请求）", "Tip: add --probe to check whether local endpoints are running (by default no network request is made)"))
 		fmt.Println("")
 	}
-	fmt.Println("用法:")
+	fmt.Println(i18n.T("用法:", "Usage:"))
 	fmt.Println("  workagent run --input <file> [--provider NAME] [--model NAME] [--replay]")
 	fmt.Println("  workagent run --input <file> --provider deepseek --model deepseek-chat")
-	fmt.Println("  workagent run --input <file> --replay        # 用已录制响应，离线可复现")
+	fmt.Println(i18n.T("  workagent run --input <file> --replay        # 用已录制响应，离线可复现", "  workagent run --input <file> --replay        # replay a recorded response, offline and reproducible"))
 	fmt.Println("")
-	fmt.Println("任何 OpenAI 兼容端点都可用 custom profile：")
+	fmt.Println(i18n.T("任何 OpenAI 兼容端点都可用 custom profile：", "Any OpenAI-compatible endpoint works via the custom profile:"))
 	fmt.Println("  set CUSTOM_BASE_URL=https://your-endpoint/v1  ;  set CUSTOM_API_KEY=xxx")
 	fmt.Println("  workagent run --input <file> --provider custom --model your-model")
 	return 0
@@ -122,14 +123,14 @@ func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, pr
 		st := asMap(raw)
 		stepID := asString(st["id"])
 		if stepID == "" {
-			return "", nil, fmt.Errorf("llm_steps 缺少 id")
+			return "", nil, fmt.Errorf(i18n.T("llm_steps 缺少 id", "llm_steps is missing an id"))
 		}
 		// 条件执行：输入里没有指定字段就跳过该步骤。
 		// 于是「结构化输入」可以零联网跑通，「自然语言输入」才需要模型。
 		if cond := asString(st["when_input_has"]); cond != "" {
 			v, ok := asMap(inputObj)[cond]
 			if !ok || v == nil || asString(v) == "" {
-				fmt.Printf("  [--]   %s: 跳过（输入中无 %s）\n", stepID, cond)
+				fmt.Printf(i18n.T("  [--]   %s: 跳过（输入中无 %s）\n", "  [--]   %s: skipped (input has no %s)\n"), stepID, cond)
 				continue
 			}
 		}
@@ -144,7 +145,7 @@ func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, pr
 		promptFile := asString(st["prompt"])
 		tplBytes, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(promptFile)))
 		if err != nil {
-			return "", nil, fmt.Errorf("步骤 %s 读不到 prompt 文件 %s: %v", stepID, promptFile, err)
+			return "", nil, fmt.Errorf(i18n.T("步骤 %s 读不到 prompt 文件 %s: %v", "step %s cannot read prompt file %s: %v"), stepID, promptFile, err)
 		}
 		prompt := strings.ReplaceAll(string(tplBytes), "{{INPUT_JSON}}", string(inputCanon))
 		promptDigest := sha256Bytes([]byte(prompt))
@@ -160,11 +161,12 @@ func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, pr
 		if replay {
 			rec, rerr := readJSON(recordPath)
 			if rerr != nil {
-				return "", nil, fmt.Errorf("步骤 %s 处于 replay 模式，但找不到录制文件 %s —— 请先在线运行一次", stepID, recordPath)
+				return "", nil, fmt.Errorf(i18n.T("步骤 %s 处于 replay 模式，但找不到录制文件 %s —— 请先在线运行一次", "step %s is in replay mode but no recording was found at %s — run it online once first"), stepID, recordPath)
 			}
 			rm := asMap(rec)
 			if asString(rm["prompt_digest"]) != promptDigest {
-				return "", nil, fmt.Errorf("步骤 %s 的 prompt 已变化，录制失效（记录 %s ≠ 当前 %s）—— 请重新录制",
+				return "", nil, fmt.Errorf(i18n.T("步骤 %s 的 prompt 已变化，录制失效（记录 %s ≠ 当前 %s）—— 请重新录制",
+					"the prompt for step %s has changed; the recording is stale (recorded %s != current %s) — record it again"),
 					stepID, short(asString(rm["prompt_digest"])), short(promptDigest))
 			}
 			text = asString(rm["text"])
@@ -176,7 +178,7 @@ func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, pr
 				level = "L1-record-replay"
 			}
 			replayed = true
-			fmt.Printf("  [--]   %s: replay（使用录制响应，未联网）\n", stepID)
+			fmt.Printf(i18n.T("  [--]   %s: replay（使用录制响应，未联网）\n", "  [--]   %s: replay (using the recorded response, offline)\n"), stepID)
 		} else {
 			temp := 0.0
 			if v, ok := st["temperature"].(float64); ok {
@@ -203,7 +205,7 @@ func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, pr
 			})
 			cancel()
 			if cerr != nil {
-				return "", nil, fmt.Errorf("步骤 %s 调用失败: %v", stepID, cerr)
+				return "", nil, fmt.Errorf(i18n.T("步骤 %s 调用失败: %v", "step %s call failed: %v"), stepID, cerr)
 			}
 			text = resp.Text
 			rawResp = resp.Raw
@@ -296,6 +298,6 @@ func writeLLMRecord(path, stepID, promptFile, promptDigest, text, rawResp string
 		"raw":             rawResp,
 		"recorded_at":     nowISO(),
 		"reproducibility": level,
-		"honesty_note":    "记录的是模型原始响应。重放记录 ≠ 重放模型；L1 只保证裁决过程可复现，不保证模型本身可复现。",
+		"honesty_note":    i18n.T("记录的是模型原始响应。重放记录 ≠ 重放模型；L1 只保证裁决过程可复现，不保证模型本身可复现。", "What is recorded is the model's raw response. Replaying a recording is not replaying the model; L1 guarantees the decision process is reproducible, not the model itself."),
 	})
 }

@@ -14,6 +14,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
 )
 
 type mcpRequest struct {
@@ -53,7 +55,7 @@ func mcpText(id json.RawMessage, text string, isErr bool) {
 func runCLI(root string, args ...string) (string, bool) {
 	exe, err := os.Executable()
 	if err != nil {
-		return "无法定位自身可执行文件: " + err.Error(), true
+		return i18n.T("无法定位自身可执行文件: ", "cannot locate own executable: ") + err.Error(), true
 	}
 	full := append([]string{}, args...)
 	if root != "" {
@@ -76,29 +78,33 @@ func mcpTools() []any {
 		return m
 	}
 	rootProp := map[string]any{"type": "string",
-		"description": "交付包根目录（含 agent.yaml）。省略时用当前工作目录。"}
+		"description": i18n.T("交付包根目录（含 agent.yaml）。省略时用当前工作目录。",
+			"Delivery package root directory (containing agent.yaml). Defaults to the current working directory.")}
 	return []any{
 		map[string]any{
-			"name":        "workagent_cases",
-			"description": "列出 WorkAgent 交付包里的可验证场景，按交付形态分组（测算型 / 核验型 / …），并给出每个场景的复现等级。",
+			"name": "workagent_cases",
+			"description": i18n.T("列出 WorkAgent 交付包里的可验证场景，按交付形态分组（测算型 / 核验型 / …），并给出每个场景的复现等级。",
+				"List the verifiable scenarios in a WorkAgent delivery package, grouped by delivery form (Estimation / Verification / …), with each scenario's reproducibility level."),
 			"inputSchema": obj(map[string]any{"root": rootProp}),
 		},
 		map[string]any{
-			"name":        "workagent_run",
-			"description": "运行一个场景并返回结论与证据包编号。结论是可复现的：同一输入任何时候跑都得到同样的输出摘要。",
+			"name": "workagent_run",
+			"description": i18n.T("运行一个场景并返回结论与证据包编号。结论是可复现的：同一输入任何时候跑都得到同样的输出摘要。",
+				"Run one scenario and return its conclusion and evidence-bundle id. The conclusion is reproducible: the same input yields the same output digest at any time."),
 			"inputSchema": obj(map[string]any{
 				"root":    rootProp,
-				"case_id": map[string]any{"type": "string", "description": "场景 ID，例如 spc_control、modbus_poll。"},
-				"input":   map[string]any{"type": "string", "description": "输入 JSON 路径。省略时用该场景自带的样例输入。"},
-				"replay":  map[string]any{"type": "boolean", "description": "带模型的场景用已录制响应重放，不需要联网与密钥。"},
+				"case_id": map[string]any{"type": "string", "description": i18n.T("场景 ID，例如 spc_control、modbus_poll。", "Scenario id, e.g. spc_control, modbus_poll.")},
+				"input":   map[string]any{"type": "string", "description": i18n.T("输入 JSON 路径。省略时用该场景自带的样例输入。", "Path to the input JSON. Defaults to the scenario's bundled sample input.")},
+				"replay":  map[string]any{"type": "boolean", "description": i18n.T("带模型的场景用已录制响应重放，不需要联网与密钥。", "For scenarios with model steps, replay a recorded response — no network or API key needed.")},
 			}, "case_id"),
 		},
 		map[string]any{
-			"name":        "workagent_verify",
-			"description": "复现校验：重放每个场景并比对结论摘要，全部 PASS 才说明交付包可对外交付。",
+			"name": "workagent_verify",
+			"description": i18n.T("复现校验：重放每个场景并比对结论摘要，全部 PASS 才说明交付包可对外交付。",
+				"Reproducibility check: replay every scenario and compare conclusion digests. All PASS is what makes the package deliverable."),
 			"inputSchema": obj(map[string]any{
 				"root": rootProp,
-				"live": map[string]any{"type": "boolean", "description": "为 true 时重新真实调用模型，测量它到底复现不复现。"},
+				"live": map[string]any{"type": "boolean", "description": i18n.T("为 true 时重新真实调用模型，测量它到底复现不复现。", "When true, calls the model again for real to measure whether it actually reproduces.")},
 			}),
 		},
 	}
@@ -110,7 +116,7 @@ func mcpCall(root string, params json.RawMessage) (string, bool) {
 		Arguments json.RawMessage `json:"arguments"`
 	}
 	if err := json.Unmarshal(params, &p); err != nil {
-		return "无法解析 tools/call 参数: " + err.Error(), true
+		return i18n.T("无法解析 tools/call 参数: ", "cannot parse tools/call params: ") + err.Error(), true
 	}
 	var args struct {
 		Root   string `json:"root"`
@@ -132,7 +138,7 @@ func mcpCall(root string, params json.RawMessage) (string, bool) {
 		return out, isErr
 	case "workagent_run":
 		if strings.TrimSpace(args.CaseID) == "" {
-			return "缺少 case_id 参数", true
+			return i18n.T("缺少 case_id 参数", "missing case_id argument"), true
 		}
 		cmdArgs := []string{"run", "--case", args.CaseID}
 		if args.Input != "" {
@@ -151,7 +157,7 @@ func mcpCall(root string, params json.RawMessage) (string, bool) {
 		out, isErr := runCLI(target, cmdArgs...)
 		return out, isErr
 	default:
-		return "未知工具: " + p.Name, true
+		return i18n.T("未知工具: ", "unknown tool: ") + p.Name, true
 	}
 }
 
@@ -180,7 +186,7 @@ func cmdMCP(root string) int {
 		}
 		var req mcpRequest
 		if err := json.Unmarshal([]byte(line), &req); err != nil {
-			mcpError(json.RawMessage("null"), -32700, "JSON 解析失败: "+err.Error())
+			mcpError(json.RawMessage("null"), -32700, i18n.T("JSON 解析失败: ", "JSON parse error: ")+err.Error())
 			continue
 		}
 		switch req.Method {
@@ -210,7 +216,7 @@ func cmdMCP(root string) int {
 			text, isErr := mcpCall(root, req.Params)
 			mcpText(req.ID, text, isErr)
 		default:
-			mcpError(req.ID, -32601, "不支持的方法: "+req.Method)
+			mcpError(req.ID, -32601, i18n.T("不支持的方法: ", "unsupported method: ")+req.Method)
 		}
 	}
 	return 0

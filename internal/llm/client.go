@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
 )
 
 // Message 是一条对话消息。
@@ -92,7 +94,7 @@ func doJSON(ctx context.Context, method, url string, headers map[string]string, 
 	}
 	var out map[string]any
 	if err := json.Unmarshal(raw, &out); err != nil {
-		return nil, text, fmt.Errorf("响应不是合法 JSON: %v", err)
+		return nil, text, fmt.Errorf(i18n.T("响应不是合法 JSON: %v", "response is not valid JSON: %v"), err)
 	}
 	return out, text, nil
 }
@@ -128,13 +130,13 @@ func dig(root any, path ...string) any {
 func Chat(ctx context.Context, providerName, model string, req Request) (*Response, Descriptor, error) {
 	p, ok := Resolve(providerName)
 	if !ok {
-		return nil, Descriptor{}, fmt.Errorf("未知 provider: %s（用 workagent models 查看全部）", providerName)
+		return nil, Descriptor{}, fmt.Errorf(i18n.T("未知 provider: %s（用 workagent models 查看全部）", "unknown provider: %s (see all with: workagent models)"), providerName)
 	}
 	if model == "" {
 		model = p.DefaultModel
 	}
 	if model == "" {
-		return nil, Descriptor{}, fmt.Errorf("provider %s 需要显式指定 --model", p.Name)
+		return nil, Descriptor{}, fmt.Errorf(i18n.T("provider %s 需要显式指定 --model", "provider %s requires an explicit --model"), p.Name)
 	}
 	desc := Descriptor{
 		Provider:    p.Name,
@@ -214,7 +216,7 @@ func callOpenAICompatible(ctx context.Context, p Profile, model string, req Requ
 
 func callAnthropic(ctx context.Context, p Profile, model string, req Request) (*Response, error) {
 	if p.APIKey() == "" {
-		return nil, fmt.Errorf("provider %s 需要环境变量 %s", p.Name, p.KeyEnv)
+		return nil, fmt.Errorf(i18n.T("provider %s 需要环境变量 %s", "provider %s requires environment variable %s"), p.Name, p.KeyEnv)
 	}
 	msgs := []map[string]any{}
 	for _, m := range req.Messages {
@@ -251,7 +253,7 @@ func callAnthropic(ctx context.Context, p Profile, model string, req Request) (*
 
 func callGemini(ctx context.Context, p Profile, model string, req Request) (*Response, error) {
 	if p.APIKey() == "" {
-		return nil, fmt.Errorf("provider %s 需要环境变量 %s", p.Name, p.KeyEnv)
+		return nil, fmt.Errorf(i18n.T("provider %s 需要环境变量 %s", "provider %s requires environment variable %s"), p.Name, p.KeyEnv)
 	}
 	contents := []map[string]any{}
 	for _, m := range req.Messages {

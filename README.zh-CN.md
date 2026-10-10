@@ -109,6 +109,22 @@ $ ./workagent run --input bad.json .
 | `mcp` | 把交付包本身作为 **MCP server** 提供（stdio） | 任何 MCP 客户端都能把"跑场景拿可复现结论"当工具调用 |
 | `seal` | 生成全包文件级摘要 `signature/agent.sig` | 证明内容自生成后未变 |
 
+### 输出语言
+
+CLI 默认中文，按需英文 —— 同一套文案，一个开关：
+
+```bash
+workagent cases .                 # 中文
+workagent cases . --lang en       # English
+WORKAGENT_LANG=en workagent cases .
+```
+
+开关可以放在命令**之前或之后**。场景标题来自 `agent.yaml`（`title` / `title_en`）——
+标题是内容，真源就是 manifest；交付形态词表由规范固定，所以放在 `internal/i18n`。
+
+> **诚实说明**：Go CLI 已经双语。**Python 场景执行体还没做** —— 它们输出的
+> `conclusion` / `findings` 仍是纯中文。这是下一步，写在这里而不是藏起来。
+
 ### 分发：先走 MCP
 
 ```bash

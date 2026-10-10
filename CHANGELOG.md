@@ -2,6 +2,35 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.11.0] - 2026-10-10
+
+**CLI 双语：`--lang en` / `WORKAGENT_LANG=en`。**
+
+### Added
+- `internal/i18n`：用**内联中英对**（`i18n.T("中文", "English")`）而不是 key 目录。
+  没有 key 就没有"拼错 key""忘了加翻译"这类错误，中文也留在调用点可见。
+- `--lang` 开关可放在命令**之前或之后**；`WORKAGENT_LANG` 环境变量等效；默认中文。
+- `agent.yaml` 新增 `title_en`（12 条）：标题是**内容**，真源在 manifest，
+  不在 Go 里硬编码一张会漂移的映射表。老平台忽略该字段，属纯增量。
+- 交付形态词表（测算/核验/抽取/排程/推演）映射放进 i18n —— 它是规范固定词汇。
+
+### 实测
+英文模式下逐命令扫描残留中文：
+
+```text
+usage 0 ｜ cases 0 ｜ check 0 ｜ models 0 ｜ attest 0 ｜ adapt 0 ｜ seal 0 ｜ verify --all 0
+run 12   ← 全部来自 Python 执行体的 conclusion/findings
+```
+
+**Go CLI 已全部双语；Python 执行体尚未（下一步）。**
+
+### Fixed
+- **`agent.yaml` 版本再次漂移**：停在 0.8.0，而标签已到 v0.10.0。已同步到 0.11.0。
+  这已是第二次 —— 说明"人肉记得同步版本"是不可靠的。
+- `usage` 打印的版本改为**从 manifest 实时读**（`toolVersion` 常量长期写死 0.3.0）。
+- `--lang` 一开始只解析 `os.Args[2:]`，导致 `workagent --lang en`（开关在命令位）
+  静默失效。改为在**完整参数**上解析，并在分发前摘除。
+
 ## [0.9.0] - 2026-10-10
 
 **`workagent record` —— 把结论变成可公开、可累积的资产。**

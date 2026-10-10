@@ -8,12 +8,15 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
 )
 
 // Case 是一个可验证的业务场景。
 type Case struct {
 	ID            string
 	Title         string
+	TitleEn       string
 	Shape         string
 	Executor      []string
 	LLMSteps      []any
@@ -21,6 +24,15 @@ type Case struct {
 	SampleInput   string
 	SampleNatural string
 	Note          string
+}
+
+// DisplayTitle 返回当前语言下的场景标题。
+// 英文缺失时回落到中文 —— 宁可显示中文，也不要显示空白。
+func (c Case) DisplayTitle() string {
+	if i18n.IsEn() && c.TitleEn != "" {
+		return c.TitleEn
+	}
+	return c.Title
 }
 
 func casesOf(m map[string]any) []Case {
@@ -31,6 +43,7 @@ func casesOf(m map[string]any) []Case {
 		c := Case{
 			ID:            asString(cm["id"]),
 			Title:         asString(cm["title"]),
+			TitleEn:       asString(cm["title_en"]),
 			Shape:         asString(cm["shape"]),
 			Boundary:      asString(cm["boundary"]),
 			SampleInput:   asString(cm["sample_input"]),
@@ -89,7 +102,7 @@ func findCase(m map[string]any, id string) (Case, bool) {
 func cmdCases(root string) int {
 	m := mustManifest(root)
 	all := casesOf(m)
-	fmt.Println("WorkAgent cases —— 按交付形态分组")
+	fmt.Println(i18n.T("WorkAgent cases —— 按交付形态分组", "WorkAgent cases — grouped by delivery form"))
 	fmt.Println("")
 	// 形态顺序固定：测算 → 核验 → 抽取 → 排程 → 推演
 	order := []string{"测算型", "核验型", "抽取型", "排程型", "推演型"}
@@ -121,23 +134,26 @@ func cmdCases(root string) int {
 		if len(cs) == 0 {
 			continue
 		}
-		fmt.Printf("【%s】%d 个\n", s, len(cs))
+		fmt.Println(i18n.Tf("【%s】%d 个", "[%s] %d", i18n.Shape(s), len(cs)))
 		for _, c := range cs {
 			rep := "L3"
 			if len(c.LLMSteps) > 0 {
 				rep = "L2/L1"
 			}
-			fmt.Printf("  %-14s %-8s %s\n", c.ID, rep, c.Title)
+			fmt.Printf("  %-16s %-8s %s\n", c.ID, rep, c.DisplayTitle())
 		}
 		fmt.Println("")
 	}
 	fmt.Println("")
-	fmt.Println("用法:")
+	fmt.Println(i18n.T("用法:", "Usage:"))
 	fmt.Println("  workagent run --case <CASE> --input <file> [--replay] [path]")
-	fmt.Println("  workagent cases                              列出全部场景")
+	fmt.Println(i18n.T("  workagent cases                              列出全部场景",
+		"  workagent cases                              list all scenarios"))
 	fmt.Println("")
-	fmt.Println("复现等级: L3 纯确定性 / L2 本地开权重模型 / L1 云端模型（靠录制重放）")
-	fmt.Println("形态说明: 测算型 · 核验型 · 抽取型 · 排程型 · 推演型 —— 见 docs/VERTICALS.md")
+	fmt.Println(i18n.T("复现等级: L3 纯确定性 / L2 本地开权重模型 / L1 云端模型（靠录制重放）",
+		"Reproducibility: L3 deterministic / L2 local open-weights / L1 cloud (replay from recording)"))
+	fmt.Println(i18n.T("形态说明: 测算型 · 核验型 · 抽取型 · 排程型 · 推演型 —— 见 docs/VERTICALS.md",
+		"Delivery forms: Estimation · Verification · Extraction · Scheduling · Simulation — see docs/VERTICALS.md"))
 	return 0
 }
 

@@ -8,6 +8,8 @@ package llm
 //  3. 本地推理（Ollama / vLLM / LM Studio）无需 API Key，因此天然适合做可复现验证。
 
 import (
+	"github.com/WmjXiaoJun/workagent/internal/i18n"
+
 	"os"
 	"strings"
 )
@@ -26,10 +28,10 @@ type Profile struct {
 
 var profiles = []Profile{
 	// ---- 本地推理：无需密钥，可离线、可复现 ----
-	{Name: "ollama", Kind: "openai", BaseURL: "http://127.0.0.1:11434/v1", BaseURLEnv: "OLLAMA_BASE_URL", KeyEnv: "", DefaultModel: "qwen2.5:7b", Vendor: "Ollama", Note: "本地开源权重，可做到端到端可复现"},
-	{Name: "vllm", Kind: "openai", BaseURL: "http://127.0.0.1:8000/v1", BaseURLEnv: "VLLM_BASE_URL", KeyEnv: "", DefaultModel: "", Vendor: "vLLM", Note: "本地部署，可固定引擎构建"},
-	{Name: "lmstudio", Kind: "openai", BaseURL: "http://127.0.0.1:1234/v1", BaseURLEnv: "LMSTUDIO_BASE_URL", KeyEnv: "", DefaultModel: "", Vendor: "LM Studio", Note: "本地桌面推理"},
-	{Name: "custom", Kind: "openai", BaseURL: "", BaseURLEnv: "CUSTOM_BASE_URL", KeyEnv: "CUSTOM_API_KEY", DefaultModel: "", Vendor: "自定义", Note: "任何 OpenAI 兼容端点"},
+	{Name: "ollama", Kind: "openai", BaseURL: "http://127.0.0.1:11434/v1", BaseURLEnv: "OLLAMA_BASE_URL", KeyEnv: "", DefaultModel: "qwen2.5:7b", Vendor: "Ollama", Note: i18n.T("本地开源权重，可做到端到端可复现", "local open weights; can be made reproducible end to end")},
+	{Name: "vllm", Kind: "openai", BaseURL: "http://127.0.0.1:8000/v1", BaseURLEnv: "VLLM_BASE_URL", KeyEnv: "", DefaultModel: "", Vendor: "vLLM", Note: i18n.T("本地部署，可固定引擎构建", "self-hosted; the engine build can be pinned")},
+	{Name: "lmstudio", Kind: "openai", BaseURL: "http://127.0.0.1:1234/v1", BaseURLEnv: "LMSTUDIO_BASE_URL", KeyEnv: "", DefaultModel: "", Vendor: "LM Studio", Note: i18n.T("本地桌面推理", "local desktop inference")},
+	{Name: "custom", Kind: "openai", BaseURL: "", BaseURLEnv: "CUSTOM_BASE_URL", KeyEnv: "CUSTOM_API_KEY", DefaultModel: "", Vendor: i18n.T("自定义", "Custom"), Note: i18n.T("任何 OpenAI 兼容端点", "any OpenAI-compatible endpoint")},
 
 	// ---- 国际 ----
 	{Name: "openai", Kind: "openai", BaseURL: "https://api.openai.com/v1", BaseURLEnv: "OPENAI_BASE_URL", KeyEnv: "OPENAI_API_KEY", DefaultModel: "gpt-4o-mini", Vendor: "OpenAI"},
@@ -39,14 +41,14 @@ var profiles = []Profile{
 	{Name: "xai", Kind: "openai", BaseURL: "https://api.x.ai/v1", BaseURLEnv: "XAI_BASE_URL", KeyEnv: "XAI_API_KEY", DefaultModel: "grok-2-latest", Vendor: "xAI"},
 	{Name: "groq", Kind: "openai", BaseURL: "https://api.groq.com/openai/v1", BaseURLEnv: "GROQ_BASE_URL", KeyEnv: "GROQ_API_KEY", DefaultModel: "llama-3.3-70b-versatile", Vendor: "Groq"},
 	{Name: "together", Kind: "openai", BaseURL: "https://api.together.xyz/v1", BaseURLEnv: "TOGETHER_BASE_URL", KeyEnv: "TOGETHER_API_KEY", DefaultModel: "meta-llama/Llama-3.3-70B-Instruct-Turbo", Vendor: "Together"},
-	{Name: "openrouter", Kind: "openai", BaseURL: "https://openrouter.ai/api/v1", BaseURLEnv: "OPENROUTER_BASE_URL", KeyEnv: "OPENROUTER_API_KEY", DefaultModel: "openai/gpt-4o-mini", Vendor: "OpenRouter", Note: "聚合数百个模型"},
+	{Name: "openrouter", Kind: "openai", BaseURL: "https://openrouter.ai/api/v1", BaseURLEnv: "OPENROUTER_BASE_URL", KeyEnv: "OPENROUTER_API_KEY", DefaultModel: "openai/gpt-4o-mini", Vendor: "OpenRouter", Note: i18n.T("聚合数百个模型", "aggregates hundreds of models")},
 
 	// ---- 国内 ----
 	{Name: "deepseek", Kind: "openai", BaseURL: "https://api.deepseek.com/v1", BaseURLEnv: "DEEPSEEK_BASE_URL", KeyEnv: "DEEPSEEK_API_KEY", DefaultModel: "deepseek-chat", Vendor: "深度求索"},
 	{Name: "qwen", Kind: "openai", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1", BaseURLEnv: "DASHSCOPE_BASE_URL", KeyEnv: "DASHSCOPE_API_KEY", DefaultModel: "qwen-plus", Vendor: "阿里通义"},
 	{Name: "moonshot", Kind: "openai", BaseURL: "https://api.moonshot.cn/v1", BaseURLEnv: "MOONSHOT_BASE_URL", KeyEnv: "MOONSHOT_API_KEY", DefaultModel: "moonshot-v1-8k", Vendor: "月之暗面 Kimi"},
 	{Name: "zhipu", Kind: "openai", BaseURL: "https://open.bigmodel.cn/api/paas/v4", BaseURLEnv: "ZHIPU_BASE_URL", KeyEnv: "ZHIPUAI_API_KEY", DefaultModel: "glm-4-plus", Vendor: "智谱 GLM"},
-	{Name: "doubao", Kind: "openai", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", BaseURLEnv: "ARK_BASE_URL", KeyEnv: "ARK_API_KEY", DefaultModel: "", Vendor: "字节豆包（火山方舟）", Note: "model 需填方舟推理接入点 ID"},
+	{Name: "doubao", Kind: "openai", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", BaseURLEnv: "ARK_BASE_URL", KeyEnv: "ARK_API_KEY", DefaultModel: "", Vendor: "字节豆包（火山方舟）", Note: i18n.T("model 需填方舟推理接入点 ID", "model must be an Ark inference endpoint id")},
 	{Name: "hunyuan", Kind: "openai", BaseURL: "https://api.hunyuan.cloud.tencent.com/v1", BaseURLEnv: "HUNYUAN_BASE_URL", KeyEnv: "HUNYUAN_API_KEY", DefaultModel: "hunyuan-turbo", Vendor: "腾讯混元"},
 	{Name: "baichuan", Kind: "openai", BaseURL: "https://api.baichuan-ai.com/v1", BaseURLEnv: "BAICHUAN_BASE_URL", KeyEnv: "BAICHUAN_API_KEY", DefaultModel: "Baichuan4", Vendor: "百川"},
 	{Name: "minimax", Kind: "openai", BaseURL: "https://api.minimax.chat/v1", BaseURLEnv: "MINIMAX_BASE_URL", KeyEnv: "MINIMAX_API_KEY", DefaultModel: "abab6.5s-chat", Vendor: "MiniMax"},
