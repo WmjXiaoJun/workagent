@@ -7,7 +7,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "1325e2131ab62455dfc2195e6b5b141d707e6e24361d78acdad30362c97b1f91"
+      "sha256": "0808ce42e10594145285e4090ad8d14d7b75432950a41f5bc15a5bb98c10661a"
     },
     {
       "path": ".gitignore",
@@ -15,7 +15,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "c1817a297e4e9c1269e3c0ca5bf594d1b1709fae47dc6f564fe342dc68d22f26"
+      "sha256": "e50fe39c827b6636ecfce303c9002948c2184d35ea28d5ddf091abc95bc704dc"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -27,19 +27,19 @@
     },
     {
       "path": "Makefile",
-      "sha256": "79298f01ebcf552e73b62ee029d0ba99c0e2b4c21de4e7edfdab72ad06fdacae"
+      "sha256": "ce716f414d9bf3721fbde8b14303de275e0437b24bfdbbf987deb1a4e6a88c18"
     },
     {
       "path": "README.en.md",
-      "sha256": "968e96a12d9984cd2059d7876e8d5096d6179150c34518e2ed834b7d80fe998a"
+      "sha256": "588ada8947d87db13b0666e59bbee85c3786288ef6765a9c532608a5788c700a"
     },
     {
       "path": "README.md",
-      "sha256": "ffdf83a036fc8c8d658d748047bd05e9f594b6ec5a7c921d485272ff12e73a4e"
+      "sha256": "f4a106bc8bfc0641569bddd51f7b3ef2113350a8a1a297c30a1fd368638b9090"
     },
     {
       "path": "agent.yaml",
-      "sha256": "1a1615e0305af2df9b432e1eb443bab08b4fe0718b2f1b4e31d9fac73f0a1646"
+      "sha256": "dfdbb3a09423e436cfdc23ebb3f9b120bf7c9df4de6099c5da9bb5dae80b41c6"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -47,11 +47,11 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "8e6ba380d20147220d72a7ebc8d37c9e84a2fd6b9973b2a2d4ab0853e5bb5af7"
+      "sha256": "838da0f470813cec5539033a90701e7014c668c4fc0b4fa19e281ebd5f03f433"
     },
     {
       "path": "artifacts/summary.template.md",
-      "sha256": "b0334474da16e1acdfaf11338a5ce8e151d97df41277ff1b1c62dabaf652fdd1"
+      "sha256": "82a7944e0b908582e1fb14fd1ec4d326928a61e35bd9bd5168cf271efcd7e65e"
     },
     {
       "path": "assets/logo.svg",
@@ -63,7 +63,7 @@
     },
     {
       "path": "cmd/workagent/cases.go",
-      "sha256": "4b5ed595a93be95bb179bfe6c21551bbbadc4cd3adbb3c15a5202f03ce30097a"
+      "sha256": "bcb2d94a62cb8fb12ecb14098cdc3f381cc3badb5ec7b7b70142fc3789dff906"
     },
     {
       "path": "cmd/workagent/llmcmd.go",
@@ -71,7 +71,7 @@
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "9ddeca8dfb2cb399b150ba9f68a858a45433f13be7d8083b6d644fdaa938e540"
+      "sha256": "08adcbd5336860a62bb90fb4a57fbcca493a5dcd4d64e63007ea3ecd531072ed"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -87,7 +87,7 @@
     },
     {
       "path": "docs/EXAMPLES.md",
-      "sha256": "5f9a5973339ac53b832e8c1b5985a9ba67c8447bf44ac1f9c97bbd8afa5447c4"
+      "sha256": "3bf76d7fc1da51377488f0fecdb147de35494366fdf1b96b9e164d052a090db0"
     },
     {
       "path": "docs/PROVIDERS.md",
@@ -127,7 +127,7 @@
     },
     {
       "path": "examples/expense_audit/README.md",
-      "sha256": "32148f32e24380dbaa4fd6e52b41da4ff734b96b47b0dc962bc146a4cfb6a1bf"
+      "sha256": "3a3249bca042f67ad29874b272890e4cda2d633aeadde2a93d18f2fb4cfdb048"
     },
     {
       "path": "examples/expense_audit/boundary.json",
@@ -147,7 +147,7 @@
     },
     {
       "path": "examples/lab_report/README.md",
-      "sha256": "3344f745467c51e0cee77861962e0fca5dfca505846c0e25b7e0bf13bd67d571"
+      "sha256": "8564c6d8c28b4a12ff7965459e31820ccfb5655402e171e4fe7f07c4c526723a"
     },
     {
       "path": "examples/lab_report/boundary.json",
@@ -167,7 +167,7 @@
     },
     {
       "path": "examples/loan_dscr/README.md",
-      "sha256": "a09b107fc5e53371695fa6ea0af05ef59292d1ffff902419ee839ede3eed9aa1"
+      "sha256": "1e609dd9d5a5a8355a2ff76007e22afac9a0f631ffa80021d4563e2dc44c11db"
     },
     {
       "path": "examples/loan_dscr/boundary.json",
@@ -175,7 +175,7 @@
     },
     {
       "path": "examples/loan_dscr/executor.py",
-      "sha256": "48f0057acef54f5f2d0bb1709bbfd39564caf6dae044b6f96a28b154618e648d"
+      "sha256": "e9c940348ffa7e85226d8e5425aefb8a9302a19fb75414d2a2e79a215df79cc8"
     },
     {
       "path": "examples/loan_dscr/input.json",
@@ -183,7 +183,7 @@
     },
     {
       "path": "examples/pin_conflict/README.md",
-      "sha256": "ab62e1ab026e02e2782e0c05387abe32f48e65ac69809acd7a57fa0726459b67"
+      "sha256": "74654ec0681147dff5dd69a2a84e9d78bf3d14c532e8d7e9bc3f7e3badf90662"
     },
     {
       "path": "examples/pin_conflict/boundary.json",
@@ -199,7 +199,7 @@
     },
     {
       "path": "examples/point_table/README.md",
-      "sha256": "9cace28e23fad7d3bc11b20ee5186d62f5177cdbcd759db66869c2147e5a1115"
+      "sha256": "cde101a92dc6ed88a222144236bf0ce6357ef957d2b1777a5aa6c29ac49f0f41"
     },
     {
       "path": "examples/point_table/boundary.json",
@@ -219,7 +219,7 @@
     },
     {
       "path": "examples/salary_tax/README.md",
-      "sha256": "954e5526f757f271d8b48801228691ae228fa7af273450bf42f55fc882fa205f"
+      "sha256": "f610d4574e0e4a9547eec832ab19470dbfe099bcdf4ca9928affdd2e941c439b"
     },
     {
       "path": "examples/salary_tax/boundary.json",
@@ -235,7 +235,7 @@
     },
     {
       "path": "examples/spc_control/README.md",
-      "sha256": "454dde137a66c50a1ad52d94cbb7847f165ec59a9a886a6cc9419abe160449f1"
+      "sha256": "663cae941ff3dc4ad664832b2df29a0ea4fc7b121eff5fef80748048f99689c7"
     },
     {
       "path": "examples/spc_control/boundary.json",
@@ -291,7 +291,7 @@
     },
     {
       "path": "provenance/llm/bid_quote/index.json",
-      "sha256": "3eacb45934df9b096632d7e42f07ce9a2e2cf0b0e04b42019727631d403b8ee5"
+      "sha256": "b329b9103b0bb9af0f38d099a732f1d5e8359ac8b7e935728d887998fd75b482"
     },
     {
       "path": "provenance/llm/expense_audit/extract.json",
@@ -319,7 +319,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "c2d4cecd3e9425826870f11ec0668b184a4968662ccadc87cc6ae804729d3748"
+      "sha256": "9d8dfc55af34727bb9670e909e9151d0de37ff7e9b0e7e066a5d7dfbbf84bb34"
     },
     {
       "path": "signature/README.md",
@@ -346,9 +346,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T20:20:26+08:00",
+  "generated_at": "2026-10-10T20:48:47+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "4dceb4a283d057aeec8c600afba9aebe4d01c58c7e7f8aec154d908db55e38a2",
+  "package_digest": "b815b41ae846b1bf9e650c10addf2fd49a977e65e6a2f393d66be648b7624749",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

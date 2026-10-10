@@ -9,7 +9,7 @@
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
 ![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
-![cases](https://img.shields.io/badge/industry%20cases-8-orange)
+![cases](https://img.shields.io/badge/scenarios-8-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -161,21 +161,26 @@ qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY  
 
 ---
 
-## 八个行业场景
+## 八个可验证场景，按交付形态分
 
-一个包承载八个可验证场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
+**不按行业分，按交付形态分。** 行业是结果不是依据——为什么这样切见 `docs/VERTICALS.md`。
+一个包承载多个场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
 
 ```text
 $ workagent cases .
-CASE           行业             形态       复现       标题
-bid_quote      建筑工程          测算型      L2/L1    投标报价测算
-expense_audit  财务             核验型      L2/L1    报销单合规审核
-lab_report     医疗             核验型      L2/L1    检验报告异常判定
-point_table    工业自动化          核验型      L2/L1    通信点表核对
-spc_control    制造业            核验型      L3       SPC 控制图判异
-pin_conflict   嵌入式            核验型      L3       嵌入式资源冲突检测
-salary_tax     人力资源           测算型      L3       工资薪金个税测算
-loan_dscr      金融             测算型      L3       项目贷款偿债能力测算
+WorkAgent cases —— 按交付形态分组
+
+【测算型】3 个
+  bid_quote      L2/L1    投标报价测算
+  salary_tax     L3       工资薪金个税测算
+  loan_dscr      L3       项目贷款偿债能力测算
+
+【核验型】5 个
+  expense_audit  L2/L1    报销单合规审核
+  lab_report     L2/L1    检验报告异常判定
+  point_table    L2/L1    通信点表核对
+  spc_control    L3       SPC 控制图判异
+  pin_conflict   L3       引脚 / 中断 / DMA 资源冲突检测
 ```
 
 ```bash

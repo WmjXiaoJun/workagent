@@ -6,7 +6,6 @@
 | 项 | 内容 |
 |---|---|
 | 场景 | `<case_id>` · <case_title> |
-| 行业 | <industry> |
 | 对象 | <subject> |
 | **结论** | **<conclusion>** |
 | 判定 | <verdict> |

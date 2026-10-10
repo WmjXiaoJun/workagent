@@ -8,14 +8,12 @@ package main
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 )
 
 // Case 是一个可验证的业务场景。
 type Case struct {
 	ID            string
 	Title         string
-	Industry      string
 	Shape         string
 	Executor      []string
 	LLMSteps      []any
@@ -33,7 +31,6 @@ func casesOf(m map[string]any) []Case {
 		c := Case{
 			ID:            asString(cm["id"]),
 			Title:         asString(cm["title"]),
-			Industry:      asString(cm["industry"]),
 			Shape:         asString(cm["shape"]),
 			Boundary:      asString(cm["boundary"]),
 			SampleInput:   asString(cm["sample_input"]),
@@ -92,26 +89,55 @@ func findCase(m map[string]any, id string) (Case, bool) {
 func cmdCases(root string) int {
 	m := mustManifest(root)
 	all := casesOf(m)
-	fmt.Println("WorkAgent cases —— 本包承载的可验证场景")
+	fmt.Println("WorkAgent cases —— 按交付形态分组")
 	fmt.Println("")
-	fmt.Printf("%-14s %-14s %-8s %-8s %s\n", "CASE", "行业", "形态", "复现", "标题")
-	fmt.Println(strings.Repeat("-", 104))
+	// 形态顺序固定：测算 → 核验 → 抽取 → 排程 → 推演
+	order := []string{"测算型", "核验型", "抽取型", "排程型", "推演型"}
+	grouped := map[string][]Case{}
+	seen := map[string]bool{}
+	var extra []string
 	for _, c := range all {
-		rep := "L3"
-		llm := "0"
-		if len(c.LLMSteps) > 0 {
-			llm = fmt.Sprint(len(c.LLMSteps))
-			rep = "L2/L1"
+		s := c.Shape
+		if s == "" {
+			s = "未分类"
 		}
-		fmt.Printf("%-14s %-14s %-8s %-8s %s\n", c.ID, c.Industry, c.Shape, rep, c.Title)
-		_ = llm
+		if !seen[s] {
+			seen[s] = true
+			known := false
+			for _, o := range order {
+				if o == s {
+					known = true
+					break
+				}
+			}
+			if !known {
+				extra = append(extra, s)
+			}
+		}
+		grouped[s] = append(grouped[s], c)
+	}
+	for _, s := range append(append([]string{}, order...), extra...) {
+		cs := grouped[s]
+		if len(cs) == 0 {
+			continue
+		}
+		fmt.Printf("【%s】%d 个\n", s, len(cs))
+		for _, c := range cs {
+			rep := "L3"
+			if len(c.LLMSteps) > 0 {
+				rep = "L2/L1"
+			}
+			fmt.Printf("  %-14s %-8s %s\n", c.ID, rep, c.Title)
+		}
+		fmt.Println("")
 	}
 	fmt.Println("")
 	fmt.Println("用法:")
 	fmt.Println("  workagent run --case <CASE> --input <file> [--replay] [path]")
 	fmt.Println("  workagent cases                              列出全部场景")
 	fmt.Println("")
-	fmt.Println("复现等级说明: L3 纯确定性 / L2 本地开权重模型 / L1 云端模型（靠录制重放）")
+	fmt.Println("复现等级: L3 纯确定性 / L2 本地开权重模型 / L1 云端模型（靠录制重放）")
+	fmt.Println("形态说明: 测算型 · 核验型 · 抽取型 · 排程型 · 推演型 —— 见 docs/VERTICALS.md")
 	return 0
 }
 

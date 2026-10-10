@@ -9,7 +9,7 @@
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
 ![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
-![cases](https://img.shields.io/badge/industry%20cases-8-orange)
+![cases](https://img.shields.io/badge/scenarios-8-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -161,22 +161,27 @@ The level is written into `evidence.json`. **We never call L1 an L2.**
 
 ---
 
-## Eight industry scenarios
+## Eight verifiable scenarios, grouped by delivery form
 
-One package carries eight verifiable scenarios sharing the same infrastructure
-(compatibility declaration, provenance, evidence bundles, reproducibility checks).
+**Not by industry — by delivery form.** Industry is an outcome, not a criterion; see
+`docs/VERTICALS.md` for why. One package carries many scenarios sharing the same
+infrastructure (compatibility declaration, provenance, evidence bundles, reproducibility checks).
 
 ```text
 $ workagent cases .
-CASE            Industry        Shape        Repro     Title
-bid_quote       Construction    Estimation   L2/L1     Bid pricing
-expense_audit   Finance         Verification L2/L1     Expense compliance
-lab_report      Healthcare      Verification L2/L1     Lab result flagging
-point_table     Industrial      Verification L2/L1     Modbus point-table audit
-spc_control     Manufacturing   Verification L3       SPC control-chart rules
-pin_conflict    Embedded        Verification L3       MCU resource conflicts
-salary_tax      HR              Estimation   L3       Payroll income tax
-loan_dscr       Finance         Estimation   L3       Loan debt-service coverage
+WorkAgent cases —— grouped by delivery form
+
+[Estimation] 3
+  bid_quote      L2/L1    Bid pricing
+  salary_tax     L3       Payroll income tax
+  loan_dscr      L3       Loan debt-service coverage
+
+[Verification] 5
+  expense_audit  L2/L1    Expense compliance
+  lab_report     L2/L1    Lab result flagging
+  point_table    L2/L1    Modbus point-table audit
+  spc_control    L3       SPC control-chart rules
+  pin_conflict   L3       Pin / IRQ / DMA resource conflicts
 ```
 
 ```bash

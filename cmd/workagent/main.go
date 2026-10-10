@@ -307,7 +307,7 @@ func cmdCheck(root string) int {
 			bad(cc.ID + " 缺少: " + strings.Join(missing, ", "))
 			failures++
 		} else {
-			ok(cc.ID + "  (" + cc.Industry + " · " + cc.Shape + ")")
+			ok(cc.ID + "  (" + cc.Shape + ")")
 		}
 	}
 
@@ -609,7 +609,6 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 	repl := map[string]string{
 		"<case_id>":          c.ID,
 		"<case_title>":       c.Title,
-		"<industry>":         c.Industry,
 		"<subject>":          subj,
 		"<verdict>":          asString(outMap["verdict"]),
 		"<findings>":         findText,
