@@ -11,7 +11,7 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "666fd0f9a954d2f5a52ac8b05ab51989aaf460e7c805f829ec20d0a51a826e35"
+      "sha256": "e62b192d630e31fd6ab07f6a7d449fecc8338647f04601abaf2df9cd08b7bcec"
     },
     {
       "path": "CHANGELOG.md",
@@ -146,9 +146,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T18:35:06+08:00",
+  "generated_at": "2026-10-10T18:35:16+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "cc1161f710b02806243f7236f031b841f61c8647df9a42b9bd911842c8027f38",
+  "package_digest": "a2a2eff41aac33b384ac9d52c0088f110f4dbbadeee3bf112b64b86a0a274e72",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

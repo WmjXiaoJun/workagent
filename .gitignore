@@ -1,12 +1,13 @@
-# 生成物
+# 生成物（注意：以 / 开头锚定到仓库根，
+# 否则 "workagent" 会连 cmd/workagent/ 源码目录一起忽略）
 adapters/*
 !adapters/.gitignore
 !adapters/README.md
-out/
-dist/
-bin/
-workagent
-workagent.exe
+/out/
+/dist/
+/bin/
+/workagent
+/workagent.exe
 
 # Go
 *.test
@@ -17,5 +18,5 @@ __pycache__/
 .venv/
 
 # 其它
-build/
+/build/
 .DS_Store
