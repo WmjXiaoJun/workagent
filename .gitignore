@@ -20,3 +20,8 @@ __pycache__/
 # 其它
 /build/
 .DS_Store
+
+# npm 打包产物
+*.tgz
+npm-debug.log*
+.npmrc

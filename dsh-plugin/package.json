@@ -1,13 +1,34 @@
 {
   "name": "dsh-plugin-workagent",
-  "version": "0.8.0",
-  "private": true,
+  "version": "0.10.0",
+  "description": "DeepSeek Harness bundle: expose a WorkAgent delivery package as MCP tools (cases / run / verify), so any MCP client can obtain a reproducible, evidence-backed conclusion.",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "bundle",
+    "plugin",
+    "mcp",
+    "workagent",
+    "reproducible",
+    "verification",
+    "provenance"
+  ],
+  "license": "MIT",
+  "author": "xiaojun <261235953@qq.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WmjXiaoJun/workagent.git",
+    "directory": "dsh-plugin"
+  },
+  "homepage": "https://github.com/WmjXiaoJun/workagent/tree/main/dsh-plugin",
+  "bugs": { "url": "https://github.com/WmjXiaoJun/workagent/issues" },
   "type": "module",
-  "description": "Expose a WorkAgent delivery package to DeepSeek Harness as MCP tools.",
   "exports": {
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
   "files": ["cordis.patch.yml", "locale/*.json", "icon.svg"],
-  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "publishConfig": { "access": "public" }
 }
