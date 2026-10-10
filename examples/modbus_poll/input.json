@@ -1,0 +1,26 @@
+{
+  "link": {
+    "name": "PLC-01 主站轮询链路（RS-485）",
+    "mode": "rtu",
+    "baud": 9600,
+    "data_bits": 8,
+    "parity": "E",
+    "stop_bits": 1,
+    "turnaround_ms": 15
+  },
+  "target_cycle_ms": 500,
+  "points": [
+    { "name": "进水流量",   "function_code": 3, "address": 40001, "registers": 2 },
+    { "name": "出水流量",   "function_code": 3, "address": 40003, "registers": 2 },
+    { "name": "进水 pH",   "function_code": 3, "address": 40005, "registers": 2 },
+    { "name": "出水 pH",   "function_code": 3, "address": 40007, "registers": 2 },
+    { "name": "浊度",      "function_code": 3, "address": 40009, "registers": 1 },
+    { "name": "液位",      "function_code": 3, "address": 40010, "registers": 1 },
+    { "name": "温度",      "function_code": 3, "address": 40011, "registers": 1 },
+    { "name": "加药泵频率", "function_code": 3, "address": 40100, "registers": 1 },
+    { "name": "加药泵状态", "function_code": 1, "address": 1,     "registers": 8 },
+    { "name": "报警字",    "function_code": 3, "address": 40200, "registers": 4 },
+    { "name": "累计流量高位", "function_code": 3, "address": 40300, "registers": 1 },
+    { "name": "累计流量低位", "function_code": 3, "address": 40301, "registers": 1 }
+  ]
+}

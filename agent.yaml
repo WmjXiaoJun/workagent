@@ -137,6 +137,20 @@ execution:
       boundary: "examples/loan_dscr/boundary.json"
       sample_input: "examples/loan_dscr/input.json"
 
+    - id: "modbus_poll"
+      title: "通信负载与轮询周期测算"
+      shape: "测算型"
+      executor: ["python", "examples/modbus_poll/executor.py"]
+      boundary: "examples/modbus_poll/boundary.json"
+      sample_input: "examples/modbus_poll/input.json"
+
+    - id: "firmware_budget"
+      title: "固件资源预算测算"
+      shape: "测算型"
+      executor: ["python", "examples/firmware_budget/executor.py"]
+      boundary: "examples/firmware_budget/boundary.json"
+      sample_input: "examples/firmware_budget/input.json"
+
 provenance:
   trace: "provenance/trace.json"
   data_sources: "provenance/data_sources.json"

@@ -1,0 +1,24 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "firmware_budget",
+  "applies_to": "MCU 固件 Flash / RAM / 任务栈资源预算核查",
+  "valid_when": [
+    "Flash 与 RAM 模块清单来自链接映射文件或人工整理表",
+    "栈峰值为实测高水位（例如 FreeRTOS 的高水位查询接口）",
+    "容量为实际 MCU 规格"
+  ],
+  "invalid_when": [
+    "需要精确到段的链接结果分析（应直接用 map 文件工具）",
+    "需要评估中断栈、DMA 缓冲区与运行时碎片",
+    "需要评估 OTA 双分区布局与升级余量"
+  ],
+  "confidence_rating": {
+    "level": "high",
+    "basis": "汇总与容量比对为纯算术；阈值来自实践惯例且可在输入中覆盖"
+  },
+  "risk_notes": [
+    "栈峰值未覆盖尚未走到的分支",
+    "未计入中断栈、DMA 缓冲与运行时动态分配"
+  ],
+  "stop_condition": "容量非正、清单为空或栈分配量非正时必须报错退出"
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "modbus_poll",
+  "applies_to": "Modbus RTU / TCP 主站轮询周期与负载测算",
+  "valid_when": [
+    "点表点位 1 ~ 1000 条",
+    "功能码限定为 1 / 2 / 3 / 4（读线圈、读离散输入、读保持寄存器、读输入寄存器）",
+    "单点寄存器数 1 ~ 125",
+    "RTU 波特率大于 0，校验位为 N / E / O"
+  ],
+  "invalid_when": [
+    "需要测算写操作（FC05/06/15/16）的负载",
+    "涉及多主站或广播",
+    "需要建模无线链路（LoRa / 4G）的丢包与重传",
+    "需要测算从站内部处理耗时（应由现场实测得到 turnaround_ms）"
+  ],
+  "confidence_rating": {
+    "level": "high",
+    "basis": "按 Modbus 帧格式与字符时间计算，纯确定性；估计类参数已在风险中声明"
+  },
+  "risk_notes": [
+    "turnaround_ms 为估计值，实际从站响应间隔需现场实测",
+    "未计入交换机时延、无线重传与主站软件调度开销"
+  ],
+  "stop_condition": "点位为空、功能码不支持、寄存器数越界或参数非法时必须报错退出"
+}

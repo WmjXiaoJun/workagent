@@ -1,0 +1,31 @@
+{
+  "mcu": "STM32F407VGT6",
+  "flash_capacity_kb": 1024,
+  "ram_capacity_kb": 128,
+  "heap_kb": 16,
+  "thresholds": { "flash_warn": 0.85, "ram_warn": 0.80, "stack_min_margin": 0.20 },
+  "flash": [
+    { "module": "Bootloader", "kb": 32 },
+    { "module": "RTOS 内核", "kb": 28 },
+    { "module": "通信协议栈", "kb": 96 },
+    { "module": "控制算法", "kb": 148 },
+    { "module": "Modbus 从站", "kb": 42 },
+    { "module": "参数存储与文件系统", "kb": 120 },
+    { "module": "HMI 字库与图形", "kb": 310 },
+    { "module": "日志与诊断", "kb": 46 },
+    { "module": "第三方库", "kb": 88 }
+  ],
+  "ram": [
+    { "module": "RTOS 内核对象", "kb": 10 },
+    { "module": "通信缓冲区", "kb": 18 },
+    { "module": "控制算法状态", "kb": 22 },
+    { "module": "图形帧缓冲", "kb": 30 },
+    { "module": "日志环形缓冲", "kb": 8 }
+  ],
+  "stacks": [
+    { "task": "主控制任务", "allocated_b": 2048, "peak_b": 1180 },
+    { "task": "通信任务", "allocated_b": 1536, "peak_b": 1290 },
+    { "task": "HMI 刷新任务", "allocated_b": 2048, "peak_b": 900 },
+    { "task": "诊断任务", "allocated_b": 1024, "peak_b": 410 }
+  ]
+}

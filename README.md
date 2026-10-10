@@ -9,7 +9,7 @@
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
 ![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
-![cases](https://img.shields.io/badge/scenarios-8-orange)
+![cases](https://img.shields.io/badge/scenarios-10-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -161,7 +161,7 @@ qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY  
 
 ---
 
-## 八个可验证场景，按交付形态分
+## 十个可验证场景，按交付形态分
 
 **不按行业分，按交付形态分。** 行业是结果不是依据——为什么这样切见 `docs/VERTICALS.md`。
 一个包承载多个场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
@@ -170,17 +170,19 @@ qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY  
 $ workagent cases .
 WorkAgent cases —— 按交付形态分组
 
-【测算型】3 个
-  bid_quote      L2/L1    投标报价测算
-  salary_tax     L3       工资薪金个税测算
-  loan_dscr      L3       项目贷款偿债能力测算
+【测算型】5 个
+  bid_quote       L2/L1    投标报价测算
+  salary_tax      L3       工资薪金个税测算
+  loan_dscr       L3       项目贷款偿债能力测算
+  modbus_poll     L3       通信负载与轮询周期测算
+  firmware_budget L3       固件资源预算测算
 
 【核验型】5 个
-  expense_audit  L2/L1    报销单合规审核
-  lab_report     L2/L1    检验报告异常判定
-  point_table    L2/L1    通信点表核对
-  spc_control    L3       SPC 控制图判异
-  pin_conflict   L3       引脚 / 中断 / DMA 资源冲突检测
+  expense_audit   L2/L1    报销单合规审核
+  lab_report      L2/L1    检验报告异常判定
+  point_table     L2/L1    通信点表核对
+  spc_control     L3       SPC 控制图判异
+  pin_conflict    L3       引脚 / 中断 / DMA 资源冲突检测
 ```
 
 ```bash

@@ -11,6 +11,11 @@
         "digest": "04ccfa28760055a02198b73d697326b2ae9cb16634aa73530c87d815eba23f93",
         "llm_steps": 1
       },
+      "firmware_budget": {
+        "command": "python examples/firmware_budget/executor.py",
+        "digest": "5a8d24e97d90a73c596a21133d5b39c64ad319fd37b29a6c5987410e9c099004",
+        "llm_steps": 0
+      },
       "lab_report": {
         "command": "python examples/lab_report/executor.py",
         "digest": "a0e12e08053e465832294814766e0da3cad2f755e3bf01efd1d177c4008a06b6",
@@ -18,7 +23,12 @@
       },
       "loan_dscr": {
         "command": "python examples/loan_dscr/executor.py",
-        "digest": "48f0057acef54f5f2d0bb1709bbfd39564caf6dae044b6f96a28b154618e648d",
+        "digest": "e9c940348ffa7e85226d8e5425aefb8a9302a19fb75414d2a2e79a215df79cc8",
+        "llm_steps": 0
+      },
+      "modbus_poll": {
+        "command": "python examples/modbus_poll/executor.py",
+        "digest": "f16c7fce631c80b8284c7c77170ac2ce72ed8e40d6c9486bae63a121fd119c67",
         "llm_steps": 0
       },
       "pin_conflict": {
@@ -48,7 +58,7 @@
     "executor_command": "python examples/bid_quote/executor.py",
     "executor_digest": "8b02553c683a01ff736e391bd6d63099aa66d691c7626faf5ee3be5be5cdbcec",
     "inputs_schema_digest": "0a4c7a3f0ec14d929af49761a83eddfb71d43f6af6747c716f69d30f0f35e326",
-    "manifest_digest": "1a1615e0305af2df9b432e1eb443bab08b4fe0718b2f1b4e31d9fac73f0a1646",
+    "manifest_digest": "3b5fca2cb01707d7cfbb2b31898fe4ea44dc2173bd70909da93912fa99ae84d3",
     "model_weights_digest": null,
     "numeric_env": {
       "LC_ALL": "C.UTF-8",
@@ -60,7 +70,7 @@
     "toolchain": "go go1.27.0",
     "workflow_digest": "4704c521c57a6b3eb3c9a83ba47024c84c80e889a14ebefb2452d3a3678651ac"
   },
-  "generated_at": "2026-10-10T20:20:25+08:00",
+  "generated_at": "2026-10-10T21:04:18+08:00",
   "llm_used": true,
   "note": "确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。",
   "principle": "摘要必须覆盖推理函数的完整计算闭包。任何落在被证明集合之外的组件，都是一条伪造通道。",

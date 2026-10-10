@@ -1,5 +1,5 @@
 {
-  "file_count": 86,
+  "file_count": 94,
   "files": [
     {
       "path": ".gitattributes",
@@ -15,7 +15,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "e50fe39c827b6636ecfce303c9002948c2184d35ea28d5ddf091abc95bc704dc"
+      "sha256": "d685d61573da15f628c6f0b65134b55db76e5e3ccca924b759a25b4b9c295307"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -31,15 +31,15 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "588ada8947d87db13b0666e59bbee85c3786288ef6765a9c532608a5788c700a"
+      "sha256": "7e20ac2ed96bd93fd98b95c5016310bf47a140b1f5e0bd23c06503de26485d9a"
     },
     {
       "path": "README.md",
-      "sha256": "f4a106bc8bfc0641569bddd51f7b3ef2113350a8a1a297c30a1fd368638b9090"
+      "sha256": "5fd6c30133948e5b7ef1eff4633bf610f499431cd3b1017ac3babb226f36be26"
     },
     {
       "path": "agent.yaml",
-      "sha256": "dfdbb3a09423e436cfdc23ebb3f9b120bf7c9df4de6099c5da9bb5dae80b41c6"
+      "sha256": "3b5fca2cb01707d7cfbb2b31898fe4ea44dc2173bd70909da93912fa99ae84d3"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "838da0f470813cec5539033a90701e7014c668c4fc0b4fa19e281ebd5f03f433"
+      "sha256": "7061fa96370ec7f57c3ae72c91922b378d26e0bf2ecc6e19d87ac6f4bcd83b52"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -59,7 +59,7 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "63d5e6cba026b50be0a871aaa77cbbf12c32e947429f157fd08d4a224102489f"
+      "sha256": "803f3aa36ddb471c1460b0d61f2a3479542a4eec41916d24471fe4f97b78c47e"
     },
     {
       "path": "cmd/workagent/cases.go",
@@ -87,7 +87,7 @@
     },
     {
       "path": "docs/EXAMPLES.md",
-      "sha256": "3bf76d7fc1da51377488f0fecdb147de35494366fdf1b96b9e164d052a090db0"
+      "sha256": "78a2002788609c9c38d2ca7a260468bcf32e1cc2a00a10137b68b39f016822a6"
     },
     {
       "path": "docs/PROVIDERS.md",
@@ -146,6 +146,22 @@
       "sha256": "bf46fc2ff617bb596e08dcf8e303c2236a6c05c6a71558c7263cffba4ddf35bf"
     },
     {
+      "path": "examples/firmware_budget/README.md",
+      "sha256": "9b8772352e8fd11e97a80e9c656b6238a533c6d51324a652b1ecd94382b7342e"
+    },
+    {
+      "path": "examples/firmware_budget/boundary.json",
+      "sha256": "c640faaa1aae9e9409cb24a7e014646c5202b5ee47c9b41ae84342ac1370e26d"
+    },
+    {
+      "path": "examples/firmware_budget/executor.py",
+      "sha256": "5a8d24e97d90a73c596a21133d5b39c64ad319fd37b29a6c5987410e9c099004"
+    },
+    {
+      "path": "examples/firmware_budget/input.json",
+      "sha256": "92291d9937c7a1c95df1a7f0d95cbeb670afbfb36d3b2d7b2ab5a48b7c04984c"
+    },
+    {
       "path": "examples/lab_report/README.md",
       "sha256": "8564c6d8c28b4a12ff7965459e31820ccfb5655402e171e4fe7f07c4c526723a"
     },
@@ -180,6 +196,22 @@
     {
       "path": "examples/loan_dscr/input.json",
       "sha256": "6a213eff8266ecacf0e1b2ee81fe138e986212436b45d01c97b2c600c23b77f1"
+    },
+    {
+      "path": "examples/modbus_poll/README.md",
+      "sha256": "9cd131a21794a5545fbce10c7aefbb617b1dd41dfd062f23d6246f3ebadc688b"
+    },
+    {
+      "path": "examples/modbus_poll/boundary.json",
+      "sha256": "c38a90c8a4385a42ae95a026f4993191b9cac993c935f0a4f14b174b84f5fb79"
+    },
+    {
+      "path": "examples/modbus_poll/executor.py",
+      "sha256": "f16c7fce631c80b8284c7c77170ac2ce72ed8e40d6c9486bae63a121fd119c67"
+    },
+    {
+      "path": "examples/modbus_poll/input.json",
+      "sha256": "2d0da89952c09a4e2ca8e0cf2034876454dddb09792e6b4df22589a9bf9d0a67"
     },
     {
       "path": "examples/pin_conflict/README.md",
@@ -291,7 +323,7 @@
     },
     {
       "path": "provenance/llm/bid_quote/index.json",
-      "sha256": "b329b9103b0bb9af0f38d099a732f1d5e8359ac8b7e935728d887998fd75b482"
+      "sha256": "32fac10089b2e6fa77b67577e6c1bdcc00be498ed758e18a1b3f6f190a3b1b59"
     },
     {
       "path": "provenance/llm/expense_audit/extract.json",
@@ -319,7 +351,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "9d8dfc55af34727bb9670e909e9151d0de37ff7e9b0e7e066a5d7dfbbf84bb34"
+      "sha256": "ab2d327581a4801fdee25dd0c91bca214299ff46ca30258b879cb685e6057c86"
     },
     {
       "path": "signature/README.md",
@@ -346,9 +378,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T20:48:47+08:00",
+  "generated_at": "2026-10-10T21:04:18+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "b815b41ae846b1bf9e650c10addf2fd49a977e65e6a2f393d66be648b7624749",
+  "package_digest": "27c135abe06de57593a45d2217b2f4b0131a1dec330486e3e32d0fe625858e20",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",
