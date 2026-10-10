@@ -7,7 +7,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "bb28ea54588d37cef8af25b14f9e1064fd9d5282db7726f8f64b42f58ed05358"
+      "sha256": "0bbc84444b8a4e2166d32aa4b54183d0b5f14f8c39f91cd4caf6de625ee86480"
     },
     {
       "path": ".gitignore",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "20009caa77a754ba050ae5465ab9a713a45572aea086f93d92ba63283fd8c542"
+      "sha256": "929bf708a372400a678aac110f574347044e8dc01bd7d8c03d17cd9c62a5e3ed"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -55,15 +55,15 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "e63175f27feddc61308c6e1c8db32f61f6688ea365700f9f8356460d670b2bb8"
+      "sha256": "af35e1fcafc74c50fd88a7588f7996a034217cfaf0bd1d15205b132e793f2eb1"
     },
     {
       "path": "cmd/workagent/llmcmd.go",
-      "sha256": "bdf454e458b55d10a4e680b35d62e4f67764832c14011588707d3e1234cfa56e"
+      "sha256": "7b2800eb6b7d0bee84c204ac41fa0ca636e74eb2020ec618fcf7840a6caa9ea5"
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "69172a4b9fd7218954bb6a7a27ca385092fdf88252f7ac6d67000a68fda9bd74"
+      "sha256": "29be3ea75c5e5769b0219aa902f41c008ffe95c61a27c6cb2076222bef916488"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -139,15 +139,15 @@
     },
     {
       "path": "provenance/llm/extract.json",
-      "sha256": "f0ff09ebf4aa2fde611db9eff8585d5b6d82a7d2df453b75d55e0db8508ef3b5"
+      "sha256": "f3302f86ec2db895c6b43a1aeea7f143a69d4f66ab571aa9e375ab5ee8f453f3"
     },
     {
       "path": "provenance/llm/index.json",
-      "sha256": "efe5bd02d05d234c2530ce44f539fba5901cd1150bbd7cbbf2d855efb38502e1"
+      "sha256": "5f739c11c354e9c7b219419b3d18034e8fe4c68050181ae486a59a9a47923a47"
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "77cea329dc2107b3867a3b726604df75e0f5aa7c29a6aea95fdead5eb7218b8b"
+      "sha256": "1aef1f1bc57dbc2282eddffd7fa2264375b4cb824e7ee289cd0cc18648cd5a7c"
     },
     {
       "path": "signature/README.md",
@@ -174,9 +174,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T19:36:00+08:00",
+  "generated_at": "2026-10-10T19:42:02+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "88fcdf1f23a9b5d369b9a650fa0529a98e7b69e7c958d591095c0b27df3ac4fa",
+  "package_digest": "33af8b0a489137b2628a88be057aba653610df5bbaac949daefc31f656606195",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

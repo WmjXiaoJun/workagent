@@ -18,7 +18,7 @@
     "toolchain": "go go1.27.0",
     "workflow_digest": "4704c521c57a6b3eb3c9a83ba47024c84c80e889a14ebefb2452d3a3678651ac"
   },
-  "generated_at": "2026-10-10T19:36:00+08:00",
+  "generated_at": "2026-10-10T19:42:02+08:00",
   "llm_used": true,
   "note": "确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。",
   "principle": "摘要必须覆盖推理函数的完整计算闭包。任何落在被证明集合之外的组件，都是一条伪造通道。",

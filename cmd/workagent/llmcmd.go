@@ -142,6 +142,7 @@ func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, provi
 		var text, rawResp string
 		var desc map[string]any
 		var level string
+		replayed := false
 
 		if replay {
 			rec, rerr := readJSON(recordPath)
@@ -156,7 +157,12 @@ func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, provi
 			text = asString(rm["text"])
 			rawResp = asString(rm["raw"])
 			desc = asMap(rm["descriptor"])
-			level = "L1-record-replay"
+			// 等级描述的是「这条证据是怎么产生的」，重放只是读取它 —— 不得降级。
+			level = asString(rm["reproducibility"])
+			if level == "" {
+				level = "L1-record-replay"
+			}
+			replayed = true
 			fmt.Printf("  [--]   %s: replay（使用录制响应，未联网）\n", stepID)
 		} else {
 			temp := 0.0
@@ -215,7 +221,7 @@ func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, provi
 		descriptors = append(descriptors, map[string]any{
 			"step_id": stepID, "provider": asString(desc["provider"]), "model": asString(desc["model"]),
 			"prompt_digest": promptDigest, "response_digest": sha256Bytes([]byte(text)),
-			"reproducibility": level, "recorded_at": nowISO(),
+			"reproducibility": level, "recorded_at": nowISO(), "replayed": replayed,
 		})
 	}
 

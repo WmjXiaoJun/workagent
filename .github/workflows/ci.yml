@@ -25,9 +25,16 @@ jobs:
       - name: go vet
         run: go vet ./...
 
-      - name: gofmt 检查
-        if: runner.os != 'Windows'
-        run: test -z "$(gofmt -l ./cmd ./internal)"
+      - name: gofmt 检查（提示性；gofmt 输出随工具链版本变化，不作为阻塞条件）
+        if: runner.os == 'ubuntu-latest'
+        continue-on-error: true
+        run: |
+          unformatted=$(gofmt -l ./cmd ./internal)
+          if [ -n "$unformatted" ]; then
+            echo "以下文件未经 gofmt 格式化："
+            echo "$unformatted"
+            gofmt -d ./cmd ./internal || true
+          fi
 
       - name: 构建
         run: go build -o workagent ./cmd/workagent

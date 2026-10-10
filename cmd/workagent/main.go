@@ -20,7 +20,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -491,7 +490,8 @@ func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride 
 	execInput := inputPath
 	var llmDescriptors []map[string]any
 	if len(llmStepsOf(m)) > 0 {
-		enriched, descs, lerr := runLLMSteps(root, m, inputObj, replay, providerOverride, modelOverride, true)
+		// replay 模式绝不写档：否则重放会用降级的等级把原始录制覆盖掉。
+		enriched, descs, lerr := runLLMSteps(root, m, inputObj, replay, providerOverride, modelOverride, !replay)
 		if lerr != nil {
 			fmt.Fprintln(os.Stderr, lerr.Error())
 			return 1
@@ -836,22 +836,63 @@ func main() {
 	case "models":
 		code = cmdModels()
 	case "run":
-		fs := flag.NewFlagSet("run", flag.ContinueOnError)
-		input := fs.String("input", "", "输入 JSON 路径")
-		replayFlag := fs.Bool("replay", false, "使用已录制的模型响应（离线，可复现）")
-		provider := fs.String("provider", "", "覆盖 manifest 中的 LLM provider")
-		model := fs.String("model", "", "覆盖 manifest 中的 LLM model")
-		if err := fs.Parse(args); err != nil {
-			os.Exit(2)
+		// 手工解析：Go 的 flag 包遇到第一个位置参数就停止解析，
+		// 于是 run --input X . --replay 会**静默忽略** --replay —— 那太危险了。
+		// 这里做成位置无关：显式声明的开关一定生效。
+		var inputArg, provider, model string
+		replayFlag := false
+		var positional []string
+		for i := 0; i < len(args); i++ {
+			a := args[i]
+			switch {
+			case a == "--replay" || a == "-replay":
+				replayFlag = true
+			case a == "--input" || a == "-input":
+				if i+1 < len(args) {
+					inputArg = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--input="):
+				inputArg = strings.TrimPrefix(a, "--input=")
+			case a == "--provider":
+				if i+1 < len(args) {
+					provider = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--provider="):
+				provider = strings.TrimPrefix(a, "--provider=")
+			case a == "--model":
+				if i+1 < len(args) {
+					model = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--model="):
+				model = strings.TrimPrefix(a, "--model=")
+			case !strings.HasPrefix(a, "-"):
+				positional = append(positional, a)
+			}
 		}
-		code = cmdRun(pathArg(fs.Args()), *input, *replayFlag, *provider, *model)
+		runRoot := resolveRoot(".")
+		if len(positional) > 0 {
+			runRoot = resolveRoot(positional[0])
+		}
+		code = cmdRun(runRoot, inputArg, replayFlag, provider, model)
 	case "verify":
-		fsv := flag.NewFlagSet("verify", flag.ContinueOnError)
-		live := fsv.Bool("live", false, "重新真实调用模型，测量模型本身是否可复现")
-		if err := fsv.Parse(args); err != nil {
-			os.Exit(2)
+		live := false
+		var vpos []string
+		for _, a := range args {
+			switch {
+			case a == "--live" || a == "-live":
+				live = true
+			case !strings.HasPrefix(a, "-"):
+				vpos = append(vpos, a)
+			}
 		}
-		code = cmdVerify(pathArg(fsv.Args()), *live)
+		verifyRoot := resolveRoot(".")
+		if len(vpos) > 0 {
+			verifyRoot = resolveRoot(vpos[0])
+		}
+		code = cmdVerify(verifyRoot, live)
 	case "seal":
 		code = cmdSeal(pathArg(args))
 	default:
