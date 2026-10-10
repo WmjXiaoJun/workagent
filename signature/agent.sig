@@ -1,5 +1,5 @@
 {
-  "file_count": 94,
+  "file_count": 109,
   "files": [
     {
       "path": ".gitattributes",
@@ -15,7 +15,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "d685d61573da15f628c6f0b65134b55db76e5e3ccca924b759a25b4b9c295307"
+      "sha256": "129e4f993cac9fd3f6ca6b6501165c2a51374b585ab67bb3cc2c9071872f0e79"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -31,15 +31,15 @@
     },
     {
       "path": "README.md",
-      "sha256": "bb43382a7562bf870921293f5e53ea951c1afddceff9fdd8acb9c6dc5bd4dbbc"
+      "sha256": "1493b36e31cbd178f32614523e9054523f4c590bd43a3247a295060b7e29fff1"
     },
     {
       "path": "README.zh-CN.md",
-      "sha256": "c17e85ba74b627e5658987080324bc471f26d66d202c7cc237cb14db101860cc"
+      "sha256": "f6ac2f4afde5d49e92bdf0d93b6cc6fea944bc963174a586cd6b9c7be66b2767"
     },
     {
       "path": "agent.yaml",
-      "sha256": "3b5fca2cb01707d7cfbb2b31898fe4ea44dc2173bd70909da93912fa99ae84d3"
+      "sha256": "27718abfc45dc58005288ec0eb08057aa458d36181fe3e4c2776e54e54adb040"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "fc84509181cf3195d9d377293f4daea2570efe4639e313531d8bf4654e813067"
+      "sha256": "9a25adb542d42984dab94dc8b549247f4b86d6b3b80740410cb3a0fdbbad5d05"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -71,7 +71,11 @@
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "70ca2083d743702c433b200fdc978bd848fb012b08463b39669be54626f695ab"
+      "sha256": "864406cdb1768ac7d0c87d567c318cd975e68a36c5f8f86452e0caa02a725f8e"
+    },
+    {
+      "path": "cmd/workagent/mcp.go",
+      "sha256": "bd15460c486c73a6e54a9642a041f2abe38a28dc5b1321f5bc525ee5f45893ca"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -87,7 +91,7 @@
     },
     {
       "path": "docs/EXAMPLES.md",
-      "sha256": "78a2002788609c9c38d2ca7a260468bcf32e1cc2a00a10137b68b39f016822a6"
+      "sha256": "666dd8dee29c36f995b9ffe1b315e68753f3589f8085a6c4991896c1bf1067db"
     },
     {
       "path": "docs/PROVIDERS.md",
@@ -100,6 +104,46 @@
     {
       "path": "docs/VERTICALS.md",
       "sha256": "0c2f03705336dff5c7493a2abceb55070820083bb765d3cdb4c84b50e456332b"
+    },
+    {
+      "path": "dsh-plugin/README.md",
+      "sha256": "8606ccb34b10788214928b4bdb5524220d4cdd50e709042ea4d794cef02deb4d"
+    },
+    {
+      "path": "dsh-plugin/cordis.patch.yml",
+      "sha256": "38bab025b408dc3745dafc6cf9c1598c44a716871daa9c55b430d43db4512e4f"
+    },
+    {
+      "path": "dsh-plugin/icon.svg",
+      "sha256": "79e1ddaabcb903772dfc5bd273409e6db773e45a69df3ddc050b4dbe93e6d531"
+    },
+    {
+      "path": "dsh-plugin/locale/en.json",
+      "sha256": "61fc203aa18efd61f67155ed876100476cf94a07fe4efdbd51c19886918792d2"
+    },
+    {
+      "path": "dsh-plugin/locale/zh.json",
+      "sha256": "277348cf0e5b249edb25ba921feb755b4cfc2424e1cee0cd4879e53b46df86d5"
+    },
+    {
+      "path": "dsh-plugin/package.json",
+      "sha256": "8403fed3e8f15ea4c155985873f42f759bc01b1c61c043ff16d9bd9bb6f04861"
+    },
+    {
+      "path": "examples/audit_chain/README.md",
+      "sha256": "5df4cdf29e66c217b7199f3fad7a5b9c0249395cce347fd68d99d875ac387c1d"
+    },
+    {
+      "path": "examples/audit_chain/boundary.json",
+      "sha256": "a25bd1f2c21b9e5c502656f851e9d250a514ffab8dfc818784edf51cb7c80696"
+    },
+    {
+      "path": "examples/audit_chain/executor.py",
+      "sha256": "57da4457a08b75049f7ab567a488a392cc7a609fbb92ee66dadf5e2a20ed4948"
+    },
+    {
+      "path": "examples/audit_chain/input.json",
+      "sha256": "4618b8fcb2e1b4f2dc405b324a0c9c73d85017477e04aa43d189a82829d74d67"
     },
     {
       "path": "examples/bid_quote/README.md",
@@ -250,6 +294,22 @@
       "sha256": "039279dd7e6d144827922fb4d40cba0b037508084b65675aeea79481a9c940f9"
     },
     {
+      "path": "examples/points_reconcile/README.md",
+      "sha256": "8630cf05d7c98cab22463b0c861f8d4e9cd7598ac614803ae175e38722c48aca"
+    },
+    {
+      "path": "examples/points_reconcile/boundary.json",
+      "sha256": "796afcf228e57b40fd83c2d93398a1bbe26a8ca0a0bc01e82b6e64fefc005d87"
+    },
+    {
+      "path": "examples/points_reconcile/executor.py",
+      "sha256": "a2f30cd84254b3719b7de5f3337912bae28206fbdca55b38b040fa33ba72f461"
+    },
+    {
+      "path": "examples/points_reconcile/input.json",
+      "sha256": "11865487aad56ace497d4ee9ef0705936a93eac160768ad7cbcdb475cb0ed2e8"
+    },
+    {
       "path": "examples/salary_tax/README.md",
       "sha256": "f610d4574e0e4a9547eec832ab19470dbfe099bcdf4ca9928affdd2e941c439b"
     },
@@ -351,7 +411,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "69dd47161086932bd79386735afc954b969416d7ab40e421046561e24de419fc"
+      "sha256": "67b83c2c03b0491e952db53395e536b5a05d03673d72660ddfb999c358acc18f"
     },
     {
       "path": "signature/README.md",
@@ -378,9 +438,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:20:01+08:00",
+  "generated_at": "2026-10-10T21:39:41+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "80da3fa812826bc82b919d89be12a0270a3f474cd62606b2c2735db6ccb3d9f0",
+  "package_digest": "736a0c14d1c7496d534cacaafed7baaa15518d338cacb2c78889b25318f8936b",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

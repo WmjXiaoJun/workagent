@@ -1,0 +1,26 @@
+{
+  "system": "示例积分系统（结构取自真实 control_plane.db，数据为合成）",
+  "accounts": [
+    { "user_id": "u_0001", "available_points": 640,  "frozen_points": 0,   "lifetime_granted": 1740, "lifetime_spent": 1100 },
+    { "user_id": "u_0002", "available_points": 1000, "frozen_points": 0,   "lifetime_granted": 1000, "lifetime_spent": 0 },
+    { "user_id": "u_0003", "available_points": 425,  "frozen_points": 100, "lifetime_granted": 800,  "lifetime_spent": 375 }
+  ],
+  "payment_orders": [
+    { "id": "ap_A0001", "user_id": "u_0001", "points": 1000, "status": "paid" },
+    { "id": "ap_A0002", "user_id": "u_0001", "points": 740,  "status": "paid" },
+    { "id": "ap_A0003", "user_id": "u_0002", "points": 1000, "status": "paid" },
+    { "id": "ap_A0004", "user_id": "u_0003", "points": 800,  "status": "paid" },
+    { "id": "ap_A0005", "user_id": "u_0003", "points": 500,  "status": "paid" }
+  ],
+  "ledger_entries": [
+    { "id": "e01", "user_id": "u_0001", "entry_type": "grant",           "amount": 1000, "balance_after": 1000, "reference_type": "payment_order", "reference_id": "ap_A0001", "idempotency_key": "payment_grant:ap_A0001", "created_at": "2026-10-01 10:00:00" },
+    { "id": "e02", "user_id": "u_0001", "entry_type": "grant",           "amount": 740,  "balance_after": 1740, "reference_type": "payment_order", "reference_id": "ap_A0002", "idempotency_key": "payment_grant:ap_A0002", "created_at": "2026-10-02 11:00:00" },
+    { "id": "e03", "user_id": "u_0001", "entry_type": "spend",           "amount": 1100, "balance_after": 640,  "reference_type": "chat",          "reference_id": "s_001",    "idempotency_key": "spend:s_001",            "created_at": "2026-10-03 09:30:00" },
+
+    { "id": "e04", "user_id": "u_0002", "entry_type": "grant",           "amount": 1000, "balance_after": 1000, "reference_type": "payment_order", "reference_id": "ap_A0003", "idempotency_key": "payment_grant:ap_A0003", "created_at": "2026-10-01 12:00:00" },
+
+    { "id": "e05", "user_id": "u_0003", "entry_type": "grant",           "amount": 800,  "balance_after": 800,  "reference_type": "payment_order", "reference_id": "ap_A0004", "idempotency_key": "payment_grant:ap_A0004", "created_at": "2026-10-01 08:00:00" },
+    { "id": "e06", "user_id": "u_0003", "entry_type": "sub2api_reserve", "amount": 100,  "balance_after": 700,  "reference_type": "relay_task",    "reference_id": "t_001",    "idempotency_key": "reserve:t_001",          "created_at": "2026-10-02 09:00:00" },
+    { "id": "e07", "user_id": "u_0003", "entry_type": "spend",           "amount": 275,  "balance_after": 425,  "reference_type": "chat",          "reference_id": "s_009",    "idempotency_key": "spend:s_009",            "created_at": "2026-10-03 10:00:00" }
+  ]
+}

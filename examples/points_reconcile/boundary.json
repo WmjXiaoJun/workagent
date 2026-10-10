@@ -1,0 +1,24 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "points_reconcile",
+  "applies_to": "积分/计费账本与账户的一致性对账",
+  "valid_when": [
+    "账本条目 1 ~ 200000 条",
+    "每条账本携带 user_id / entry_type / amount / balance_after",
+    "账户携带 available_points / frozen_points / lifetime_granted / lifetime_spent"
+  ],
+  "invalid_when": [
+    "校验业务语义（某笔授予是否该给、某次消费是否合理）——本场景只做自洽性对账",
+    "核对与外部支付渠道（微信/支付宝/Stripe）的实际到账——需对账单接口",
+    "并发写入过程中的瞬时中间态（应在事务边界处对账）"
+  ],
+  "confidence_rating": {
+    "level": "high",
+    "basis": "七项不变量为纯确定性校验；规则先在真实生产库上验证（违反数 0），确认正确后才固化"
+  },
+  "risk_notes": [
+    "reserve/capture 配对按 reference_id 计数，跨系统对账需先统一 reference_id 口径",
+    "不在事务边界取数时，可能读到中间态而产生假告警"
+  ],
+  "stop_condition": "账本或账户为空、金额非数字、条目数超限时必须报错退出"
+}

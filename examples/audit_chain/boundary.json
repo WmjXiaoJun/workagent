@@ -1,0 +1,23 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "audit_chain",
+  "applies_to": "知识库摄入审计日志的哈希链与状态一致性核验",
+  "valid_when": [
+    "事件 1 ~ 100000 条，按文档分组、组内保留日志原始顺序",
+    "事件携带 doc_id / event_type / ts，摄入事件另带 old_sha256 / new_sha256 / line_count"
+  ],
+  "invalid_when": [
+    "校验文档内容本身是否正确",
+    "校验跨系统的端到端一致性（需与对象存储/向量库对账）",
+    "把 line_count 突降直接判定为错误——也可能是合法的文档精简，本场景只报 error 并交由人工确认"
+  ],
+  "confidence_rating": {
+    "level": "high",
+    "basis": "六项校验基于事件字段的确定性语义；字段定义取自真实审计日志，规则不依赖模型"
+  },
+  "risk_notes": [
+    "哈希链按 doc_id 分组，同一文档跨多个来源路径时需先统一 doc_id 口径",
+    "日志按追加写假设有序；若日志本身被重排，时间戳倒退检测会失真"
+  ],
+  "stop_condition": "事件为空、条数超限或 line_drop_ratio 不在 (0,1) 区间时必须报错退出"
+}

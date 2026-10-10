@@ -1,0 +1,13 @@
+{
+  "name": "dsh-plugin-workagent",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "description": "Expose a WorkAgent delivery package to DeepSeek Harness as MCP tools.",
+  "exports": {
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": ["cordis.patch.yml", "locale/*.json", "icon.svg"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}

@@ -1,0 +1,20 @@
+# WorkAgent DSH bundle
+#
+# 把一个 WorkAgent 交付包通过 MCP 暴露给 Harness，让 agent 能直接
+# 「列场景 / 跑场景 / 复现校验」。走 stdio，不需要端口，也不需要常驻进程。
+#
+# 前置条件：workagent 可执行文件在 PATH 上（或把 command 改成绝对路径）。
+#
+# command/args/cwd 按需修改：
+#   - 想在某个固定交付包上工作：把 args 的 "." 换成该包路径，或设置 cwd
+#   - command 用绝对路径可以避免 PATH 问题，例如
+#       command: C:\tools\workagent.exe
+- insert:
+    - id: workagent-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: workagent
+        transport: stdio
+        command: workagent
+        args: ["mcp", "."]
+        failOnStartupError: true

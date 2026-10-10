@@ -11,14 +11,14 @@
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
 ![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
-![cases](https://img.shields.io/badge/scenarios-10-orange)
+![cases](https://img.shields.io/badge/scenarios-12-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 ![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
-[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#七个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.md)
+[30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#八个命令) · [下载二进制](https://github.com/WmjXiaoJun/workagent/releases/latest) · [English](README.md)
 
 </div>
 
@@ -95,7 +95,7 @@ $ ./workagent run --input bad.json .
 
 ---
 
-## 七个命令
+## 八个命令
 
 | 命令 | 做什么 | 为什么存在 |
 |---|---|---|
@@ -105,7 +105,23 @@ $ ./workagent run --input bad.json .
 | `attest` | 计算 **Attestation Closure** 摘要 | 让"可复现"有可核对的证据，而不是一句承诺 |
 | `run` | 执行执行体，产出证据包 + 摘要 + 溯源记录 | 结论必须带着证据一起走 |
 | `verify` | 重放并比对结论摘要，PASS / FAIL | **本项目的核心**。不可复现 = 不可交付 |
+| `mcp` | 把交付包本身作为 **MCP server** 提供（stdio） | 任何 MCP 客户端都能把"跑场景拿可复现结论"当工具调用 |
 | `seal` | 生成全包文件级摘要 `signature/agent.sig` | 证明内容自生成后未变 |
+
+### 分发：先走 MCP
+
+```bash
+workagent mcp .          # stdio MCP server，不需要端口，也不需要常驻进程
+```
+
+实现方式是**起自身子进程并捕获输出**，所以 **MCP 调用与命令行调用走的是同一份逻辑**——
+不存在第二条会漂移的代码路径。
+
+`dsh-plugin/` 是一个 DeepSeek Harness 插件 bundle：五行配置把这个 MCP server 接进 Harness。
+它同样适用于任何 MCP 客户端，不只 DSH。
+
+> ⚠️ **MCP server 侧已验证**（握手、`tools/list`、`tools/call`、未知工具报错都实测过）；
+> **Cordis 装载侧未验证** —— 原因见 `dsh-plugin/README.md`。
 
 ---
 
@@ -163,7 +179,7 @@ qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY  
 
 ---
 
-## 十个可验证场景，按交付形态分
+## 十二个可验证场景，按交付形态分
 
 **不按行业分，按交付形态分。** 行业是结果不是依据——为什么这样切见 `docs/VERTICALS.md`。
 一个包承载多个场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
@@ -179,12 +195,14 @@ WorkAgent cases —— 按交付形态分组
   modbus_poll     L3       通信负载与轮询周期测算
   firmware_budget L3       固件资源预算测算
 
-【核验型】5 个
-  expense_audit   L2/L1    报销单合规审核
-  lab_report      L2/L1    检验报告异常判定
-  point_table     L2/L1    通信点表核对
-  spc_control     L3       SPC 控制图判异
-  pin_conflict    L3       引脚 / 中断 / DMA 资源冲突检测
+【核验型】7 个
+  expense_audit    L2/L1    报销单合规审核
+  lab_report       L2/L1    检验报告异常判定
+  point_table      L2/L1    通信点表核对
+  spc_control      L3       SPC 控制图判异
+  pin_conflict     L3       引脚 / 中断 / DMA 资源冲突检测
+  points_reconcile L3       积分账本一致性对账
+  audit_chain      L3       知识库摄入审计核验
 ```
 
 ```bash

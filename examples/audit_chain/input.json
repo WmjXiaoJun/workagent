@@ -1,0 +1,19 @@
+{
+  "system": "示例知识库审计日志（字段取自真实 audit.jsonl，数据为合成）",
+  "line_drop_ratio": 0.5,
+  "events": [
+    { "id": "a01", "ts": 1788185000.0, "event_type": "kb.ingest", "actor": "system", "doc_id": "doc_alpha", "source": "docs/guide.md", "old_sha256": null, "new_sha256": "aaaa1111", "line_count": 120, "source_changed": false, "semantic_stale": false, "semantic_status": "fresh" },
+    { "id": "a02", "ts": 1788185100.0, "event_type": "kb.ingest", "actor": "user_7", "doc_id": "doc_alpha", "source": "docs/guide.md", "old_sha256": "aaaa1111", "new_sha256": "aaaa2222", "line_count": 128, "source_changed": true, "semantic_stale": false, "semantic_status": "fresh" },
+
+    { "id": "a03", "ts": 1788185300.0, "event_type": "kb.ingest", "actor": "user_7", "doc_id": "doc_beta", "source": "docs/spec.md", "old_sha256": null, "new_sha256": "bbbb1111", "line_count": 400, "source_changed": false, "semantic_stale": false, "semantic_status": "fresh" },
+    { "id": "a04", "ts": 1788185250.0, "event_type": "kb.ingest", "actor": "user_9", "doc_id": "doc_beta", "source": "docs/spec.md", "old_sha256": "bbbb9999", "new_sha256": "bbbb2222", "line_count": 410, "source_changed": true, "semantic_stale": false, "semantic_status": "fresh" },
+
+    { "id": "a05", "ts": 1788185400.0, "event_type": "kb.ingest", "actor": "user_9", "doc_id": "doc_gamma", "source": "docs/notes.md", "old_sha256": null, "new_sha256": "cccc1111", "line_count": 300, "source_changed": false, "semantic_stale": true, "semantic_status": "fresh" },
+    { "id": "a06", "ts": 1788185450.0, "event_type": "kb.ingest", "actor": "user_9", "doc_id": "doc_gamma", "source": "docs/notes.md", "old_sha256": "cccc1111", "new_sha256": "cccc2222", "line_count": 90, "source_changed": true, "semantic_stale": true, "semantic_status": "stale" },
+
+    { "id": "a07", "ts": 1788185600.0, "event_type": "upload", "actor": "user_5", "doc_id": "doc_delta", "source": "uploads/new.pdf", "old_sha256": null, "new_sha256": "dddd1111", "line_count": 50, "source_changed": false, "semantic_stale": false, "semantic_status": "fresh" },
+    { "id": "a08", "ts": 1788185700.0, "event_type": "kb.ingest", "actor": "user_5", "doc_id": "doc_delta", "source": "uploads/new.pdf", "old_sha256": "dddd1111", "new_sha256": "dddd1111", "line_count": 50, "source_changed": true, "semantic_stale": false, "semantic_status": "fresh" },
+
+    { "id": "a09", "ts": 1788185800.0, "event_type": "section.update", "actor": "user_2", "doc_id": "doc_missing", "source": "docs/ghost.md", "old_sha256": null, "new_sha256": "eeee1111", "line_count": 10, "source_changed": false, "semantic_stale": false, "semantic_status": "fresh" }
+  ]
+}

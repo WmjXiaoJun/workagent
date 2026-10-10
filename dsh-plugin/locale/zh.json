@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "WorkAgent 交付包",
+    "description": "把 WorkAgent 交付包作为 MCP 工具使用：列出可验证场景、运行一个场景拿到可复现结论与证据包、并校验全部场景是否仍能复现。"
+  }
+}

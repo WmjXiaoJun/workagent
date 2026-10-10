@@ -1,6 +1,6 @@
 {
-  "evidence_id": "8a1c092dc5b671b6",
-  "last_case": "firmware_budget",
+  "evidence_id": "f81b02e0f6fc3eed",
+  "last_case": "audit_chain",
   "note": "由 workagent run 写入；verify 据此重放并比对结论摘要。input_file 一律记包内相对路径，保证跨机器可复现。",
   "policy": "记录需要留存的关键节点：数据调用、参数修改、计算步骤、结论摘要。",
   "schema": "workagent/trace/1",
@@ -124,6 +124,160 @@
       "input_file": "examples/firmware_budget/input.json",
       "output_digest": "959acbbc1f9b2a228c6c19bd5d5c5e43c3482a1b47931ca179e1b868d590db90",
       "seq": 11,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:38:18+08:00",
+      "case": "audit_chain",
+      "evidence_id": "197330d8f4cb2f09",
+      "executor": "python examples/audit_chain/executor.py",
+      "input_digest": "522d5782e27b3337bc368552f86cb6546c4337e482daa4b1c5839b09246059ae",
+      "input_file": "examples/audit_chain/input.json",
+      "output_digest": "ea70c91625e07e08b8600cce1727fedafdc562c32364fc1688b44bebb2fb396e",
+      "seq": 12,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "bid_quote",
+      "evidence_id": "b67babcc366599a8",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "examples/bid_quote/input.json",
+      "output_digest": "2775a35462d805b50ea8aa2cbd08e21bb863008899a8a2a85483e615c2b21a32",
+      "seq": 13,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "bid_quote",
+      "evidence_id": "382de7c0d5ff9e4c",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "8d870746a52cea2c9aed677e4c4395449ab3c9fb165be20696f94a2bfe12f7ee",
+      "input_file": "examples/bid_quote/input.natural.json",
+      "output_digest": "e1318f8ca20cb1e451e330f8f1749a85e595ffaa6231183bb0c2810876df9b67",
+      "seq": 14,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "expense_audit",
+      "evidence_id": "9c9c6a03da62a7b1",
+      "executor": "python examples/expense_audit/executor.py",
+      "input_digest": "b45b149d11a103225502a8714a93b0b9551a18816770ccee35751cf682c4182e",
+      "input_file": "examples/expense_audit/input.natural.json",
+      "output_digest": "f746d8e68f87fb0430f276445ec54ac1f7af690ca113d2acfc66832ae413588c",
+      "seq": 15,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "lab_report",
+      "evidence_id": "f86ce16689d58ab1",
+      "executor": "python examples/lab_report/executor.py",
+      "input_digest": "e29a2a9381ac2d6932f176414f99d50e03ca7bb7ce9bde7692006c6ee01db546",
+      "input_file": "examples/lab_report/input.natural.json",
+      "output_digest": "6d0f45ef3edc7a43cb0082dd65f62eaf1f87bbb06c2b86086ce963d2d8bcf947",
+      "seq": 16,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "point_table",
+      "evidence_id": "6d22ce17877794f9",
+      "executor": "python examples/point_table/executor.py",
+      "input_digest": "81a1cc93f410bea1f382614562b28d15b321ea051aaf94db42a6476bf3e9f927",
+      "input_file": "examples/point_table/input.natural.json",
+      "output_digest": "be320b395bb6836895350ccaa2071693c438a21a0b39564eaa4bd630303ae123",
+      "seq": 17,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "spc_control",
+      "evidence_id": "1d7ba306ebde899b",
+      "executor": "python examples/spc_control/executor.py",
+      "input_digest": "45de3ebe52deb584ef725518d91b9b9b03fb11b743f97671448e81dd8b946b22",
+      "input_file": "examples/spc_control/input.json",
+      "output_digest": "67a870863eac0dcbc5641f1db658b2b272f18561fdc9780325f9a2af6cc2e9fa",
+      "seq": 18,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "pin_conflict",
+      "evidence_id": "241a271dafac4e13",
+      "executor": "python examples/pin_conflict/executor.py",
+      "input_digest": "afc55b0a57c241059e483b1eb00fc99ba8cc3f7da38ed020134a23f08173ea72",
+      "input_file": "examples/pin_conflict/input.json",
+      "output_digest": "566f5ca7445cca7fe1516226a9c3fff3e21831142e522d5843c34537b03c09db",
+      "seq": 19,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:40+08:00",
+      "case": "salary_tax",
+      "evidence_id": "cf31baef695df544",
+      "executor": "python examples/salary_tax/executor.py",
+      "input_digest": "7adff286ccd5a21bd83ae83707926b3dc3936bada6042da2f7a672a80c0b6a2f",
+      "input_file": "examples/salary_tax/input.json",
+      "output_digest": "39e92b1797e8dcbd90fb92c1eb550d9e5b97b101f7ab367302c2e324790d260f",
+      "seq": 20,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:41+08:00",
+      "case": "loan_dscr",
+      "evidence_id": "373b9fbe5781472c",
+      "executor": "python examples/loan_dscr/executor.py",
+      "input_digest": "e9cd0b116f4975fdd9a230384e70e9838ee199672612c94b05ad3599b764aa3d",
+      "input_file": "examples/loan_dscr/input.json",
+      "output_digest": "166f7706ca5e2c22481acbd6d77064449af3d4018faef48d59ee072d2a3de43c",
+      "seq": 21,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:41+08:00",
+      "case": "modbus_poll",
+      "evidence_id": "44ee42e4508f0172",
+      "executor": "python examples/modbus_poll/executor.py",
+      "input_digest": "879e58aa57c499923d23e8e79d02b0d5d438fd5a319321a14ae53c573a29f59d",
+      "input_file": "examples/modbus_poll/input.json",
+      "output_digest": "b14c43001bd4dc770f2a8212bcc1901b8920a125ba1da3fdd707f695bbe1a90b",
+      "seq": 22,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:41+08:00",
+      "case": "firmware_budget",
+      "evidence_id": "fb3b3dfc56ca72ba",
+      "executor": "python examples/firmware_budget/executor.py",
+      "input_digest": "ba08fd26952dffbee74726120a83724275e378b4ff3f656bb6b01885b3a199b2",
+      "input_file": "examples/firmware_budget/input.json",
+      "output_digest": "959acbbc1f9b2a228c6c19bd5d5c5e43c3482a1b47931ca179e1b868d590db90",
+      "seq": 23,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:41+08:00",
+      "case": "points_reconcile",
+      "evidence_id": "cf5d0bf5bd5680b7",
+      "executor": "python examples/points_reconcile/executor.py",
+      "input_digest": "d76d508f6ba1c7aa91d92f1a24d58547ed22e497a3a8e539b4db3da5f7435f11",
+      "input_file": "examples/points_reconcile/input.json",
+      "output_digest": "0aa873ef1841e21d0e2316e8796255902e69ceb37e4afd2c1c337c4eeff55424",
+      "seq": 24,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T21:39:41+08:00",
+      "case": "audit_chain",
+      "evidence_id": "f81b02e0f6fc3eed",
+      "executor": "python examples/audit_chain/executor.py",
+      "input_digest": "522d5782e27b3337bc368552f86cb6546c4337e482daa4b1c5839b09246059ae",
+      "input_file": "examples/audit_chain/input.json",
+      "output_digest": "ea70c91625e07e08b8600cce1727fedafdc562c32364fc1688b44bebb2fb396e",
+      "seq": 25,
       "step": "run"
     }
   ]

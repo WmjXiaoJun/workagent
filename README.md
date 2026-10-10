@@ -11,7 +11,7 @@
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
 ![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
-![cases](https://img.shields.io/badge/scenarios-10-orange)
+![cases](https://img.shields.io/badge/scenarios-12-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -95,7 +95,7 @@ executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an arra
 
 ---
 
-## The seven commands
+## The eight commands
 
 | Command | What it does | Why it exists |
 |---|---|---|
@@ -105,7 +105,23 @@ executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an arra
 | `attest` | Computes the **Attestation Closure** digests | Makes "reproducible" checkable rather than a promise |
 | `run` | Executes the agent, emits an evidence bundle, summary and trace | A conclusion must travel with its evidence |
 | `verify` | Replays and compares conclusion digests; PASS / FAIL | **The core of this project.** Not reproducible = not deliverable |
+| `mcp` | Serves the package itself as an **MCP server** over stdio | Any MCP client can call "run a scenario, get a reproducible conclusion" as a tool |
 | `seal` | Produces the whole-package digest `signature/agent.sig` | Proves content is unchanged since sealing |
+
+### Distribution: MCP first
+
+```bash
+workagent mcp .          # stdio MCP server, no port, no daemon
+```
+
+The implementation re-executes its own binary and captures the output, so **an MCP call and a
+command-line call run exactly the same logic** — there is no second code path to drift.
+
+`dsh-plugin/` ships a DeepSeek Harness bundle: five lines of configuration that connect
+this MCP server to the Harness. It works with any MCP client, not just DSH.
+
+> ⚠️ The **MCP server side is verified** (handshake, `tools/list`, `tools/call`, unknown-tool errors).
+> The **Cordis loading side is not** — see `dsh-plugin/README.md` for why.
 
 ---
 
@@ -163,7 +179,7 @@ The level is written into `evidence.json`. **We never call L1 an L2.**
 
 ---
 
-## Ten verifiable scenarios, grouped by delivery form
+## Twelve verifiable scenarios, grouped by delivery form
 
 **Not by industry — by delivery form.** Industry is an outcome, not a criterion; see
 `docs/VERTICALS.md` for why. One package carries many scenarios sharing the same
@@ -180,12 +196,14 @@ WorkAgent cases —— grouped by delivery form
   modbus_poll     L3       Modbus polling load and cycle time
   firmware_budget L3       Firmware Flash / RAM / stack budget
 
-[Verification] 5
-  expense_audit   L2/L1    Expense compliance
-  lab_report      L2/L1    Lab result flagging
-  point_table     L2/L1    Modbus point-table audit
-  spc_control     L3       SPC control-chart rules
-  pin_conflict    L3       Pin / IRQ / DMA resource conflicts
+[Verification] 7
+  expense_audit    L2/L1    Expense compliance
+  lab_report       L2/L1    Lab result flagging
+  point_table      L2/L1    Modbus point-table audit
+  spc_control      L3       SPC control-chart rules
+  pin_conflict     L3       Pin / IRQ / DMA resource conflicts
+  points_reconcile L3       Points ledger reconciliation
+  audit_chain      L3       Knowledge-base audit-log integrity
 ```
 
 ```bash

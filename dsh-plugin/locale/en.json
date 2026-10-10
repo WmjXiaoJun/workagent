@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "WorkAgent",
+    "description": "Run a WorkAgent delivery package as MCP tools: list verifiable scenarios, execute one and get a reproducible conclusion with an evidence bundle, and verify that every scenario still reproduces."
+  }
+}

@@ -7,6 +7,7 @@
 //	workagent attest [path]                  计算 Attestation Closure 摘要
 //	workagent run    --input FILE [path]     执行并产出证据包
 //	workagent verify [path]                  复现校验：同输入是否产出同结论
+//	workagent mcp    [path]                  以 MCP server 方式暴露本包（stdio）
 //	workagent seal   [path]                  生成全包摘要
 //
 // 设计原则:
@@ -995,6 +996,7 @@ func usage() {
 		"  workagent models                        列出内置模型服务商与可用状态\n" +
 		"  workagent verify [path]                 复现校验：同输入是否产出同结论\n" +
 		"  workagent verify [path] --live          重新真实调用模型，测量其是否可复现\n" +
+		"  workagent mcp    [path]                 以 MCP server 方式暴露本包（stdio）\n" +
 		"  workagent seal   [path]                 生成全包摘要\n" +
 		"\npath 默认为当前目录。")
 }
@@ -1116,6 +1118,8 @@ func main() {
 			verifyRoot = resolveRoot(vpos[0])
 		}
 		code = cmdVerify(verifyRoot, live)
+	case "mcp":
+		code = cmdMCP(pathArg(args))
 	case "seal":
 		code = cmdSeal(pathArg(args))
 	default:
