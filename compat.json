@@ -1,0 +1,77 @@
+{
+  "schema": "workagent/compat/1",
+  "package": "io.github.example/workagent",
+  "spec_version": "0.3.0",
+  "principle": "新增只加目录，不改字段。旧平台忽略 x-workagent，本包仍可运行。",
+  "min_platform": {
+    "aps": "0.2"
+  },
+  "capability_matrix": [
+    {
+      "capability": "read_manifest",
+      "requires": "aps",
+      "on_legacy": "full",
+      "note": "agent.yaml 基础字段，任何 APS 平台均可读"
+    },
+    {
+      "capability": "validate_input_output",
+      "requires": "aps",
+      "on_legacy": "full",
+      "note": "inputs.schema.json / output_schema.json 为标准 JSON Schema"
+    },
+    {
+      "capability": "execute_workflow",
+      "requires": "aps",
+      "on_legacy": "full",
+      "note": "execution/ 为标准工作流描述"
+    },
+    {
+      "capability": "read_summary",
+      "requires": "aps",
+      "on_legacy": "full",
+      "note": "artifacts/summary.md 为纯 Markdown"
+    },
+    {
+      "capability": "boundary_enforcement",
+      "requires": "x-workagent",
+      "on_legacy": "lost",
+      "note": "失效边界不校验，越界输入不会被拒绝"
+    },
+    {
+      "capability": "regression_baseline",
+      "requires": "x-workagent",
+      "on_legacy": "lost",
+      "note": "无基准结果比对，迭代后偏差不可见"
+    },
+    {
+      "capability": "reproducibility_check",
+      "requires": "x-workagent+attest",
+      "on_legacy": "lost",
+      "note": "无法验证同输入是否产出同结论"
+    },
+    {
+      "capability": "signature_verification",
+      "requires": "x-workagent+signature",
+      "on_legacy": "lost",
+      "note": "无法验证包未被篡改"
+    }
+  ],
+  "degradation": {
+    "legacy_platform": {
+      "preserved": [
+        "智能体身份与元数据",
+        "输入输出标准化校验",
+        "工作流执行",
+        "人工可读摘要 artifacts/summary.md"
+      ],
+      "lost": [
+        "失效边界校验",
+        "回归基准比对",
+        "结论可复现性校验",
+        "包完整性验签"
+      ],
+      "statement": "在仅支持 APS 基础字段的平台上，本包可以运行并产出结论；但该结论不可复现校验、不可验签、不受失效边界保护。请勿据此结论做高风险决策。",
+      "statement_en": "On APS-only platforms this package still runs and produces a conclusion, but that conclusion cannot be reproduced, verified, or boundary-checked. Do not use it for high-stakes decisions."
+    }
+  }
+}

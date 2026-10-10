@@ -1,0 +1,25 @@
+{
+  "schema": "workagent/boundary/1",
+  "applies_to": "投标报价测算（bid-quote-v1）",
+  "valid_when": [
+    "输入为结构化 JSON，且通过 inputs.schema.json 校验",
+    "成本明细行数在 1 ~ 500 之间",
+    "费率均在 [0, 1] 区间内",
+    "项目周期不超过 24 个月"
+  ],
+  "invalid_when": [
+    "输入含未登记的成本项或外币直接结算",
+    "需要税务、汇率或工期延误测算",
+    "涉及法律、合规或安全结论",
+    "输入规模超出上述区间"
+  ],
+  "confidence_rating": {
+    "level": "medium",
+    "basis": "纯确定性计算，无外部数据依赖；上限受输入质量与假设 AS-001/AS-003 约束"
+  },
+  "risk_notes": [
+    "结论不构成报价承诺，需业务负责人签字确认",
+    "费率假设失效时结论系统性偏低"
+  ],
+  "stop_condition": "任一 invalid_when 命中时，本包必须报错退出，禁止输出结论"
+}

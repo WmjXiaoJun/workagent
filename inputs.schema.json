@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/workagent/inputs.schema.json",
+  "title": "WorkAgent Inputs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "line_items"],
+  "properties": {
+    "project": {
+      "type": "string",
+      "minLength": 1,
+      "description": "项目名称"
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["CNY", "USD", "EUR"],
+      "default": "CNY"
+    },
+    "line_items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "成本明细行",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "quantity", "unit_cost"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "quantity": { "type": "number", "exclusiveMinimum": 0 },
+          "unit_cost": { "type": "number", "minimum": 0 },
+          "category": { "type": "string" }
+        }
+      }
+    },
+    "overhead_rate": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.08 },
+    "margin_rate": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.12 },
+    "risk_buffer_rate": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.05 }
+  }
+}

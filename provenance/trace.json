@@ -1,0 +1,28 @@
+{
+  "schema": "workagent/trace/1",
+  "policy": "记录需要留存的关键节点：数据调用、参数修改、计算步骤、结论摘要。",
+  "evidence_id": "6723c555d11c0a3e",
+  "steps": [
+    {
+      "seq": 1,
+      "at": "2026-10-10T18:25:17+08:00",
+      "step": "run",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
+      "evidence_id": "6723c555d11c0a3e"
+    },
+    {
+      "seq": 2,
+      "at": "2026-10-10T18:26:58+08:00",
+      "step": "run",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
+      "evidence_id": "6723c555d11c0a3e"
+    }
+  ],
+  "note": "由 tools/workagent.py run 写入；verify 会据此重放并比对结论摘要"
+}

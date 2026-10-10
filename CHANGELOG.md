@@ -1,0 +1,26 @@
+# Changelog
+
+本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+## [0.3.0] - 2026-10-10
+
+个人可验证版首发。
+
+### Added
+- `agent.yaml` 单一真源清单（APS 基础字段 + `x-workagent` 扩展区）
+- `compat.json` **兼容降级声明**：显式说明旧平台会丢失哪些能力（本项目的差异化能力）
+- `attest/closure.json` **Attestation Closure**：计算闭包摘要，覆盖执行体 / schema / 工作流 / 运行环境
+- `tools/workagent.py` 零依赖工具链：`check` / `adapt` / `attest` / `run` / `verify` / `seal`
+- `adapters/` 适配层生成：Agent Plugins 1.0 `plugin.json` + A2A `agent-card.json`
+- `provenance/` 溯源三件套：`trace.json` / `data_sources.json` / `assumptions.json`
+- `x-workagent/` 扩展层：`boundary.json` + 四类测试套件
+- 示例场景：投标报价测算（`examples/bid_quote/`）
+- `docs/SPEC.md` 规范说明、`docs/COMPAT.md` 兼容指南
+
+### Design notes
+- 确定性优先：示例执行体不含 LLM；一旦启用 LLM，必须在 closure 中登记模型摘要
+- `seal` 默认 `digest-only`，不冒充密码学签名
+
+## [0.2.0] - 规范草案
+
+- 来自《工作智能体（WorkAgent）定制开发指南（兼容规范 v0.2）》

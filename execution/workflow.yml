@@ -1,0 +1,45 @@
+# 业务逻辑工作流编排
+# 确定性优先：步骤本身是纯计算；如需 LLM，必须作为独立步骤声明并在 attest 中登记模型摘要。
+workflow:
+  id: "bid-quote-v1"
+  name: "投标报价测算"
+  version: "0.3.0"
+  deterministic: true
+
+  steps:
+    - id: "load"
+      name: "读取输入"
+      type: "io"
+      action: "read_json"
+      from: "input.json"
+
+    - id: "validate"
+      name: "结构校验"
+      type: "validate"
+      schema: "inputs.schema.json"
+      on_fail: "reject"
+
+    - id: "compute_direct_cost"
+      name: "直接成本合计"
+      type: "compute"
+      formula: "sum(item.quantity * item.unit_cost)"
+
+    - id: "compute_loaded_cost"
+      name: "计取管理费与风险预备金"
+      type: "compute"
+      formula: "direct_cost * (1 + overhead_rate) * (1 + risk_buffer_rate)"
+
+    - id: "compute_price"
+      name: "计取利润并生成报价"
+      type: "compute"
+      formula: "loaded_cost * (1 + margin_rate)"
+      round: 2
+
+    - id: "emit"
+      name: "输出标准化结果"
+      type: "io"
+      action: "write_json"
+      schema: "artifacts/output_schema.json"
+
+  # LLM 步骤（可选）：一旦启用，必须在 attest/closure.json 登记模型闭包摘要
+  llm_steps: []

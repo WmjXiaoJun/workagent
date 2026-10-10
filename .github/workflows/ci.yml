@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: `{{ matrix.python-version }}`
+      - name: 包结构校验
+        run: python tools/workagent.py check .
+      - name: 计算闭包摘要
+        run: python tools/workagent.py attest .
+      - name: 生成适配层
+        run: python tools/workagent.py adapt .
+      - name: 执行并产出证据包
+        run: python tools/workagent.py run --input examples/bid_quote/input.json .
+      - name: 复现校验（必须 PASS）
+        run: python tools/workagent.py verify .
+      - name: 边界拒绝测试（越界输入必须失败）
+        run: |
+          echo '{"project":"x","line_items":[]}' > /tmp/bad.json
+          if python tools/workagent.py run --input /tmp/bad.json . ; then
+            echo "越界输入未被拒绝，边界失效"; exit 1
+          else
+            echo "越界输入已正确拒绝"
+          fi
+      - name: 全包摘要
+        run: python tools/workagent.py seal .

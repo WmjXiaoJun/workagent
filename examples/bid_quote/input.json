@@ -1,0 +1,14 @@
+{
+  "project": "某厂房钢结构工程",
+  "currency": "CNY",
+  "line_items": [
+    { "name": "钢材采购", "quantity": 120, "unit_cost": 4850, "category": "material" },
+    { "name": "加工制作", "quantity": 120, "unit_cost": 1350, "category": "labor" },
+    { "name": "现场安装", "quantity": 120, "unit_cost": 980, "category": "labor" },
+    { "name": "运输", "quantity": 12, "unit_cost": 3200, "category": "logistics" },
+    { "name": "防腐涂装", "quantity": 1, "unit_cost": 68000, "category": "material" }
+  ],
+  "overhead_rate": 0.08,
+  "margin_rate": 0.12,
+  "risk_buffer_rate": 0.05
+}

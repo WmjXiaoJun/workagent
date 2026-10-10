@@ -1,0 +1,19 @@
+{
+  "schema": "workagent/test/1",
+  "type": "unit",
+  "goal": "单节点逻辑校验：每个计算步骤单独可验证",
+  "cases": [
+    {
+      "id": "UT-001",
+      "step": "compute_direct_cost",
+      "given": { "line_items": [{ "quantity": 2, "unit_cost": 100 }] },
+      "expect": { "direct_cost": 200 }
+    },
+    {
+      "id": "UT-002",
+      "step": "compute_price",
+      "given": { "loaded_cost": 1000, "margin_rate": 0.1 },
+      "expect": { "total_price": 1100.0 }
+    }
+  ]
+}

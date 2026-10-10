@@ -1,0 +1,14 @@
+{
+  "schema": "workagent/test/1",
+  "type": "regression",
+  "goal": "固定历史基准数据，迭代后自动校验结论是否偏差",
+  "tolerance": { "relative": 0.0001 },
+  "baselines": [
+    {
+      "id": "RG-001",
+      "input": "examples/bid_quote/input.json",
+      "expected_output_digest": null,
+      "note": "首次 run 后由 tools/workagent.py 回填基准摘要"
+    }
+  ]
+}

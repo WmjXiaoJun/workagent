@@ -1,0 +1,55 @@
+# ============================================================================
+# WorkAgent Package Manifest —— 唯一真源 (Single Source of Truth)
+# ============================================================================
+# 兼容策略：APS 基础字段结构保持不变；所有自定义能力置于 x-workagent 扩展区。
+# 旧平台读到 x-workagent 会忽略它，本包仍可运行（能力降级，见 compat.json）。
+# 新增能力只加目录、不改字段。
+# ----------------------------------------------------------------------------
+
+aps_version: "0.2"
+spec_version: "0.3.0"
+
+id: "io.github.example/workagent"
+name: "workagent"
+display_name: "WorkAgent"
+display_name_en: "WorkAgent"
+version: "0.3.0"
+license: "MIT"
+summary: "别人交付对话，我们交付可复现的结论。"
+summary_en: "Others ship conversations. We ship reproducible conclusions."
+
+author:
+  name: "Your Name"
+  contact: "you@example.com"
+  responsibility: "对规则、假设、数据源与逻辑框架负责"
+
+inputs: "inputs.schema.json"
+outputs: "artifacts/output_schema.json"
+
+execution:
+  workflow: "execution/workflow.yml"
+  runtime: "execution/runtime.dockerfile"
+  executor:
+    # 确定性执行体：读 input.json，向 stdout 输出形如 {"output": {...}} 的 JSON
+    command: ["python", "examples/bid_quote/executor.py"]
+    deterministic: true
+    requires_network: false
+
+provenance:
+  trace: "provenance/trace.json"
+  data_sources: "provenance/data_sources.json"
+  assumptions: "provenance/assumptions.json"
+
+attest:
+  closure: "attest/closure.json"
+
+signature:
+  path: "signature/agent.sig"
+
+x-workagent:
+  namespace: "x-workagent"
+  version: "0.3.0"
+  compat: "compat.json"
+  boundary: "x-workagent/boundary.json"
+  test_suite: "x-workagent/test_suite"
+  adapters: "adapters"

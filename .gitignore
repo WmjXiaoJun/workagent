@@ -1,0 +1,11 @@
+adapters/*
+!adapters/.gitignore
+!adapters/README.md
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
+.DS_Store
+out/
+evidence/

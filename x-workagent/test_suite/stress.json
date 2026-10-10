@@ -1,0 +1,12 @@
+{
+  "schema": "workagent/test/1",
+  "type": "stress",
+  "goal": "极端输入与边界场景下，智能体应正常报错或输出合理结果，不得逻辑崩塌",
+  "cases": [
+    { "id": "ST-001", "desc": "空明细行", "input": { "line_items": [] }, "expect": "reject" },
+    { "id": "ST-002", "desc": "数量为 0", "input": { "line_items": [{ "quantity": 0, "unit_cost": 1 }] }, "expect": "reject" },
+    { "id": "ST-003", "desc": "费率为 1", "input": { "overhead_rate": 1, "margin_rate": 1 }, "expect": "output" },
+    { "id": "ST-004", "desc": "500 行明细", "input": { "line_items_count": 500 }, "expect": "output" },
+    { "id": "ST-005", "desc": "超大金额", "input": { "unit_cost": 1000000000 }, "expect": "output" }
+  ]
+}

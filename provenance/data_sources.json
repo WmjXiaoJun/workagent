@@ -1,0 +1,17 @@
+{
+  "schema": "workagent/data_sources/1",
+  "policy": "任何进入结论的数据源都必须登记来源、快照版本、获取时间与哈希。禁止未登记数据源参与计算。",
+  "sources": [
+    {
+      "id": "DS-001",
+      "name": "示例：企业内部定额库",
+      "kind": "file",
+      "origin": "examples/bid_quote/input.json",
+      "snapshot_version": "2026.10",
+      "retrieved_at": "2026-10-10T00:00:00+08:00",
+      "sha256": null,
+      "access": "private",
+      "note": "首次运行时由 tools/workagent.py 回填哈希"
+    }
+  ]
+}
