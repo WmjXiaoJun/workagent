@@ -17,7 +17,7 @@ fmt:
 	gofmt -w ./cmd
 
 test: build
-	go test ./...
+	CGO_ENABLED=0 go test ./... -count=1
 
 check: build
 	./$(BIN) check .

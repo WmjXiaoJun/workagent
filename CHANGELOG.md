@@ -25,6 +25,7 @@
 - 通用结论摘要模板（`subject / verdict / findings / metrics / confidence` 统一契约）
 
 ### Fixed
+- **CI 在 macOS 上构建测试二进制时缺少 `LC_UUID`，dyld 直接 abort trap**：统一改用 `CGO_ENABLED=0` 静态构建（与 `go build` 保持一致）。本项目不需要 cgo，静态构建同时避免了另一类偶发崩溃。
 - **LLM 录制按场景分目录**：四个场景的步骤都叫 `extract`，原先共用 `provenance/llm/extract.json` 会互相覆盖
 - `cmdRun` 中 `ok` 变量遮蔽同名辅助函数
 - J 编辑引入的两处 Go 字符串换行转义错误

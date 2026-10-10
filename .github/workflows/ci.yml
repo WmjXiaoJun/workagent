@@ -26,7 +26,11 @@ jobs:
         run: go vet ./...
 
       - name: 模型适配层协议族测试（无需任何 API key，不联网）
-        run: go test ./internal/llm/ -v
+        env:
+          # macOS 上 cgo 链接出的测试二进制缺少 LC_UUID，dyld 会直接 abort trap。
+          # 本项目不需要 cgo，统一走静态构建（与 go build 一致）。
+          CGO_ENABLED: "0"
+        run: go test ./internal/llm/ -v -count=1
 
       - name: gofmt 检查（提示性；gofmt 输出随工具链版本变化，不作为阻塞条件）
         if: runner.os == 'ubuntu-latest'
