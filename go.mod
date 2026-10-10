@@ -1,3 +1,3 @@
-module github.com/xiaojun/workagent
+module github.com/WmjXiaoJun/workagent
 
 go 1.21

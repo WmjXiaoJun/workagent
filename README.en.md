@@ -46,7 +46,7 @@ The reality today: you can build an agent in 15 minutes, but you cannot answer t
 **Zero third-party dependencies. Go 1.21+. One static binary — no runtime needed on the receiving end.**
 
 ```bash
-git clone https://github.com/xiaojun/workagent.git
+git clone https://github.com/WmjXiaoJun/workagent.git
 cd workagent
 go build -o workagent ./cmd/workagent
 

@@ -6,7 +6,7 @@
     "executor_command": "python examples/bid_quote/executor.py",
     "executor_digest": "a5fb03f6128c2679bd8c28df257d88314f5f96e5a4bca2a405940b5171d40074",
     "inputs_schema_digest": "484d8fdcb00982615cdffb565ad0025704e2067015094d4d82886de07b87ed15",
-    "manifest_digest": "2beddb3cd4e0ed35adc2698db936898876fe03cfec2b98f51a3444430f8b51f1",
+    "manifest_digest": "7395d6104f2d14d0abd0951f14e7aed248be635a8e603ac346ce5a76fbc7d0f7",
     "model_weights_digest": null,
     "numeric_env": {
       "LC_ALL": "C.UTF-8",
@@ -18,7 +18,7 @@
     "toolchain": "go go1.27.0",
     "workflow_digest": "4704c521c57a6b3eb3c9a83ba47024c84c80e889a14ebefb2452d3a3678651ac"
   },
-  "generated_at": "2026-10-10T18:40:22+08:00",
+  "generated_at": "2026-10-10T18:40:57+08:00",
   "llm_used": false,
   "note": "确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。",
   "principle": "摘要必须覆盖推理函数的完整计算闭包。任何落在被证明集合之外的组件，都是一条伪造通道。",

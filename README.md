@@ -46,7 +46,7 @@
 **零第三方依赖。Go 1.21+。编译出一个静态二进制，对方不需要装任何运行时。**
 
 ```bash
-git clone https://github.com/xiaojun/workagent.git
+git clone https://github.com/WmjXiaoJun/workagent.git
 cd workagent
 go build -o workagent ./cmd/workagent
 

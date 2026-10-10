@@ -9,7 +9,7 @@
 aps_version: "0.2"
 spec_version: "0.3.0"
 
-id: "io.github.xiaojun/workagent"
+id: "io.github.wmjxiaojun/workagent"
 name: "workagent"
 display_name: "WorkAgent"
 display_name_en: "WorkAgent"
