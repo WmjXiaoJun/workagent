@@ -1,0 +1,53 @@
+name: publish-dsh-plugin
+
+# 手动触发。需要先在仓库 Secrets 里配置 NPM_TOKEN
+# （npm 官网 → Access Tokens → Generate New Token → Automation）。
+#
+# 默认 dry_run=true，只演练不真发 —— 先看清楚会发布什么，再关掉它正式发。
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只演练，不真正发布（建议先跑一次 true）"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write        # npm provenance 需要
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dsh-plugin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 检查实际会打包哪些文件
+        run: npm pack --dry-run
+
+      - name: 校验 bundle 清单完整（补丁/图标/多语言都必须在内）
+        run: |
+          set -e
+          npm pack --dry-run 2>&1 | tee /tmp/pack.txt
+          for f in cordis.patch.yml icon.svg locale/en.json locale/zh.json; do
+            grep -q "$f" /tmp/pack.txt || { echo "打包产物缺少 $f"; exit 1; }
+          done
+          echo "bundle 清单完整"
+
+      - name: 演练发布
+        if: ${{ inputs.dry_run }}
+        run: npm publish --dry-run
+
+      - name: 正式发布
+        if: ${{ !inputs.dry_run }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
