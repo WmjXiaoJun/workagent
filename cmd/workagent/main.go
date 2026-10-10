@@ -463,7 +463,7 @@ func runExecutor(root string, m map[string]any, inputPath string) (any, []string
 	return payload, cmd, nil
 }
 
-func cmdRun(root, inputArg string) int {
+func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride string) int {
 	m := mustManifest(root)
 	if inputArg == "" {
 		fmt.Fprintln(os.Stderr, "run 需要 --input 参数")
@@ -486,7 +486,23 @@ func cmdRun(root, inputArg string) int {
 	inCanon, _ := canonicalJSON(inputObj)
 	inputDigest := sha256Bytes(inCanon)
 
-	outputObj, cmd, err := runExecutor(root, m, inputPath)
+	// LLM 步骤（可选）：在确定性执行体之前完成"抽取"，把非结构化输入变成结构化中间表示。
+	// 执行体拿到的始终是确定性数据，因此裁决过程可复现。
+	execInput := inputPath
+	var llmDescriptors []map[string]any
+	if len(llmStepsOf(m)) > 0 {
+		enriched, descs, lerr := runLLMSteps(root, m, inputObj, replay, providerOverride, modelOverride, true)
+		if lerr != nil {
+			fmt.Fprintln(os.Stderr, lerr.Error())
+			return 1
+		}
+		llmDescriptors = descs
+		if enriched != "" {
+			execInput = enriched
+		}
+	}
+
+	outputObj, cmd, err := runExecutor(root, m, execInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return 1
@@ -563,21 +579,27 @@ func cmdRun(root, inputArg string) int {
 	writeJSON(filepath.Join(root, "provenance", "trace.json"), trace)
 
 	writeJSON(filepath.Join(evDir, "evidence.json"), map[string]any{
-		"schema":        "workagent/evidence/1",
-		"evidence_id":   evidenceID,
-		"generated_at":  nowISO(),
-		"spec_version":  specVersion,
-		"tool_version":  toolVersion,
-		"executor":      strings.Join(cmd, " "),
-		"input_digest":  inputDigest,
-		"output_digest": outputDigest,
-		"output":        outputObj,
+		"schema":          "workagent/evidence/1",
+		"evidence_id":     evidenceID,
+		"generated_at":    nowISO(),
+		"spec_version":    specVersion,
+		"tool_version":    toolVersion,
+		"executor":        strings.Join(cmd, " "),
+		"input_digest":    inputDigest,
+		"output_digest":   outputDigest,
+		"llm_steps":       llmDescriptors,
+		"reproducibility": overallLevel(llmDescriptors),
+		"output":          outputObj,
 	})
 
 	fmt.Println("run —— 执行完成")
 	ok("证据包编号 " + evidenceID)
 	ok("结论: " + asString(outMap["conclusion"]))
 	ok("输出摘要 " + outputDigest[:16])
+	ok("复现等级 " + overallLevel(llmDescriptors))
+	if len(llmDescriptors) > 0 {
+		info("证据包含模型响应留档；verify 默认重放记录而非重放模型")
+	}
 	info("证据目录 " + evDir)
 	info("摘要文件 " + filepath.Join(root, "artifacts", "summary.md"))
 	return 0
@@ -585,7 +607,7 @@ func cmdRun(root, inputArg string) int {
 
 // ---------------------------------------------------------------- verify
 
-func cmdVerify(root string) int {
+func cmdVerify(root string, live bool) int {
 	m := mustManifest(root)
 	traceRaw, err := readJSON(filepath.Join(root, "provenance", "trace.json"))
 	if err != nil {
@@ -614,7 +636,65 @@ func cmdVerify(root string) int {
 		return 1
 	}
 
-	outputObj, _, err := runExecutor(root, m, inputFile)
+	// 含 LLM 步骤时：默认重放已录制的模型响应（离线、可复现）；
+	// --live 则重新真实调用模型，用来**测量**模型本身是否可复现。
+	execInput := inputFile
+	liveDiffers := false
+	if len(llmStepsOf(m)) > 0 {
+		inObj, ierr := readJSON(inputFile)
+		if ierr != nil {
+			fmt.Fprintln(os.Stderr, ierr.Error())
+			return 1
+		}
+		if live {
+			// 关键：必须**先**读出旧录制的摘要，再重新调用。
+			// 否则拿刚被覆盖的档去比对，永远相等、永远 PASS —— 那样的测试是摆设。
+			oldDigests := map[string]string{}
+			for _, st := range llmStepsOf(m) {
+				sid := asString(asMap(st)["id"])
+				if rec, rerr := readJSON(filepath.Join(root, llmDir, sid+".json")); rerr == nil {
+					oldDigests[sid] = asString(asMap(rec)["response_digest"])
+				}
+			}
+			enriched, descs, lerr := runLLMSteps(root, m, inObj, false, "", "", false)
+			if lerr != nil {
+				fmt.Fprintln(os.Stderr, "live 调用失败: "+lerr.Error())
+				return 1
+			}
+			if enriched != "" {
+				execInput = enriched
+			}
+			for _, d := range descs {
+				sid := asString(d["step_id"])
+				old := oldDigests[sid]
+				neu := asString(d["response_digest"])
+				if old == "" {
+					fmt.Println("  [!!]   " + sid + " 没有历史录制，无法比较模型是否复现")
+					continue
+				}
+				if old == neu {
+					fmt.Println("  [OK]   " + sid + " 模型本次响应与录制**逐字节一致**（" + short(neu) + "）")
+				} else {
+					liveDiffers = true
+					fmt.Println("  [!!]   " + sid + " 模型本次响应与录制不同")
+					fmt.Println("         录制 " + short(old) + "  ≠  本次 " + short(neu))
+					fmt.Println("         —— 该模型在 temperature=0/seed 固定下**仍然不可复现**")
+				}
+			}
+		} else {
+			fmt.Println("  [--]   LLM 步骤：重放已录制响应（未联网）")
+			enriched, _, lerr := runLLMSteps(root, m, inObj, true, "", "", false)
+			if lerr != nil {
+				fmt.Fprintln(os.Stderr, lerr.Error())
+				return 1
+			}
+			if enriched != "" {
+				execInput = enriched
+			}
+		}
+	}
+
+	outputObj, _, err := runExecutor(root, m, execInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return 1
@@ -622,6 +702,10 @@ func cmdVerify(root string) int {
 	canon, _ := canonicalJSON(outputObj)
 	replay := sha256Bytes(canon)
 	expected := asString(last["output_digest"])
+	if live && liveDiffers {
+		fmt.Println("结果: FAIL（live）—— 模型本次未复现，因此该结论不可复现。请用 replay 模式交付。")
+		return 1
+	}
 
 	fmt.Println("  期望摘要 " + expected)
 	fmt.Println("  重放摘要 " + replay)
@@ -713,7 +797,10 @@ func usage() {
 		"  workagent adapt  [path]                 从 agent.yaml 生成适配层\n" +
 		"  workagent attest [path]                 计算 Attestation Closure 摘要\n" +
 		"  workagent run    --input FILE [path]    执行并产出证据包\n" +
+		"  workagent run    --input FILE --replay  使用已录制的模型响应（离线）\n" +
+		"  workagent models                        列出内置模型服务商与可用状态\n" +
 		"  workagent verify [path]                 复现校验：同输入是否产出同结论\n" +
+		"  workagent verify [path] --live          重新真实调用模型，测量其是否可复现\n" +
 		"  workagent seal   [path]                 生成全包摘要\n" +
 		"\npath 默认为当前目录。")
 }
@@ -746,15 +833,25 @@ func main() {
 		code = cmdAdapt(pathArg(args))
 	case "attest":
 		code = cmdAttest(pathArg(args))
+	case "models":
+		code = cmdModels()
 	case "run":
 		fs := flag.NewFlagSet("run", flag.ContinueOnError)
 		input := fs.String("input", "", "输入 JSON 路径")
+		replayFlag := fs.Bool("replay", false, "使用已录制的模型响应（离线，可复现）")
+		provider := fs.String("provider", "", "覆盖 manifest 中的 LLM provider")
+		model := fs.String("model", "", "覆盖 manifest 中的 LLM model")
 		if err := fs.Parse(args); err != nil {
 			os.Exit(2)
 		}
-		code = cmdRun(pathArg(fs.Args()), *input)
+		code = cmdRun(pathArg(fs.Args()), *input, *replayFlag, *provider, *model)
 	case "verify":
-		code = cmdVerify(pathArg(args))
+		fsv := flag.NewFlagSet("verify", flag.ContinueOnError)
+		live := fsv.Bool("live", false, "重新真实调用模型，测量模型本身是否可复现")
+		if err := fsv.Parse(args); err != nil {
+			os.Exit(2)
+		}
+		code = cmdVerify(pathArg(fsv.Args()), *live)
 	case "seal":
 		code = cmdSeal(pathArg(args))
 	default:

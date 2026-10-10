@@ -30,10 +30,23 @@ execution:
   workflow: "execution/workflow.yml"
   runtime: "execution/runtime.dockerfile"
   executor:
-    # 确定性执行体：读 input.json，向 stdout 输出形如 {"output": {...}} 的 JSON
+    # 确定性执行体：读 argv[1]（可能是富化后的输入），向 stdout 输出 {"output": {...}}
     command: ["python", "examples/bid_quote/executor.py"]
     deterministic: true
     requires_network: false
+
+  # LLM 步骤（可选）—— 模型只做「抽取」，判断与计算全部交给上面的确定性执行体。
+  # 抽取结果不可复现，因此会被录制到 provenance/llm/；verify 默认重放录制而非重放模型。
+  # when_input_has 为真时该步骤才执行：结构化输入会直接跳过，无需联网。
+  llm_steps:
+    - id: "extract"
+      provider: "ollama"          # 本地开源权重，可离线、可做到端到端复现
+      model: "qwen2.5:7b"
+      prompt: "examples/bid_quote/extract.prompt.md"
+      temperature: 0
+      seed: 42
+      json_mode: true
+      when_input_has: "description"
 
 provenance:
   trace: "provenance/trace.json"

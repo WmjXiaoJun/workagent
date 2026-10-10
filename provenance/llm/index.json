@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-10-10T19:36:00+08:00",
+  "level": "L2-decision-candidate",
+  "schema": "workagent/llm-index/1",
+  "steps": [
+    {
+      "model": "qwen2.5:7b",
+      "prompt_digest": "0d6da2f0d57897ffa033f8a0ddb083103f0fb5294a4f541b568e0538f7da6f12",
+      "provider": "ollama",
+      "recorded_at": "2026-10-10T19:36:00+08:00",
+      "reproducibility": "L2-decision-candidate",
+      "response_digest": "4d6abc79490d324184315cf075f7a23e6aa4dff2f5fed21921137fdd50cef2c3",
+      "step_id": "extract"
+    }
+  ]
+}

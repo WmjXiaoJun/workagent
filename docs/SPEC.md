@@ -115,3 +115,50 @@
 - 遵循语义化版本。
 - **只加不改**：兼容性靠新增目录/字段，不靠修改既有字段语义。
 - 破坏性变更必须提升主版本号，并在 `CHANGELOG.md` 说明迁移路径。
+
+## 12. LLM 步骤与复现等级
+
+### 12.1 声明
+
+`agent.yaml` 的 `execution.llm_steps` 声明模型步骤：
+
+```yaml
+llm_steps:
+  - id: "extract"
+    provider: "ollama"              # 见 workagent models
+    model: "qwen2.5:7b"
+    prompt: "path/to/prompt.md"     # 支持 {{INPUT_JSON}} 占位符
+    temperature: 0
+    seed: 42
+    json_mode: true
+    when_input_has: "description"   # 输入中无该字段则跳过（结构化输入零联网）
+```
+
+### 12.2 契约
+
+1. 模型步骤在确定性执行体**之前**执行；
+2. 模型输出被解析为结构化中间表示，与原始输入一起写入 `out/run/input.enriched.json`；
+3. 执行体读到的**必须是结构化数据** —— 这是裁决可复现的前提；
+4. 模型原始响应写入 `provenance/llm/<id>.json`，含 `prompt_digest` 与 `response_digest`。
+
+### 12.3 重放
+
+`run --replay` / `verify` 使用录制响应，**不联网**。
+
+**规范性要求**：重放前必须校验 `prompt_digest`；不一致时必须**报错退出**，不得静默使用过期录制。
+
+### 12.4 复现等级
+
+| 等级 | 含义 | 条件 |
+|---|---|---|
+| L3 | 完全可复现 | 无 LLM 步骤 |
+| L2 | 决策可复现 | 本地开权重服务商 + `temperature=0` + 固定 `seed` |
+| L1 | 记录可复现 | 其余情况；裁决过程可重放，模型本身不可复现 |
+| L0 | 不可复现 | `temperature>0` |
+
+**规范性要求**：等级必须如实写入 `evidence.json` 的 `reproducibility` 字段。
+`verify --live` 若测得模型本次响应与录制不同，必须报告 FAIL，**不得**降级为警告。
+
+### 12.5 留档不可被校验破坏
+
+**规范性要求**：`verify --live` 与其他校验路径**不得覆盖** `provenance/llm/` 下已有的录制。

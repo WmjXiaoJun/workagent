@@ -27,10 +27,13 @@ jobs:
 
       - name: gofmt 检查
         if: runner.os != 'Windows'
-        run: test -z "$(gofmt -l ./cmd)"
+        run: test -z "$(gofmt -l ./cmd ./internal)"
 
       - name: 构建
         run: go build -o workagent ./cmd/workagent
+
+      - name: 列出模型服务商（无需密钥）
+        run: ./workagent models
 
       - name: 包结构校验
         run: ./workagent check .
@@ -41,17 +44,23 @@ jobs:
       - name: 生成适配层
         run: ./workagent adapt .
 
-      - name: 执行并产出证据包
+      - name: 路径 A — 结构化输入，纯确定性（L3，不联网、不调模型）
         run: ./workagent run --input examples/bid_quote/input.json .
 
-      - name: 复现校验（必须 PASS）
+      - name: 路径 A 复现校验（必须 PASS）
+        run: ./workagent verify .
+
+      - name: 路径 B — 自然语言输入，模型抽取（重放录制响应，无需联网与密钥）
+        run: ./workagent run --input examples/bid_quote/input.natural.json . --replay
+
+      - name: 路径 B 复现校验（必须 PASS）
         run: ./workagent verify .
 
       - name: 边界拒绝测试（越界输入必须失败）
         shell: bash
         run: |
           echo '{"project":"x","line_items":[]}' > /tmp/bad.json
-          if ./workagent run --input /tmp/bad.json . ; then
+          if ./workagent run --input /tmp/bad.json . --replay ; then
             echo "越界输入未被拒绝，边界失效"; exit 1
           else
             echo "越界输入已正确拒绝"

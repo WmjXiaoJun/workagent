@@ -12,6 +12,7 @@
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
+![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
 [30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#六个命令) · [English](README.en.md)
 
@@ -90,16 +91,71 @@ $ ./workagent run --input bad.json .
 
 ---
 
-## 六个命令
+## 七个命令
 
 | 命令 | 做什么 | 为什么存在 |
 |---|---|---|
+| `models` | 列出 22 家内置模型服务商、端点、所需环境变量与可用状态 | 不用记各家的 API 格式，有 key 就能跑 |
 | `check` | 校验包结构、JSON 可解析性、兼容声明、边界与测试套件 | 交付前最后一道门 |
 | `adapt` | 从 `agent.yaml` 生成 `adapters/`（Agent Plugins 1.0 `plugin.json` + A2A `agent-card.json`） | 一次编写，多生态可用，且不污染真源 |
 | `attest` | 计算 **Attestation Closure** 摘要 | 让"可复现"有可核对的证据，而不是一句承诺 |
 | `run` | 执行执行体，产出证据包 + 摘要 + 溯源记录 | 结论必须带着证据一起走 |
 | `verify` | 重放并比对结论摘要，PASS / FAIL | **本项目的核心**。不可复现 = 不可交付 |
 | `seal` | 生成全包文件级摘要 `signature/agent.sig` | 证明内容自生成后未变 |
+
+---
+
+## 模型适配与复现等级
+
+**22 家内置服务商，零第三方依赖。** `workagent models` 一条命令看清全部：
+
+```text
+$ workagent models
+PROVIDER     PROTOCOL   端点                                 密钥环境变量              状态
+ollama       openai     http://127.0.0.1:11434/v1           (无需)                    本地可用
+openai       openai     https://api.openai.com/v1            OPENAI_API_KEY            缺少密钥
+anthropic    anthropic  https://api.anthropic.com/v1         ANTHROPIC_API_KEY         缺少密钥
+deepseek     openai     https://api.deepseek.com/v1          DEEPSEEK_API_KEY          缺少密钥
+qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY         缺少密钥
+...（共 22 家）
+```
+
+覆盖 OpenAI / Anthropic / Gemini / Mistral / xAI / Groq / Together / OpenRouter，
+国内 DeepSeek / 通义千问 / Kimi / 智谱 GLM / 豆包 / 混元 / 百川 / MiniMax / 星火 / 硅基流动，
+以及本地 Ollama / vLLM / LM Studio。**任何 OpenAI 兼容端点**用 `custom` 就能接入。
+
+### 但模型不可复现，怎么办
+
+这是本项目的核心矛盾。解法是**把一次 LLM 调用拆成两半**：
+
+```text
+非结构化输入 ──[模型抽取]──▶ 结构化中间表示 ──[确定性代码]──▶ 结论 + 证据
+                     ↑ 不可复现 → 录制成档案         ↑ 完全可复现
+```
+
+**模型只做翻译，判断交给代码。** 然后：
+
+| 命令 | 行为 |
+|---|---|
+| `run` | 真实调用模型，把**原始响应**录进 `provenance/llm/` |
+| `run --replay` | 用录制响应，**离线**跑通，不需要 key、不需要网络 |
+| `verify` | 重放录制，校验裁决过程 —— CI 里跑的就是这条 |
+| `verify --live` | **重新真实调用模型**，测量它到底复现不复现 |
+
+### 复现等级（如实标注，绝不冒充）
+
+| 等级 | 含义 | 触发条件 |
+|---|---|---|
+| **L3** | 完全可复现 | 纯确定性，无 LLM |
+| **L2** | 决策可复现 | 本地开权重 + `temperature=0` + 固定 seed → 实测逐字节一致 |
+| **L1** | 记录可复现 | 云端模型本身不可复现，但裁决过程可重放 |
+| **L0** | 不可复现 | `temperature>0`，只是一次调用记录 |
+
+等级会写进 `evidence.json`。**我们不把 L1 说成 L2。**
+
+> **实测**：本地 `ollama / qwen2.5:7b`、`temperature=0`、`seed=42`，
+> 三次独立调用返回**逐字节相同**的响应（`response_digest 4d6abc79490d3241…`）→ 该路径达到 **L2**。
+> 这是测出来的，不是声称的。
 
 ---
 

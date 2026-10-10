@@ -4,7 +4,11 @@
   "title": "WorkAgent Inputs",
   "type": "object",
   "additionalProperties": false,
-  "required": ["project", "line_items"],
+  "required": ["project"],
+  "anyOf": [
+    { "required": ["line_items"] },
+    { "required": ["description"] }
+  ],
   "properties": {
     "project": {
       "type": "string",
@@ -16,10 +20,15 @@
       "enum": ["CNY", "USD", "EUR"],
       "default": "CNY"
     },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "自然语言项目描述。若提供且配置了 llm_steps，则由模型抽取为 line_items；抽取结果属于不可复现部分，必须录制后才能 verify。"
+    },
     "line_items": {
       "type": "array",
       "minItems": 1,
-      "description": "成本明细行",
+      "description": "成本明细行（确定性输入）",
       "items": {
         "type": "object",
         "additionalProperties": false,

@@ -12,6 +12,7 @@
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
 ![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
+![providers](https://img.shields.io/badge/LLM%20providers-22-blueviolet)
 
 [Quickstart](#quickstart) · [Concepts](#core-concepts) · [Legacy compatibility](#legacy-platform-compatibility) · [CLI](#the-six-commands) · [中文](README.md)
 
@@ -90,16 +91,71 @@ executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an arra
 
 ---
 
-## The six commands
+## The seven commands
 
 | Command | What it does | Why it exists |
 |---|---|---|
+| `models` | Lists all 22 built-in providers, endpoints, required env keys and availability | No need to memorise each vendor's API shape |
 | `check` | Validates package structure, JSON parseability, compatibility declaration, boundary and test suite | The last gate before delivery |
 | `adapt` | Generates `adapters/` from `agent.yaml` (Agent Plugins 1.0 `plugin.json` + A2A `agent-card.json`) | One source, many ecosystems, no sync cost |
 | `attest` | Computes the **Attestation Closure** digests | Makes "reproducible" checkable rather than a promise |
 | `run` | Executes the agent, emits an evidence bundle, summary and trace | A conclusion must travel with its evidence |
 | `verify` | Replays and compares conclusion digests; PASS / FAIL | **The core of this project.** Not reproducible = not deliverable |
 | `seal` | Produces the whole-package digest `signature/agent.sig` | Proves content is unchanged since sealing |
+
+---
+
+## Model support and reproducibility levels
+
+**22 built-in providers, zero third-party dependencies.** One command shows them all:
+
+```text
+$ workagent models
+PROVIDER     PROTOCOL    endpoint                              env key                   status
+ollama       openai     http://127.0.0.1:11434/v1             (none)                    local, ready
+openai       openai     https://api.openai.com/v1             OPENAI_API_KEY            key missing
+anthropic    anthropic  https://api.anthropic.com/v1          ANTHROPIC_API_KEY         key missing
+deepseek     openai     https://api.deepseek.com/v1           DEEPSEEK_API_KEY          key missing
+qwen         openai     https://dashscope.aliyuncs.com/...    DASHSCOPE_API_KEY         key missing
+... (22 in total)
+```
+
+OpenAI / Anthropic / Gemini / Mistral / xAI / Groq / Together / OpenRouter,
+plus DeepSeek / Qwen / Kimi / Zhipu GLM / Doubao / Hunyuan / Baichuan / MiniMax / Spark / SiliconFlow,
+plus local Ollama / vLLM / LM Studio. **Any OpenAI-compatible endpoint** works via the `custom` profile.
+
+### But models are not reproducible — so what
+
+That is the central tension of this project. The resolution is to **split one LLM call into two halves**:
+
+```text
+unstructured input ──[model extracts]──▶ structured IR ──[deterministic code]──▶ conclusion + evidence
+                          ^ not reproducible → recorded       ^ fully reproducible
+```
+
+**The model translates; the code decides.** Then:
+
+| Command | Behaviour |
+|---|---|
+| `run` | Calls the model for real and records the **raw response** into `provenance/llm/` |
+| `run --replay` | Uses the recorded response — **offline**, no key, no network |
+| `verify` | Replays the record and checks the decision path — this is what CI runs |
+| `verify --live` | **Calls the model again** to measure whether it actually reproduces |
+
+### Reproducibility levels (labelled honestly, never inflated)
+
+| Level | Meaning | Condition |
+|---|---|---|
+| **L3** | Fully reproducible | Pure determinism, no LLM |
+| **L2** | Decision reproducible | Local open weights + `temperature=0` + fixed seed → byte-identical in measurement |
+| **L1** | Record reproducible | Cloud model is not reproducible, but the decision path can be replayed |
+| **L0** | Not reproducible | `temperature>0` — a call log, nothing more |
+
+The level is written into `evidence.json`. **We never call L1 an L2.**
+
+> **Measured**: local `ollama / qwen2.5:7b`, `temperature=0`, `seed=42` —
+> three independent calls returned a **byte-identical** response (`response_digest 4d6abc79490d3241…`),
+> so this path reaches **L2**. Measured, not claimed.
 
 ---
 
