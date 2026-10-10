@@ -1,0 +1,18 @@
+{
+  "employee": "张三",
+  "tax_year": "2026",
+  "months": [
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 32000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 45000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 28000, "social_insurance": 4200, "special_deduction": 2000 },
+    { "salary": 60000, "social_insurance": 4200, "special_deduction": 2000 }
+  ]
+}

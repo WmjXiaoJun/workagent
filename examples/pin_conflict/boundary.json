@@ -1,0 +1,24 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "pin_conflict",
+  "applies_to": "MCU 引脚 / 中断 / DMA 资源分配表的一致性检查",
+  "valid_when": [
+    "分配表来自原理图网表、CubeMX 配置或人工整理表",
+    "引脚数不超过 2000 条",
+    "优先级上限与所用 MCU 一致"
+  ],
+  "invalid_when": [
+    "需要判断电气特性（驱动能力、上下拉、电平域）",
+    "需要判断时钟树与时序可行性",
+    "需要判断复用功能矩阵之外的软件时序冲突"
+  ],
+  "confidence_rating": {
+    "level": "high",
+    "basis": "确定性规则检查；同一分配表必然得到同一冲突清单"
+  },
+  "risk_notes": [
+    "规则集为示例，需按具体 MCU 数据手册扩展复用功能与电气约束",
+    "引脚冲突不代表功能不可实现，部分 MCU 支持分时复用"
+  ],
+  "stop_condition": "pins 非数组或超过 2000 条时必须报错退出"
+}

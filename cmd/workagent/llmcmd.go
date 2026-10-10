@@ -29,10 +29,6 @@ const (
 	runDir = "out/run"
 )
 
-func llmStepsOf(m map[string]any) []any {
-	return asList(asMap(m["execution"])["llm_steps"])
-}
-
 // ---------------------------------------------------------------- models
 
 // cmdModels 只做一件事：把内置服务商打成一张表。
@@ -105,8 +101,10 @@ func reachable(endpoint string) bool {
 // ---------------------------------------------------------------- run
 
 // runLLMSteps 执行全部 LLM 步骤，返回富化后的输入文件路径与调用描述。
-func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, providerOverride, modelOverride string, record bool) (string, []map[string]any, error) {
-	steps := llmStepsOf(m)
+func runLLMSteps(root, caseID string, steps []any, inputObj any, replay bool, providerOverride, modelOverride string, record bool) (string, []map[string]any, error) {
+	if caseID == "" {
+		caseID = "default"
+	}
 	if len(steps) == 0 {
 		return "", nil, nil
 	}
@@ -151,7 +149,9 @@ func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, provi
 		prompt := strings.ReplaceAll(string(tplBytes), "{{INPUT_JSON}}", string(inputCanon))
 		promptDigest := sha256Bytes([]byte(prompt))
 
-		recordPath := filepath.Join(root, llmDir, stepID+".json")
+		// 录制必须按「场景」分目录：不同场景的步骤常常同名（都叫 extract），
+		// 共用路径会互相覆盖，导致重放拿到别人的响应。
+		recordPath := filepath.Join(root, llmDir, caseID, stepID+".json")
 		var text, rawResp string
 		var desc map[string]any
 		var level string
@@ -249,7 +249,7 @@ func runLLMSteps(root string, m map[string]any, inputObj any, replay bool, provi
 		"level":        overallLevel(descriptors),
 	}
 	if record {
-		writeJSON(filepath.Join(root, llmDir, "index.json"), index)
+		writeJSON(filepath.Join(root, llmDir, caseID, "index.json"), index)
 	}
 	return enrichedPath, descriptors, nil
 }

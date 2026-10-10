@@ -1,0 +1,26 @@
+{
+  "mcu": "STM32F407VGT6",
+  "priority_max": 15,
+  "reserved_pins": ["PA13", "PA14"],
+  "pins": [
+    { "pin": "PA9",  "signal": "USART1_TX", "owner": "debug-uart" },
+    { "pin": "PA10", "signal": "USART1_RX", "owner": "debug-uart" },
+    { "pin": "PA9",  "signal": "TIM1_CH2",  "owner": "motor-pwm" },
+    { "pin": "PB6",  "signal": "I2C1_SCL",  "owner": "eeprom" },
+    { "pin": "PB7",  "signal": "I2C1_SDA",  "owner": "eeprom" },
+    { "pin": "PA13", "signal": "GPIO_OUT",  "owner": "led-run" },
+    { "pin": "PC13", "signal": "GPIO_IN",   "owner": "key-stop" },
+    { "pin": "P13",  "signal": "GPIO_IN",   "owner": "typo-pin" }
+  ],
+  "interrupts": [
+    { "irq": "USART1_IRQn", "priority": 5, "handler": "uart_isr" },
+    { "irq": "TIM1_UP_IRQn", "priority": 5, "handler": "pwm_isr" },
+    { "irq": "DMA1_Stream5_IRQn", "priority": 6, "handler": "dma_isr" },
+    { "irq": "EXTI0_IRQn", "priority": 20, "handler": "key_isr" }
+  ],
+  "dma": [
+    { "channel": "DMA1_Stream5", "peripheral": "USART1_RX" },
+    { "channel": "DMA1_Stream5", "peripheral": "ADC1" },
+    { "channel": "DMA2_Stream0", "peripheral": "SPI1_TX" }
+  ]
+}

@@ -8,7 +8,8 @@
 
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
-![spec](https://img.shields.io/badge/spec-v0.5.4-blue)
+![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
+![cases](https://img.shields.io/badge/industry%20cases-8-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -157,6 +158,47 @@ The level is written into `evidence.json`. **We never call L1 an L2.**
 > **Measured**: local `ollama / qwen2.5:7b`, `temperature=0`, `seed=42` —
 > three independent calls returned a **byte-identical** response (`response_digest 4d6abc79490d3241…`),
 > so this path reaches **L2**. Measured, not claimed.
+
+---
+
+## Eight industry scenarios
+
+One package carries eight verifiable scenarios sharing the same infrastructure
+(compatibility declaration, provenance, evidence bundles, reproducibility checks).
+
+```text
+$ workagent cases .
+CASE            Industry        Shape        Repro     Title
+bid_quote       Construction    Estimation   L2/L1     Bid pricing
+expense_audit   Finance         Verification L2/L1     Expense compliance
+lab_report      Healthcare      Verification L2/L1     Lab result flagging
+point_table     Industrial      Verification L2/L1     Modbus point-table audit
+spc_control     Manufacturing   Verification L3       SPC control-chart rules
+pin_conflict    Embedded        Verification L3       MCU resource conflicts
+salary_tax      HR              Estimation   L3       Payroll income tax
+loan_dscr       Finance         Estimation   L3       Loan debt-service coverage
+```
+
+```bash
+workagent run --case spc_control --input examples/spc_control/input.json .
+workagent verify --all .
+```
+
+| Scenario | What it does | Rules from |
+|---|---|---|
+| `salary_tax` | Cumulative withholding, month by month, plus effective tax rate | PRC Individual Income Tax Law, 7 brackets |
+| `loan_dscr` | DSCR and interest coverage; thresholds come from **input**, not hard-coded | Standard DSCR formula |
+| `spc_control` | 8 rule violations, naming **which point broke which rule** | Western Electric / Nelson rules |
+| `pin_conflict` | Pin muxing / IRQ priority / DMA channel conflicts | MCU resource consistency rules |
+| `bid_quote` | Structured or natural-language input, same executor | Construction estimating practice |
+| `expense_audit` | Per-item and per-category limits, deadlines, invoice numbers, totals | Corporate expense policy (sample) |
+| `lab_report` | Sex-specific reference intervals plus critical values | Adult reference intervals (sample) |
+| `point_table` | Address overlap, data types, ranges, out-of-bounds, **Modbus reference-address normalisation** | Modbus addressing rules |
+
+**Four L3 scenarios do not use a model at all** — same input, same digest, on any machine at any time.
+
+> See `docs/EXAMPLES.md` and `docs/PROVIDERS.md`.
+> The healthcare reference intervals are samples and **do not constitute a diagnosis**.
 
 ---
 

@@ -126,6 +126,12 @@ def main():
         extra_risk = "管理费费率假设（AS-001）失效时结论系统性偏低"
 
     result = {
+        "subject": payload.get("project", ""),
+        "verdict": "已测算",
+        "findings": [
+            {"level": "info", "code": "BQ-SRC",
+             "message": "明细来源：" + source + "，共 " + str(len(items)) + " 项"},
+        ],
         "project": payload.get("project", ""),
         "currency": payload.get("currency", "CNY"),
         "line_item_source": source,

@@ -1,0 +1,127 @@
+package main
+
+// 多场景（cases）：一个 WorkAgent 包可以承载多个可验证业务场景，
+// 共用同一套基础设施（兼容声明、溯源、证据包、复现校验）。
+//
+// 向后兼容：若 agent.yaml 没有 execution.cases，则用 execution.executor 合成一个隐式场景。
+
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+)
+
+// Case 是一个可验证的业务场景。
+type Case struct {
+	ID            string
+	Title         string
+	Industry      string
+	Shape         string
+	Executor      []string
+	LLMSteps      []any
+	Boundary      string
+	SampleInput   string
+	SampleNatural string
+	Note          string
+}
+
+func casesOf(m map[string]any) []Case {
+	execNode := asMap(m["execution"])
+	var out []Case
+	for _, r := range asList(execNode["cases"]) {
+		cm := asMap(r)
+		c := Case{
+			ID:            asString(cm["id"]),
+			Title:         asString(cm["title"]),
+			Industry:      asString(cm["industry"]),
+			Shape:         asString(cm["shape"]),
+			Boundary:      asString(cm["boundary"]),
+			SampleInput:   asString(cm["sample_input"]),
+			SampleNatural: asString(cm["sample_natural"]),
+			Note:          asString(cm["note"]),
+		}
+		for _, e := range asList(cm["executor"]) {
+			c.Executor = append(c.Executor, asString(e))
+		}
+		c.LLMSteps = asList(cm["llm_steps"])
+		if c.ID != "" {
+			out = append(out, c)
+		}
+	}
+	if len(out) == 0 {
+		var cmdv []string
+		for _, e := range asList(asMap(execNode["executor"])["command"]) {
+			cmdv = append(cmdv, asString(e))
+		}
+		if len(cmdv) > 0 {
+			out = append(out, Case{
+				ID:       "default",
+				Title:    "默认场景",
+				Executor: cmdv,
+				LLMSteps: asList(execNode["llm_steps"]),
+				Boundary: "x-workagent/boundary.json",
+			})
+		}
+	}
+	return out
+}
+
+func findCase(m map[string]any, id string) (Case, bool) {
+	all := casesOf(m)
+	if id == "" {
+		if def := asString(asMap(m["execution"])["default_case"]); def != "" {
+			for _, c := range all {
+				if c.ID == def {
+					return c, true
+				}
+			}
+		}
+		if len(all) > 0 {
+			return all[0], true
+		}
+		return Case{}, false
+	}
+	for _, c := range all {
+		if c.ID == id {
+			return c, true
+		}
+	}
+	return Case{}, false
+}
+
+func cmdCases(root string) int {
+	m := mustManifest(root)
+	all := casesOf(m)
+	fmt.Println("WorkAgent cases —— 本包承载的可验证场景")
+	fmt.Println("")
+	fmt.Printf("%-14s %-14s %-8s %-8s %s\n", "CASE", "行业", "形态", "复现", "标题")
+	fmt.Println(strings.Repeat("-", 104))
+	for _, c := range all {
+		rep := "L3"
+		llm := "0"
+		if len(c.LLMSteps) > 0 {
+			llm = fmt.Sprint(len(c.LLMSteps))
+			rep = "L2/L1"
+		}
+		fmt.Printf("%-14s %-14s %-8s %-8s %s\n", c.ID, c.Industry, c.Shape, rep, c.Title)
+		_ = llm
+	}
+	fmt.Println("")
+	fmt.Println("用法:")
+	fmt.Println("  workagent run --case <CASE> --input <file> [--replay] [path]")
+	fmt.Println("  workagent cases                              列出全部场景")
+	fmt.Println("")
+	fmt.Println("复现等级说明: L3 纯确定性 / L2 本地开权重模型 / L1 云端模型（靠录制重放）")
+	return 0
+}
+
+func caseSample(root string, c Case, natural bool) string {
+	p := c.SampleInput
+	if natural && c.SampleNatural != "" {
+		p = c.SampleNatural
+	}
+	if p == "" {
+		return ""
+	}
+	return filepath.Join(root, filepath.FromSlash(p))
+}

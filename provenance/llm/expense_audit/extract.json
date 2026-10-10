@@ -1,0 +1,30 @@
+{
+  "descriptor": {
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "json_mode": true,
+    "kind": "openai",
+    "latency_ms": 2049,
+    "model": "qwen2.5:7b",
+    "provider": "ollama",
+    "seed": 42,
+    "temperature": 0,
+    "usage": {
+      "completion_tokens": 239,
+      "prompt_tokens": 435,
+      "prompt_tokens_details": {
+        "cached_tokens": 434
+      },
+      "total_tokens": 674
+    }
+  },
+  "honesty_note": "记录的是模型原始响应。重放记录 ≠ 重放模型；L1 只保证裁决过程可复现，不保证模型本身可复现。",
+  "prompt_digest": "ca966bc384a619d9ac1eff01f0c95deefd211c4cf1d64e4a369e7e3b01f24df3",
+  "prompt_file": "examples/expense_audit/prompt.md",
+  "raw": "{\"id\":\"chatcmpl-755\",\"object\":\"chat.completion\",\"created\":1791634719,\"model\":\"qwen2.5:7b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"items\\\": [\\n    { \\\"name\\\": \\\"高铁往返\\\", \\\"category\\\": \\\"交通\\\", \\\"amount\\\": 986, \\\"date\\\": \\\"2026-10-06\\\", \\\"invoice_no\\\": \\\"04412\\\" },\\n    { \\\"name\\\": \\\"住宿\\\", \\\"category\\\": \\\"住宿\\\", \\\"amount\\\": 960, \\\"date\\\": \\\"2026-10-06\\\", \\\"invoice_no\\\": \\\"04413\\\" },\\n    { \\\"name\\\": \\\"请客户吃饭\\\", \\\"category\\\": \\\"餐饮\\\", \\\"amount\\\": 1180, \\\"date\\\": \\\"2026-10-06\\\", \\\"invoice_no\\\": \\\"04414\\\" },\\n    { \\\"name\\\": \\\"市内打车和停车费\\\", \\\"category\\\": \\\"交通\\\", \\\"amount\\\": 84, \\\"date\\\": null, \\\"invoice_no\\\": null },\\n    { \\\"name\\\": \\\"打印标书\\\", \\\"category\\\": \\\"办公\\\", \\\"amount\\\": 50, \\\"date\\\": null, \\\"invoice_no\\\": null }\\n  ],\\n  \\\"notes\\\": null\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":435,\"prompt_tokens_details\":{\"cached_tokens\":434},\"completion_tokens\":239,\"total_tokens\":674}}",
+  "recorded_at": "2026-10-10T20:18:39+08:00",
+  "reproducibility": "L2-decision-candidate",
+  "response_digest": "2f7ab536af30991f1b3784e55e1f6dd0cad4b2d018b97127a7a8ef3bc5664335",
+  "schema": "workagent/llm-record/1",
+  "step_id": "extract",
+  "text": "{\n  \"items\": [\n    { \"name\": \"高铁往返\", \"category\": \"交通\", \"amount\": 986, \"date\": \"2026-10-06\", \"invoice_no\": \"04412\" },\n    { \"name\": \"住宿\", \"category\": \"住宿\", \"amount\": 960, \"date\": \"2026-10-06\", \"invoice_no\": \"04413\" },\n    { \"name\": \"请客户吃饭\", \"category\": \"餐饮\", \"amount\": 1180, \"date\": \"2026-10-06\", \"invoice_no\": \"04414\" },\n    { \"name\": \"市内打车和停车费\", \"category\": \"交通\", \"amount\": 84, \"date\": null, \"invoice_no\": null },\n    { \"name\": \"打印标书\", \"category\": \"办公\", \"amount\": 50, \"date\": null, \"invoice_no\": null }\n  ],\n  \"notes\": null\n}"
+}

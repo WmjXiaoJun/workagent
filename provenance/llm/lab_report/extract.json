@@ -1,0 +1,30 @@
+{
+  "descriptor": {
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "json_mode": true,
+    "kind": "openai",
+    "latency_ms": 3399,
+    "model": "qwen2.5:7b",
+    "provider": "ollama",
+    "seed": 42,
+    "temperature": 0,
+    "usage": {
+      "completion_tokens": 404,
+      "prompt_tokens": 419,
+      "prompt_tokens_details": {
+        "cached_tokens": 418
+      },
+      "total_tokens": 823
+    }
+  },
+  "honesty_note": "记录的是模型原始响应。重放记录 ≠ 重放模型；L1 只保证裁决过程可复现，不保证模型本身可复现。",
+  "prompt_digest": "0ffe684f2bf0a12c213a30da9ca8a52a66c44f71604a94e38be63b75b3fb60b7",
+  "prompt_file": "examples/lab_report/prompt.md",
+  "raw": "{\"id\":\"chatcmpl-359\",\"object\":\"chat.completion\",\"created\":1791634722,\"model\":\"qwen2.5:7b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"items\\\": [\\n    { \\\"code\\\": \\\"ALT\\\", \\\"name\\\": \\\"谷丙转氨酶\\\", \\\"value\\\": 68, \\\"unit\\\": \\\"U/L\\\", \\\"raw\\\": \\\"谷丙转氨酶 68 U/L\\\" },\\n    { \\\"code\\\": \\\"AST\\\", \\\"name\\\": \\\"谷草转氨酶\\\", \\\"value\\\": 45, \\\"unit\\\": \\\"U/L\\\", \\\"raw\\\": \\\"谷草转氨酶 45 U/L\\\" },\\n    { \\\"code\\\": \\\"GLU\\\", \\\"name\\\": \\\"空腹血糖\\\", \\\"value\\\": 6.8, \\\"unit\\\": \\\"mmol/L\\\", \\\"raw\\\": \\\"空腹血糖 6.8 mmol/L\\\" },\\n    { \\\"code\\\": \\\"CREA\\\", \\\"name\\\": \\\"肌酐\\\", \\\"value\\\": 88, \\\"unit\\\": \\\"umol/L\\\", \\\"raw\\\": \\\"肌酐 88 umol/L\\\" },\\n    { \\\"code\\\": \\\"WBC\\\", \\\"name\\\": \\\"白细胞\\\", \\\"value\\\": 3.2, \\\"unit\\\": \\\"10^9/L\\\", \\\"raw\\\": \\\"白细胞 3.2 10^9/L\\\" },\\n    { \\\"code\\\": \\\"HGB\\\", \\\"name\\\": \\\"血红蛋白\\\", \\\"value\\\": 148, \\\"unit\\\": \\\"g/L\\\", \\\"raw\\\": \\\"血红蛋白 148 g/L\\\" },\\n    { \\\"code\\\": \\\"PLT\\\", \\\"name\\\": \\\"血小板\\\", \\\"value\\\": 210, \\\"unit\\\": \\\"10^9/L\\\", \\\"raw\\\": \\\"血小板 210 10^9/L\\\" },\\n    { \\\"code\\\": \\\"TC\\\", \\\"name\\\": \\\"总胆固醇\\\", \\\"value\\\": 5.6, \\\"unit\\\": \\\"mmol/L\\\", \\\"raw\\\": \\\"总胆固醇 5.6 mmol/L\\\" }\\n  ],\\n  \\\"notes\\\": \\\"\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":419,\"prompt_tokens_details\":{\"cached_tokens\":418},\"completion_tokens\":404,\"total_tokens\":823}}",
+  "recorded_at": "2026-10-10T20:18:42+08:00",
+  "reproducibility": "L2-decision-candidate",
+  "response_digest": "f353b5a5f5034fa4277a0ab1bfb591ddf6a43fa3fcd501f133ebf140edb10d3a",
+  "schema": "workagent/llm-record/1",
+  "step_id": "extract",
+  "text": "{\n  \"items\": [\n    { \"code\": \"ALT\", \"name\": \"谷丙转氨酶\", \"value\": 68, \"unit\": \"U/L\", \"raw\": \"谷丙转氨酶 68 U/L\" },\n    { \"code\": \"AST\", \"name\": \"谷草转氨酶\", \"value\": 45, \"unit\": \"U/L\", \"raw\": \"谷草转氨酶 45 U/L\" },\n    { \"code\": \"GLU\", \"name\": \"空腹血糖\", \"value\": 6.8, \"unit\": \"mmol/L\", \"raw\": \"空腹血糖 6.8 mmol/L\" },\n    { \"code\": \"CREA\", \"name\": \"肌酐\", \"value\": 88, \"unit\": \"umol/L\", \"raw\": \"肌酐 88 umol/L\" },\n    { \"code\": \"WBC\", \"name\": \"白细胞\", \"value\": 3.2, \"unit\": \"10^9/L\", \"raw\": \"白细胞 3.2 10^9/L\" },\n    { \"code\": \"HGB\", \"name\": \"血红蛋白\", \"value\": 148, \"unit\": \"g/L\", \"raw\": \"血红蛋白 148 g/L\" },\n    { \"code\": \"PLT\", \"name\": \"血小板\", \"value\": 210, \"unit\": \"10^9/L\", \"raw\": \"血小板 210 10^9/L\" },\n    { \"code\": \"TC\", \"name\": \"总胆固醇\", \"value\": 5.6, \"unit\": \"mmol/L\", \"raw\": \"总胆固醇 5.6 mmol/L\" }\n  ],\n  \"notes\": \"\"\n}"
+}

@@ -2,6 +2,38 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.6.0] - 2026-10-10
+
+**八个行业场景 + 多场景框架 + 模型适配层被测试覆盖。**
+
+### Added
+- **多场景框架**：`agent.yaml` 的 `execution.cases`，一个包承载多个可验证场景，共用兼容声明 / 溯源 / 证据包 / 复现校验
+- `workagent cases`：列出全部场景（ID / 行业 / 形态 / 复现等级）
+- `workagent run --case <ID>`：按场景运行
+- `workagent verify --all`：**逐个场景复现校验**，CI 里 8 个场景必须全 PASS
+- **八个行业场景**：
+  - `salary_tax` 人力资源 · 个税累计预扣（L3）
+  - `loan_dscr` 金融 · 偿债能力测算（L3）
+  - `spc_control` 制造业 · SPC 判异 8 准则（L3）
+  - `pin_conflict` 嵌入式 · 引脚/中断/DMA 冲突（L3）
+  - `bid_quote` 建筑工程 · 报价测算（L3/L2）
+  - `expense_audit` 财务 · 报销合规（L2/L1）
+  - `lab_report` 医疗 · 检验异常判定（L2/L1）
+  - `point_table` 工业自动化 · Modbus 点表核对（L2/L1）
+- **模型适配层单元测试**：三种协议族（OpenAI 兼容 / Anthropic / Gemini）用 `httptest` 覆盖，**无需 API key、不联网**即可在 CI 验证
+- `docs/EXAMPLES.md` 场景清单与规则来源；`docs/PROVIDERS.md` 22 家服务商接入指南
+- 通用结论摘要模板（`subject / verdict / findings / metrics / confidence` 统一契约）
+
+### Fixed
+- **LLM 录制按场景分目录**：四个场景的步骤都叫 `extract`，原先共用 `provenance/llm/extract.json` 会互相覆盖
+- `cmdRun` 中 `ok` 变量遮蔽同名辅助函数
+- J 编辑引入的两处 Go 字符串换行转义错误
+
+### Design notes
+- 阈值一律放在**输入或规则文件**里，不写死在代码中（`loan_dscr` 的 1.25/1.10 可覆盖）
+- 医疗场景的参考区间明确标注为**示例值**，并在结论里声明不构成医学诊断
+- 点表场景补上 **Modbus 参考地址归一化**（`40001` → 偏移 0），不归一化会造成大面积误判
+
 ## [0.5.0] - 2026-10-10
 
 **模型适配层：22 家服务商 + 可复现的 LLM 步骤。**

@@ -181,15 +181,6 @@ func mustManifest(root string) map[string]any {
 	return m
 }
 
-func executorCommand(m map[string]any) []string {
-	execNode := asMap(asMap(m["execution"])["executor"])
-	var out []string
-	for _, c := range asList(execNode["command"]) {
-		out = append(out, asString(c))
-	}
-	return out
-}
-
 // resolveExecCommand 解决 python / python3 的跨平台差异：
 // 声明的是 python 但系统只有 python3（或反之）时，自动落到可用的那个。
 func resolveExecCommand(cmd []string) []string {
@@ -273,7 +264,7 @@ func cmdCheck(root string) int {
 		}
 	}
 
-	fmt.Println("\n[4/4] 边界与测试套件")
+	fmt.Println("\n[4/5] 边界与测试套件")
 	boundaryRaw, err := readJSON(filepath.Join(root, "x-workagent", "boundary.json"))
 	if err != nil {
 		bad("boundary.json -> " + err.Error())
@@ -291,6 +282,34 @@ func cmdCheck(root string) int {
 	}
 	sort.Strings(names)
 	ok(fmt.Sprintf("测试套件 %d 个: %s", len(names), strings.Join(names, ", ")))
+
+	fmt.Println("\n[5/5] 场景（cases）")
+	for _, cc := range casesOf(mustManifest(root)) {
+		var missing []string
+		if len(cc.Executor) > 1 && !fileExists(filepath.Join(root, filepath.FromSlash(cc.Executor[1]))) {
+			missing = append(missing, cc.Executor[1])
+		}
+		if cc.Boundary != "" && !fileExists(filepath.Join(root, filepath.FromSlash(cc.Boundary))) {
+			missing = append(missing, cc.Boundary)
+		}
+		if cc.SampleInput != "" && !fileExists(filepath.Join(root, filepath.FromSlash(cc.SampleInput))) {
+			missing = append(missing, cc.SampleInput)
+		}
+		if cc.SampleNatural != "" && !fileExists(filepath.Join(root, filepath.FromSlash(cc.SampleNatural))) {
+			missing = append(missing, cc.SampleNatural)
+		}
+		for _, st := range cc.LLMSteps {
+			if pf := asString(asMap(st)["prompt"]); pf != "" && !fileExists(filepath.Join(root, filepath.FromSlash(pf))) {
+				missing = append(missing, pf)
+			}
+		}
+		if len(missing) > 0 {
+			bad(cc.ID + " 缺少: " + strings.Join(missing, ", "))
+			failures++
+		} else {
+			ok(cc.ID + "  (" + cc.Industry + " · " + cc.Shape + ")")
+		}
+	}
 
 	fmt.Println("")
 	if failures > 0 {
@@ -380,12 +399,29 @@ func cmdAdapt(root string) int {
 
 func cmdAttest(root string) int {
 	m := mustManifest(root)
-	cmd := executorCommand(m)
+	all := casesOf(m)
+	def, _ := findCase(m, "")
+	cmd := def.Executor
 	var execDigest any
 	if len(cmd) > 1 {
 		if h, err := sha256File(filepath.Join(root, filepath.FromSlash(cmd[1]))); err == nil {
 			execDigest = h
 		}
+	}
+	// 逐场景记录执行体摘要：多场景包里，每个场景都是独立的计算闭包
+	caseExec := map[string]any{}
+	llmUsed := false
+	for _, cc := range all {
+		entry := map[string]any{"command": strings.Join(cc.Executor, " "), "llm_steps": len(cc.LLMSteps)}
+		if len(cc.Executor) > 1 {
+			if h, err := sha256File(filepath.Join(root, filepath.FromSlash(cc.Executor[1]))); err == nil {
+				entry["digest"] = h
+			}
+		}
+		if len(cc.LLMSteps) > 0 {
+			llmUsed = true
+		}
+		caseExec[cc.ID] = entry
 	}
 	schemaDigest, _ := sha256File(filepath.Join(root, "inputs.schema.json"))
 	wfDigest, _ := sha256File(filepath.Join(root, "execution", "workflow.yml"))
@@ -398,6 +434,7 @@ func cmdAttest(root string) int {
 		"closure": map[string]any{
 			"executor_digest":      execDigest,
 			"executor_command":     strings.Join(cmd, " "),
+			"case_executors":       caseExec,
 			"inputs_schema_digest": schemaDigest,
 			"workflow_digest":      wfDigest,
 			"manifest_digest":      manifestDigest,
@@ -414,7 +451,7 @@ func cmdAttest(root string) int {
 			"engine_build_digest":  nil,
 			"decoding_config":      nil,
 		},
-		"llm_used": len(asList(asMap(m["execution"])["llm_steps"])) > 0,
+		"llm_used": llmUsed,
 		"note":     "确定性执行体不涉及模型闭包；一旦启用 LLM 步骤，model/tokenizer/chat_template/engine/decoding 字段必须填写，否则不能声称结论可复现。执行体自身的运行时版本（如 Python/Node）由执行体作者负责登记。",
 	}
 	if err := writeJSON(filepath.Join(root, "attest", "closure.json"), closure); err != nil {
@@ -423,6 +460,7 @@ func cmdAttest(root string) int {
 	}
 
 	fmt.Println("attest —— 计算闭包摘要已写入 attest/closure.json")
+	ok(fmt.Sprintf("场景数 %d（执行体摘要逐场景记录）", len(all)))
 	ok("executor_digest      " + short(execDigest))
 	ok("inputs_schema_digest " + short(schemaDigest))
 	ok("workflow_digest      " + short(wfDigest))
@@ -434,18 +472,18 @@ func cmdAttest(root string) int {
 
 // ---------------------------------------------------------------- run
 
-func runExecutor(root string, m map[string]any, inputPath string) (any, []string, error) {
-	cmd := resolveExecCommand(executorCommand(m))
+func runExecutor(root string, c Case, inputPath string) (any, []string, error) {
+	cmd := resolveExecCommand(c.Executor)
 	if len(cmd) == 0 {
-		return nil, nil, fmt.Errorf("agent.yaml 中未声明 execution.executor.command")
+		return nil, nil, fmt.Errorf("场景 %s 未声明 executor", c.ID)
 	}
 	args := append(append([]string{}, cmd[1:]...), inputPath)
-	c := exec.Command(cmd[0], args...)
-	c.Dir = root
+	proc := exec.Command(cmd[0], args...)
+	proc.Dir = root
 	var stdout, stderr bytes.Buffer
-	c.Stdout = &stdout
-	c.Stderr = &stderr
-	if err := c.Run(); err != nil {
+	proc.Stdout = &stdout
+	proc.Stderr = &stderr
+	if err := proc.Run(); err != nil {
 		return nil, cmd, fmt.Errorf("执行体失败 (%v): %s", err, strings.TrimSpace(stderr.String()))
 	}
 	dec := json.NewDecoder(bytes.NewReader(stdout.Bytes()))
@@ -462,8 +500,13 @@ func runExecutor(root string, m map[string]any, inputPath string) (any, []string
 	return payload, cmd, nil
 }
 
-func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride string) int {
+func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelOverride string) int {
 	m := mustManifest(root)
+	c, found := findCase(m, caseID)
+	if !found {
+		fmt.Fprintln(os.Stderr, "找不到场景: "+caseID+"（用 workagent cases 查看全部）")
+		return 2
+	}
 	if inputArg == "" {
 		fmt.Fprintln(os.Stderr, "run 需要 --input 参数")
 		return 2
@@ -489,9 +532,9 @@ func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride 
 	// 执行体拿到的始终是确定性数据，因此裁决过程可复现。
 	execInput := inputPath
 	var llmDescriptors []map[string]any
-	if len(llmStepsOf(m)) > 0 {
+	if len(c.LLMSteps) > 0 {
 		// replay 模式绝不写档：否则重放会用降级的等级把原始录制覆盖掉。
-		enriched, descs, lerr := runLLMSteps(root, m, inputObj, replay, providerOverride, modelOverride, !replay)
+		enriched, descs, lerr := runLLMSteps(root, c.ID, c.LLMSteps, inputObj, replay, providerOverride, modelOverride, !replay)
 		if lerr != nil {
 			fmt.Fprintln(os.Stderr, lerr.Error())
 			return 1
@@ -502,7 +545,8 @@ func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride 
 		}
 	}
 
-	outputObj, cmd, err := runExecutor(root, m, execInput)
+	fmt.Println("场景: " + c.ID + "  " + c.Title)
+	outputObj, cmd, err := runExecutor(root, c, execInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return 1
@@ -539,7 +583,37 @@ func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride 
 			execDigest = h[:16]
 		}
 	}
+	// 通用发现渲染：[级别] 说明
+	var findLines []string
+	for _, f := range asList(outMap["findings"]) {
+		fm := asMap(f)
+		lv := asString(fm["level"])
+		if lv == "" {
+			lv = "info"
+		}
+		msg := asString(fm["message"])
+		code := asString(fm["code"])
+		if code != "" {
+			msg = "[" + code + "] " + msg
+		}
+		findLines = append(findLines, "- **"+lv+"** "+msg)
+	}
+	findText := "- （无）"
+	if len(findLines) > 0 {
+		findText = strings.Join(findLines, "\n")
+	}
+	subj := asString(outMap["subject"])
+	if subj == "" {
+		subj = asString(outMap["project"])
+	}
 	repl := map[string]string{
+		"<case_id>":          c.ID,
+		"<case_title>":       c.Title,
+		"<industry>":         c.Industry,
+		"<subject>":          subj,
+		"<verdict>":          asString(outMap["verdict"]),
+		"<findings>":         findText,
+		"<repro_level>":      overallLevel(llmDescriptors),
 		"<project>":          asString(outMap["project"]),
 		"<conclusion>":       asString(outMap["conclusion"]),
 		"<currency>":         asString(outMap["currency"]),
@@ -566,7 +640,9 @@ func cmdRun(root, inputArg string, replay bool, providerOverride, modelOverride 
 	trace := asMap(traceRaw)
 	steps := asList(trace["steps"])
 	trace["evidence_id"] = evidenceID
+	trace["last_case"] = c.ID
 	trace["steps"] = append(steps, map[string]any{
+		"case":          c.ID,
 		"seq":           len(steps) + 1,
 		"at":            nowISO(),
 		"step":          "run",
@@ -636,11 +712,18 @@ func cmdVerify(root string, live bool) int {
 		return 1
 	}
 
+	// 从 trace 里取上次 run 用的场景（多场景包必须区分）
+	lastCase := asString(asMap(traceRaw)["last_case"])
+	vc, okc := findCase(m, lastCase)
+	if !okc {
+		fmt.Fprintln(os.Stderr, "trace 中的场景无法解析: "+lastCase)
+		return 1
+	}
 	// 含 LLM 步骤时：默认重放已录制的模型响应（离线、可复现）；
 	// --live 则重新真实调用模型，用来**测量**模型本身是否可复现。
 	execInput := inputFile
 	liveDiffers := false
-	if len(llmStepsOf(m)) > 0 {
+	if len(vc.LLMSteps) > 0 {
 		inObj, ierr := readJSON(inputFile)
 		if ierr != nil {
 			fmt.Fprintln(os.Stderr, ierr.Error())
@@ -650,13 +733,13 @@ func cmdVerify(root string, live bool) int {
 			// 关键：必须**先**读出旧录制的摘要，再重新调用。
 			// 否则拿刚被覆盖的档去比对，永远相等、永远 PASS —— 那样的测试是摆设。
 			oldDigests := map[string]string{}
-			for _, st := range llmStepsOf(m) {
+			for _, st := range vc.LLMSteps {
 				sid := asString(asMap(st)["id"])
-				if rec, rerr := readJSON(filepath.Join(root, llmDir, sid+".json")); rerr == nil {
+				if rec, rerr := readJSON(filepath.Join(root, llmDir, vc.ID, sid+".json")); rerr == nil {
 					oldDigests[sid] = asString(asMap(rec)["response_digest"])
 				}
 			}
-			enriched, descs, lerr := runLLMSteps(root, m, inObj, false, "", "", false)
+			enriched, descs, lerr := runLLMSteps(root, vc.ID, vc.LLMSteps, inObj, false, "", "", false)
 			if lerr != nil {
 				fmt.Fprintln(os.Stderr, "live 调用失败: "+lerr.Error())
 				return 1
@@ -683,7 +766,7 @@ func cmdVerify(root string, live bool) int {
 			}
 		} else {
 			fmt.Println("  [--]   LLM 步骤：重放已录制响应（未联网）")
-			enriched, _, lerr := runLLMSteps(root, m, inObj, true, "", "", false)
+			enriched, _, lerr := runLLMSteps(root, vc.ID, vc.LLMSteps, inObj, true, "", "", false)
 			if lerr != nil {
 				fmt.Fprintln(os.Stderr, lerr.Error())
 				return 1
@@ -694,7 +777,7 @@ func cmdVerify(root string, live bool) int {
 		}
 	}
 
-	outputObj, _, err := runExecutor(root, m, execInput)
+	outputObj, _, err := runExecutor(root, vc, execInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return 1
@@ -715,6 +798,96 @@ func cmdVerify(root string, live bool) int {
 	}
 	fmt.Println("结果: FAIL —— 结论不可复现，禁止对外交付该结论。")
 	return 1
+}
+
+// cmdVerifyAll 逐个场景复现校验：CI 里 8 个场景都要过。
+func cmdVerifyAll(root string) int {
+	m := mustManifest(root)
+	traceRaw, err := readJSON(filepath.Join(root, "provenance", "trace.json"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+	lastByCase := map[string]map[string]any{}
+	var order []string
+	for _, s := range asList(asMap(traceRaw)["steps"]) {
+		sm := asMap(s)
+		if asString(sm["step"]) != "run" {
+			continue
+		}
+		cid := asString(sm["case"])
+		if cid == "" {
+			cid = "default"
+		}
+		if _, seen := lastByCase[cid]; !seen {
+			order = append(order, cid)
+		}
+		lastByCase[cid] = sm
+	}
+	if len(order) == 0 {
+		fmt.Println("verify --all —— trace 里没有 run 记录")
+		return 1
+	}
+	fmt.Printf("verify --all —— 共 %d 个场景\n", len(order))
+	failures := 0
+	for _, cid := range order {
+		st := lastByCase[cid]
+		c, found := findCase(m, cid)
+		if !found {
+			bad(cid + " 场景无法解析")
+			failures++
+			continue
+		}
+		inputFile := asString(st["input_file"])
+		if !fileExists(inputFile) {
+			inputFile = filepath.Join(root, evidenceDir, asString(st["evidence_id"]), "input.json")
+		}
+		if !fileExists(inputFile) {
+			bad(cid + " 找不到原始输入")
+			failures++
+			continue
+		}
+		execInput := inputFile
+		if len(c.LLMSteps) > 0 {
+			inObj, ierr := readJSON(inputFile)
+			if ierr != nil {
+				bad(cid + " 输入读取失败: " + ierr.Error())
+				failures++
+				continue
+			}
+			enriched, _, lerr := runLLMSteps(root, c.ID, c.LLMSteps, inObj, true, "", "", false)
+			if lerr != nil {
+				bad(cid + " 重放失败: " + lerr.Error())
+				failures++
+				continue
+			}
+			if enriched != "" {
+				execInput = enriched
+			}
+		}
+		outputObj, _, rerr := runExecutor(root, c, execInput)
+		if rerr != nil {
+			bad(cid + " 执行失败: " + rerr.Error())
+			failures++
+			continue
+		}
+		canon, _ := canonicalJSON(outputObj)
+		got := sha256Bytes(canon)
+		want := asString(st["output_digest"])
+		if got == want {
+			ok(fmt.Sprintf("%-14s PASS  %s", cid, got[:16]))
+		} else {
+			bad(fmt.Sprintf("%-14s FAIL  期望 %s 实际 %s", cid, short(want), got[:16]))
+			failures++
+		}
+	}
+	fmt.Println("")
+	if failures > 0 {
+		fmt.Printf("结果: %d 个场景未通过，禁止对外交付。\n", failures)
+		return 1
+	}
+	fmt.Printf("结果: 全部 %d 个场景复现通过。\n", len(order))
+	return 0
 }
 
 // ---------------------------------------------------------------- seal
@@ -833,6 +1006,8 @@ func main() {
 		code = cmdAdapt(pathArg(args))
 	case "attest":
 		code = cmdAttest(pathArg(args))
+	case "cases":
+		code = cmdCases(pathArg(args))
 	case "models":
 		probe := false
 		for _, a := range args {
@@ -845,7 +1020,7 @@ func main() {
 		// 手工解析：Go 的 flag 包遇到第一个位置参数就停止解析，
 		// 于是 run --input X . --replay 会**静默忽略** --replay —— 那太危险了。
 		// 这里做成位置无关：显式声明的开关一定生效。
-		var inputArg, provider, model string
+		var inputArg, provider, model, caseID string
 		replayFlag := false
 		var positional []string
 		for i := 0; i < len(args); i++ {
@@ -874,6 +1049,13 @@ func main() {
 				}
 			case strings.HasPrefix(a, "--model="):
 				model = strings.TrimPrefix(a, "--model=")
+			case a == "--case" || a == "-case":
+				if i+1 < len(args) {
+					caseID = args[i+1]
+					i++
+				}
+			case strings.HasPrefix(a, "--case="):
+				caseID = strings.TrimPrefix(a, "--case=")
 			case !strings.HasPrefix(a, "-"):
 				positional = append(positional, a)
 			}
@@ -882,17 +1064,24 @@ func main() {
 		if len(positional) > 0 {
 			runRoot = resolveRoot(positional[0])
 		}
-		code = cmdRun(runRoot, inputArg, replayFlag, provider, model)
+		code = cmdRun(runRoot, caseID, inputArg, replayFlag, provider, model)
 	case "verify":
 		live := false
+		all := false
 		var vpos []string
 		for _, a := range args {
 			switch {
 			case a == "--live" || a == "-live":
 				live = true
+			case a == "--all" || a == "-all":
+				all = true
 			case !strings.HasPrefix(a, "-"):
 				vpos = append(vpos, a)
 			}
+		}
+		if all {
+			code = cmdVerifyAll(resolveRoot("."))
+			break
 		}
 		verifyRoot := resolveRoot(".")
 		if len(vpos) > 0 {

@@ -1,0 +1,11 @@
+{
+  "project": "某工业园分布式光伏一期",
+  "net_profit": 18600000,
+  "depreciation": 7400000,
+  "amortization": 600000,
+  "interest_expense": 5200000,
+  "principal_repayment": 12000000,
+  "tax_rate": 0.25,
+  "dscr_min": 1.25,
+  "dscr_review": 1.10
+}

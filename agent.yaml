@@ -7,13 +7,13 @@
 # ----------------------------------------------------------------------------
 
 aps_version: "0.2"
-spec_version: "0.3.0"
+spec_version: "0.6.0"
 
 id: "io.github.wmjxiaojun/workagent"
 name: "workagent"
 display_name: "WorkAgent"
 display_name_en: "WorkAgent"
-version: "0.3.0"
+version: "0.6.0"
 license: "MIT"
 summary: "别人交付对话，我们交付可复现的结论。"
 summary_en: "Others ship conversations. We ship reproducible conclusions."
@@ -29,24 +29,121 @@ outputs: "artifacts/output_schema.json"
 execution:
   workflow: "execution/workflow.yml"
   runtime: "execution/runtime.dockerfile"
+  default_case: "bid_quote"
+
+  # 兼容保留：未声明 cases 的旧包用这两个字段
   executor:
-    # 确定性执行体：读 argv[1]（可能是富化后的输入），向 stdout 输出 {"output": {...}}
     command: ["python", "examples/bid_quote/executor.py"]
     deterministic: true
     requires_network: false
+  llm_steps: []
 
-  # LLM 步骤（可选）—— 模型只做「抽取」，判断与计算全部交给上面的确定性执行体。
-  # 抽取结果不可复现，因此会被录制到 provenance/llm/；verify 默认重放录制而非重放模型。
-  # when_input_has 为真时该步骤才执行：结构化输入会直接跳过，无需联网。
-  llm_steps:
-    - id: "extract"
-      provider: "ollama"          # 本地开源权重，可离线、可做到端到端复现
-      model: "qwen2.5:7b"
-      prompt: "examples/bid_quote/extract.prompt.md"
-      temperature: 0
-      seed: 42
-      json_mode: true
-      when_input_has: "description"
+  # --------------------------------------------------------------------------
+  # 多场景：一个包承载多个可验证业务场景，共用同一套基础设施
+  #   shape: 测算型 / 核验型 / 抽取型 / 排程型 / 推演型
+  #   LLM 步骤一律「模型只抽取，判断交给代码」，抽取结果会被录制以便离线重放
+  # --------------------------------------------------------------------------
+  cases:
+    - id: "bid_quote"
+      title: "投标报价测算"
+      industry: "建筑工程"
+      shape: "测算型"
+      executor: ["python", "examples/bid_quote/executor.py"]
+      boundary: "examples/bid_quote/boundary.json"
+      sample_input: "examples/bid_quote/input.json"
+      sample_natural: "examples/bid_quote/input.natural.json"
+      llm_steps:
+        - id: "extract"
+          provider: "ollama"
+          model: "qwen2.5:7b"
+          prompt: "examples/bid_quote/extract.prompt.md"
+          temperature: 0
+          seed: 42
+          json_mode: true
+          when_input_has: "description"
+
+    - id: "expense_audit"
+      title: "报销单合规审核"
+      industry: "财务"
+      shape: "核验型"
+      executor: ["python", "examples/expense_audit/executor.py"]
+      boundary: "examples/expense_audit/boundary.json"
+      sample_natural: "examples/expense_audit/input.natural.json"
+      llm_steps:
+        - id: "extract"
+          provider: "ollama"
+          model: "qwen2.5:7b"
+          prompt: "examples/expense_audit/prompt.md"
+          temperature: 0
+          seed: 42
+          json_mode: true
+          when_input_has: "description"
+
+    - id: "lab_report"
+      title: "检验报告异常判定"
+      industry: "医疗"
+      shape: "核验型"
+      executor: ["python", "examples/lab_report/executor.py"]
+      boundary: "examples/lab_report/boundary.json"
+      sample_natural: "examples/lab_report/input.natural.json"
+      llm_steps:
+        - id: "extract"
+          provider: "ollama"
+          model: "qwen2.5:7b"
+          prompt: "examples/lab_report/prompt.md"
+          temperature: 0
+          seed: 42
+          json_mode: true
+          when_input_has: "description"
+
+    - id: "point_table"
+      title: "通信点表核对"
+      industry: "工业自动化"
+      shape: "核验型"
+      executor: ["python", "examples/point_table/executor.py"]
+      boundary: "examples/point_table/boundary.json"
+      sample_natural: "examples/point_table/input.natural.json"
+      llm_steps:
+        - id: "extract"
+          provider: "ollama"
+          model: "qwen2.5:7b"
+          prompt: "examples/point_table/prompt.md"
+          temperature: 0
+          seed: 42
+          json_mode: true
+          when_input_has: "description"
+
+    - id: "spc_control"
+      title: "SPC 控制图判异"
+      industry: "制造业"
+      shape: "核验型"
+      executor: ["python", "examples/spc_control/executor.py"]
+      boundary: "examples/spc_control/boundary.json"
+      sample_input: "examples/spc_control/input.json"
+
+    - id: "pin_conflict"
+      title: "嵌入式资源冲突检测"
+      industry: "嵌入式"
+      shape: "核验型"
+      executor: ["python", "examples/pin_conflict/executor.py"]
+      boundary: "examples/pin_conflict/boundary.json"
+      sample_input: "examples/pin_conflict/input.json"
+
+    - id: "salary_tax"
+      title: "工资薪金个税测算"
+      industry: "人力资源"
+      shape: "测算型"
+      executor: ["python", "examples/salary_tax/executor.py"]
+      boundary: "examples/salary_tax/boundary.json"
+      sample_input: "examples/salary_tax/input.json"
+
+    - id: "loan_dscr"
+      title: "项目贷款偿债能力测算"
+      industry: "金融"
+      shape: "测算型"
+      executor: ["python", "examples/loan_dscr/executor.py"]
+      boundary: "examples/loan_dscr/boundary.json"
+      sample_input: "examples/loan_dscr/input.json"
 
 provenance:
   trace: "provenance/trace.json"
@@ -61,7 +158,7 @@ signature:
 
 x-workagent:
   namespace: "x-workagent"
-  version: "0.3.0"
+  version: "0.6.0"
   compat: "compat.json"
   boundary: "x-workagent/boundary.json"
   test_suite: "x-workagent/test_suite"

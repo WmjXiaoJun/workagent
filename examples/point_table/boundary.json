@@ -1,0 +1,24 @@
+{
+  "schema": "workagent/boundary/1",
+  "case": "point_table",
+  "applies_to": "Modbus 通信点表与组态配置的一致性初筛",
+  "valid_when": [
+    "点表为文本或表格描述，点位 1 ~ 500 条",
+    "地址使用 Modbus 常规参考号（0xxxxx/1xxxxx/3xxxxx/4xxxxx）或纯偏移量"
+  ],
+  "invalid_when": [
+    "需要校验字节序（大端/小端）与上位机实际解析设置",
+    "需要校验从站地址、波特率、超时等通信参数",
+    "需要校验厂商私有映射或非 Modbus 协议（如 OPC UA 信息模型）",
+    "点位超过 500 条"
+  ],
+  "confidence_rating": {
+    "level": "medium",
+    "basis": "点位由模型抽取，存在识别误差；一致性检查为确定性规则"
+  },
+  "risk_notes": [
+    "地址重叠判断按连续寄存器区间，未考虑厂商自定义映射",
+    "结论不替代现场联调与报文实测"
+  ],
+  "stop_condition": "没有可核对点位或点位超过 500 条时必须报错退出"
+}

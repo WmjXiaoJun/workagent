@@ -25,6 +25,9 @@ jobs:
       - name: go vet
         run: go vet ./...
 
+      - name: 模型适配层协议族测试（无需任何 API key，不联网）
+        run: go test ./internal/llm/ -v
+
       - name: gofmt 检查（提示性；gofmt 输出随工具链版本变化，不作为阻塞条件）
         if: runner.os == 'ubuntu-latest'
         continue-on-error: true
@@ -41,10 +44,13 @@ jobs:
           CGO_ENABLED: "0"
         run: go build -trimpath -o workagent ./cmd/workagent
 
-      - name: 列出模型服务商（无需密钥）
+      - name: 列出模型服务商（不联网）
         run: ./workagent models
 
-      - name: 包结构校验
+      - name: 列出场景
+        run: ./workagent cases .
+
+      - name: 包结构校验（含逐场景文件齐备性）
         run: ./workagent check .
 
       - name: 计算闭包摘要
@@ -53,23 +59,28 @@ jobs:
       - name: 生成适配层
         run: ./workagent adapt .
 
-      - name: 路径 A — 结构化输入，纯确定性（L3，不联网、不调模型）
-        run: ./workagent run --input examples/bid_quote/input.json .
+      - name: 运行全部场景（L3 场景纯确定性；带模型的场景重放已录制响应，无需联网与密钥）
+        shell: bash
+        run: |
+          set -e
+          ./workagent run --case bid_quote     --input examples/bid_quote/input.json . 
+          ./workagent run --case bid_quote     --input examples/bid_quote/input.natural.json . --replay
+          ./workagent run --case expense_audit --input examples/expense_audit/input.natural.json . --replay
+          ./workagent run --case lab_report    --input examples/lab_report/input.natural.json . --replay
+          ./workagent run --case point_table   --input examples/point_table/input.natural.json . --replay
+          ./workagent run --case spc_control   --input examples/spc_control/input.json .
+          ./workagent run --case pin_conflict  --input examples/pin_conflict/input.json .
+          ./workagent run --case salary_tax    --input examples/salary_tax/input.json .
+          ./workagent run --case loan_dscr     --input examples/loan_dscr/input.json .
 
-      - name: 路径 A 复现校验（必须 PASS）
-        run: ./workagent verify .
-
-      - name: 路径 B — 自然语言输入，模型抽取（重放录制响应，无需联网与密钥）
-        run: ./workagent run --input examples/bid_quote/input.natural.json . --replay
-
-      - name: 路径 B 复现校验（必须 PASS）
-        run: ./workagent verify .
+      - name: 全场景复现校验（必须全部 PASS）
+        run: ./workagent verify --all .
 
       - name: 边界拒绝测试（越界输入必须失败）
         shell: bash
         run: |
           echo '{"project":"x","line_items":[]}' > /tmp/bad.json
-          if ./workagent run --input /tmp/bad.json . --replay ; then
+          if ./workagent run --case bid_quote --input /tmp/bad.json . --replay ; then
             echo "越界输入未被拒绝，边界失效"; exit 1
           else
             echo "越界输入已正确拒绝"

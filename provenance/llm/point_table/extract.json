@@ -1,0 +1,30 @@
+{
+  "descriptor": {
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "json_mode": true,
+    "kind": "openai",
+    "latency_ms": 3489,
+    "model": "qwen2.5:7b",
+    "provider": "ollama",
+    "seed": 42,
+    "temperature": 0,
+    "usage": {
+      "completion_tokens": 407,
+      "prompt_tokens": 567,
+      "prompt_tokens_details": {
+        "cached_tokens": 566
+      },
+      "total_tokens": 974
+    }
+  },
+  "honesty_note": "记录的是模型原始响应。重放记录 ≠ 重放模型；L1 只保证裁决过程可复现，不保证模型本身可复现。",
+  "prompt_digest": "65d4a608ad7884cbe90d69022d71be7b3f88cd38f179b10761dcc55051d85053",
+  "prompt_file": "examples/point_table/prompt.md",
+  "raw": "{\"id\":\"chatcmpl-533\",\"object\":\"chat.completion\",\"created\":1791634726,\"model\":\"qwen2.5:7b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"points\\\": [\\n    { \\\"name\\\": \\\"进水流量\\\", \\\"function_code\\\": 3, \\\"address\\\": 40001, \\\"data_type\\\": \\\"float32\\\", \\\"scale_min\\\": 0, \\\"scale_max\\\": 500, \\\"unit\\\": \\\"m3/h\\\" },\\n    { \\\"name\\\": \\\"出水流量\\\", \\\"function_code\\\": 3, \\\"address\\\": 40001, \\\"data_type\\\": \\\"float32\\\", \\\"scale_min\\\": 0, \\\"scale_max\\\": 500, \\\"unit\\\": \\\"m3/h\\\" },\\n    { \\\"name\\\": \\\"进水pH\\\", \\\"function_code\\\": 3, \\\"address\\\": 40003, \\\"data_type\\\": \\\"float32\\\", \\\"scale_min\\\": 0, \\\"scale_max\\\": 14, \\\"unit\\\": \\\"\\\" },\\n    { \\\"name\\\": \\\"浊度\\\", \\\"function_code\\\": 3, \\\"address\\\": 40004, \\\"data_type\\\": \\\"uint16\\\", \\\"scale_min\\\": 0, \\\"scale_max\\\": 100, \\\"unit\\\": \\\"\\\" },\\n    { \\\"name\\\": \\\"液位\\\", \\\"function_code\\\": 3, \\\"address\\\": 70000, \\\"data_type\\\": \\\"uint16\\\", \\\"scale_min\\\": 0, \\\"scale_max\\\": 10, \\\"unit\\\": \\\"m\\\" },\\n    { \\\"name\\\": \\\"温度\\\", \\\"function_code\\\": 3, \\\"address\\\": 40006, \\\"data_type\\\": \\\"int16\\\", \\\"scale_min\\\": null, \\\"scale_max\\\": null, \\\"unit\\\": \\\"\\\" },\\n    { \\\"name\\\": \\\"加药泵启停\\\", \\\"function_code\\\": 5, \\\"address\\\": 0, \\\"data_type\\\": \\\"bool\\\", \\\"scale_min\\\": null, \\\"scale_max\\\": null, \\\"unit\\\": \\\"\\\" }\\n  ],\\n  \\\"notes\\\": \\\"\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":567,\"prompt_tokens_details\":{\"cached_tokens\":566},\"completion_tokens\":407,\"total_tokens\":974}}",
+  "recorded_at": "2026-10-10T20:18:46+08:00",
+  "reproducibility": "L2-decision-candidate",
+  "response_digest": "90b92a3d088f2ef5c2734e8ec89cfe8a21c79d5239bafc79b0c4c6f775fd5ee8",
+  "schema": "workagent/llm-record/1",
+  "step_id": "extract",
+  "text": "{\n  \"points\": [\n    { \"name\": \"进水流量\", \"function_code\": 3, \"address\": 40001, \"data_type\": \"float32\", \"scale_min\": 0, \"scale_max\": 500, \"unit\": \"m3/h\" },\n    { \"name\": \"出水流量\", \"function_code\": 3, \"address\": 40001, \"data_type\": \"float32\", \"scale_min\": 0, \"scale_max\": 500, \"unit\": \"m3/h\" },\n    { \"name\": \"进水pH\", \"function_code\": 3, \"address\": 40003, \"data_type\": \"float32\", \"scale_min\": 0, \"scale_max\": 14, \"unit\": \"\" },\n    { \"name\": \"浊度\", \"function_code\": 3, \"address\": 40004, \"data_type\": \"uint16\", \"scale_min\": 0, \"scale_max\": 100, \"unit\": \"\" },\n    { \"name\": \"液位\", \"function_code\": 3, \"address\": 70000, \"data_type\": \"uint16\", \"scale_min\": 0, \"scale_max\": 10, \"unit\": \"m\" },\n    { \"name\": \"温度\", \"function_code\": 3, \"address\": 40006, \"data_type\": \"int16\", \"scale_min\": null, \"scale_max\": null, \"unit\": \"\" },\n    { \"name\": \"加药泵启停\", \"function_code\": 5, \"address\": 0, \"data_type\": \"bool\", \"scale_min\": null, \"scale_max\": null, \"unit\": \"\" }\n  ],\n  \"notes\": \"\"\n}"
+}

@@ -8,7 +8,8 @@
 
 **A portable agent package where every conclusion is reproducible, traceable, and signable.**
 
-![spec](https://img.shields.io/badge/spec-v0.5.4-blue)
+![spec](https://img.shields.io/badge/spec-v0.6.0-blue)
+![cases](https://img.shields.io/badge/industry%20cases-8-orange)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
@@ -157,6 +158,46 @@ qwen         openai     https://dashscope.aliyuncs.com/...   DASHSCOPE_API_KEY  
 > **实测**：本地 `ollama / qwen2.5:7b`、`temperature=0`、`seed=42`，
 > 三次独立调用返回**逐字节相同**的响应（`response_digest 4d6abc79490d3241…`）→ 该路径达到 **L2**。
 > 这是测出来的，不是声称的。
+
+---
+
+## 八个行业场景
+
+一个包承载八个可验证场景，**共用同一套基础设施**（兼容声明、溯源、证据包、复现校验）。
+
+```text
+$ workagent cases .
+CASE           行业             形态       复现       标题
+bid_quote      建筑工程          测算型      L2/L1    投标报价测算
+expense_audit  财务             核验型      L2/L1    报销单合规审核
+lab_report     医疗             核验型      L2/L1    检验报告异常判定
+point_table    工业自动化          核验型      L2/L1    通信点表核对
+spc_control    制造业            核验型      L3       SPC 控制图判异
+pin_conflict   嵌入式            核验型      L3       嵌入式资源冲突检测
+salary_tax     人力资源           测算型      L3       工资薪金个税测算
+loan_dscr      金融             测算型      L3       项目贷款偿债能力测算
+```
+
+```bash
+workagent run --case spc_control --input examples/spc_control/input.json .
+workagent verify --all .
+```
+
+| 场景 | 做什么 | 规则来源 |
+|---|---|---|
+| `salary_tax` | 累计预扣法逐月算个税 + 实际税负率 | 《个人所得税法》7 级累进预扣率表 |
+| `loan_dscr` | DSCR 与利息保障倍数，阈值**写在输入里**不写死在代码里 | DSCR 标准公式 |
+| `spc_control` | 8 条判异准则，指出**哪一点违反哪条** | Western Electric / Nelson |
+| `pin_conflict` | 引脚复用 / 中断优先级 / DMA 通道冲突 | MCU 资源一致性规则集 |
+| `bid_quote` | 结构化或自然语言两种入口，共用同一执行体 | 工程造价惯例 |
+| `expense_audit` | 单笔限额、类别限额、时限、发票号、合计一致性 | 企业报销制度（示例阈值） |
+| `lab_report` | 按性别区分的参考区间 + 危急值 | 成人常见参考区间（示例值） |
+| `point_table` | 地址重叠、数据类型、量程、越界 + **Modbus 参考地址归一化** | Modbus 寻址规则 |
+
+**四个 L3 场景完全不依赖模型**——同样输入，任何机器任何时间，结论摘要都一样。
+
+> 详细说明见 `docs/EXAMPLES.md` ｜ 模型适配见 `docs/PROVIDERS.md`。
+> ⚠️ 医疗场景的参考区间为示例值，**不构成医学诊断**。
 
 ---
 
