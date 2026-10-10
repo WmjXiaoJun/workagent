@@ -130,11 +130,18 @@ func pick(lang string, e map[string]string) (string, bool) {
 }
 
 // Conclusion 渲染结论句。args 为 nil 或没有对应文案时返回 ok=false。
-func (c *Catalog) Conclusion(lang, caseID string, args map[string]any) (string, bool) {
+// Conclusion 渲染结论句。code 为空时用保留码 CONCLUSION。
+//
+// 执行体可以按**事实**选不同的文案码（例如"触发判异"与"过程受控"），
+// 但文案本身仍由本表提供 —— 执行体不写人话这条不变。
+func (c *Catalog) Conclusion(lang, caseID, code string, args map[string]any) (string, bool) {
 	if c == nil || args == nil {
 		return "", false
 	}
-	tpl, ok := pick(lang, c.Messages[caseID+".CONCLUSION"])
+	if code == "" {
+		code = "CONCLUSION"
+	}
+	tpl, ok := pick(lang, c.Messages[caseID+"."+code])
 	if !ok {
 		return "", false
 	}
@@ -186,7 +193,7 @@ func (c *Catalog) Apply(lang, caseID string, output any) any {
 				use = cp
 			}
 		}
-		if s, done := c.Conclusion(lang, caseID, use); done {
+		if s, done := c.Conclusion(lang, caseID, asString(m["conclusion_code"]), use); done {
 			m["conclusion"] = s
 		}
 	}

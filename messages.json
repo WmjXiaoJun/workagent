@@ -29,6 +29,126 @@
         "zh": "平",
         "en": "balanced"
       }
+    },
+    "expense_audit": {
+      "退回": {
+        "zh": "退回",
+        "en": "returned"
+      },
+      "需人工复核": {
+        "zh": "需人工复核",
+        "en": "needs human review"
+      },
+      "通过": {
+        "zh": "通过",
+        "en": "passed"
+      }
+    },
+    "lab_report": {
+      "危急": {
+        "zh": "危急",
+        "en": "critical"
+      },
+      "异常": {
+        "zh": "异常",
+        "en": "abnormal"
+      },
+      "未见异常": {
+        "zh": "未见异常",
+        "en": "no abnormality"
+      }
+    },
+    "point_table": {
+      "不通过": {
+        "zh": "不通过",
+        "en": "failed"
+      },
+      "有告警": {
+        "zh": "有告警",
+        "en": "warnings"
+      },
+      "通过": {
+        "zh": "通过",
+        "en": "passed"
+      }
+    },
+    "spc_control": {
+      "失控": {
+        "zh": "失控",
+        "en": "out of control"
+      },
+      "预警": {
+        "zh": "预警",
+        "en": "warning"
+      },
+      "受控": {
+        "zh": "受控",
+        "en": "in control"
+      }
+    },
+    "pin_conflict": {
+      "存在冲突": {
+        "zh": "存在冲突",
+        "en": "conflicts"
+      },
+      "有告警": {
+        "zh": "有告警",
+        "en": "warnings"
+      },
+      "无冲突": {
+        "zh": "无冲突",
+        "en": "no conflicts"
+      }
+    },
+    "salary_tax": {
+      "已测算": {
+        "zh": "已测算",
+        "en": "computed"
+      }
+    },
+    "bid_quote": {
+      "已测算": {
+        "zh": "已测算",
+        "en": "computed"
+      }
+    },
+    "loan_dscr": {
+      "通过": {
+        "zh": "通过",
+        "en": "passed"
+      },
+      "需复核": {
+        "zh": "需复核",
+        "en": "needs review"
+      },
+      "不予通过": {
+        "zh": "不予通过",
+        "en": "rejected"
+      }
+    },
+    "modbus_poll": {
+      "满足": {
+        "zh": "满足",
+        "en": "met"
+      },
+      "不满足": {
+        "zh": "不满足",
+        "en": "not met"
+      }
+    },
+    "firmware_budget": {
+      "超限": {
+        "zh": "超限",
+        "en": "over budget"
+      },
+      "告警": {
+        "zh": "告警",
+        "en": "warnings"
+      },
+      "通过": {
+        "zh": "通过",
+        "en": "passed"
+      }
     }
   },
   "messages": {
@@ -103,6 +223,274 @@
     "points_reconcile.PR-OK": {
       "zh": "账本 {ledger} 条、账户 {accounts} 个、订单 {orders} 笔，七项不变量全部成立",
       "en": "{ledger} ledger entries, {accounts} accounts, {orders} orders; all seven invariants hold"
+    },
+    "expense_audit.CONCLUSION": {
+      "zh": "审核判定「{verdict}」：明细 {items} 项合计 {total} 元；错误 {errors} 项、告警 {warns} 项",
+      "en": "Review verdict \"{verdict}\": {items} line items totalling {total}; {errors} error(s), {warns} warning(s)"
+    },
+    "expense_audit.EXP-01": {
+      "zh": "申报总额 {claimed} 与明细合计 {total} 不一致",
+      "en": "Claimed total {claimed} does not match the line-item total {total}"
+    },
+    "expense_audit.EXP-02": {
+      "zh": "{name} 金额 {amount} 超过单笔上限 {limit}",
+      "en": "{name}: amount {amount} exceeds the per-item limit {limit}"
+    },
+    "expense_audit.EXP-03": {
+      "zh": "{name} 属「{category}」类别，金额 {amount} 超过该类别上限 {limit}",
+      "en": "{name} is in category \"{category}\"; amount {amount} exceeds that category's limit {limit}"
+    },
+    "expense_audit.EXP-04": {
+      "zh": "{name} 发生日期晚于提交日期",
+      "en": "{name}: the expense date is later than the submission date"
+    },
+    "expense_audit.EXP-04B": {
+      "zh": "{name} 距提交已 {days} 天，超过 {limit} 天报销时限",
+      "en": "{name}: {days} days since submission, beyond the {limit}-day claim window"
+    },
+    "expense_audit.EXP-05": {
+      "zh": "{name} 类别「{category}」不在白名单",
+      "en": "{name}: category \"{category}\" is not on the allow-list"
+    },
+    "expense_audit.EXP-06": {
+      "zh": "{name} 缺少发票号，无法核验",
+      "en": "{name}: no invoice number, so it cannot be verified"
+    },
+    "expense_audit.EXP-07": {
+      "zh": "模型抽取时标注了以下不确定项，需人工核对：{notes}",
+      "en": "The model flagged uncertain items that need human review: {notes}"
+    },
+    "expense_audit.EXP-OK": {
+      "zh": "未发现违规项",
+      "en": "No violations found"
+    },
+    "lab_report.CONCLUSION": {
+      "zh": "判定「{verdict}」：共 {items} 项，异常 {abnormal} 项，危急值 {critical} 项",
+      "en": "Verdict \"{verdict}\": {items} items, {abnormal} abnormal, {critical} critical"
+    },
+    "lab_report.LAB-01": {
+      "zh": "指标由模型从报告文本抽取，共 {count} 项，请对照原报告复核",
+      "en": "The model extracted {count} items from the report text; check them against the original report"
+    },
+    "lab_report.LAB-02": {
+      "zh": "{name} 数值无法解析，已跳过",
+      "en": "{name}: the value could not be parsed, skipped"
+    },
+    "lab_report.LAB-03": {
+      "zh": "{name} 不在本示例参考区间表中，未判定",
+      "en": "{name}: not in this example's reference table, not judged"
+    },
+    "lab_report.CRIT-01": {
+      "zh": "{name} {value} {unit} 达危急值（{lo}~{hi}），须立即复核并报告",
+      "en": "{name} {value} {unit} is a critical value ({lo}~{hi}); review and report immediately"
+    },
+    "lab_report.REF-01": {
+      "zh": "{name} {value} {unit} 低于参考下限 {ref}",
+      "en": "{name} {value} {unit} is below the lower reference limit {ref}"
+    },
+    "lab_report.REF-02": {
+      "zh": "{name} {value} {unit} 高于参考上限 {ref}",
+      "en": "{name} {value} {unit} is above the upper reference limit {ref}"
+    },
+    "point_table.CONCLUSION": {
+      "zh": "核对判定「{verdict}」：点位 {points} 条，错误 {errors} 项、告警 {warns} 项",
+      "en": "Audit verdict \"{verdict}\": {points} points, {errors} error(s), {warns} warning(s)"
+    },
+    "point_table.PT-00": {
+      "zh": "点位由模型从点表文本抽取，共 {count} 条，请对照原始点表复核",
+      "en": "The model extracted {count} points from the point-table text; check them against the original"
+    },
+    "point_table.PT-01": {
+      "zh": "地址重叠（功能码 {fc}）：{name_a} [{range_a}] 与 {name_b} [{range_b}]",
+      "en": "Address overlap (function code {fc}): {name_a} [{range_a}] and {name_b} [{range_b}]"
+    },
+    "point_table.PT-02": {
+      "zh": "{name} 数据类型 {dtype} 未知，无法判断寄存器数量",
+      "en": "{name}: data type {dtype} is unknown, so the register count cannot be derived"
+    },
+    "point_table.PT-03": {
+      "zh": "{name} 量程倒置：下限 {lo} >= 上限 {hi}",
+      "en": "{name}: inverted range, lower bound {lo} >= upper bound {hi}"
+    },
+    "point_table.PT-03B": {
+      "zh": "{name} 量程非数值，无法判断",
+      "en": "{name}: the range is not numeric, so it cannot be judged"
+    },
+    "point_table.PT-04": {
+      "zh": "{name} 地址非法：{addr}",
+      "en": "{name}: illegal address {addr}"
+    },
+    "point_table.PT-04B": {
+      "zh": "{name} 地址 {addr} 超出 Modbus 可寻址范围 0~65535",
+      "en": "{name}: address {addr} is outside the Modbus addressable range 0~65535"
+    },
+    "point_table.PT-05": {
+      "zh": "{name} 缺少工程单位",
+      "en": "{name}: missing engineering unit"
+    },
+    "point_table.PT-06": {
+      "zh": "{name} 功能码 {fc} 不是合法 Modbus 功能码",
+      "en": "{name}: function code {fc} is not a valid Modbus function code"
+    },
+    "point_table.PT-OK": {
+      "zh": "点位 {count} 条，未发现一致性问题",
+      "en": "{count} points; no consistency problems found"
+    },
+    "spc_control.CONCLUSION": {
+      "zh": "过程判定「{verdict}」：共触发 {count} 处判异（{rules}）",
+      "en": "Process verdict \"{verdict}\": {count} rule violation(s) triggered ({rules})"
+    },
+    "spc_control.CONCLUSION_CLEAN": {
+      "zh": "过程判定「{verdict}」：8 条判异准则均未触发",
+      "en": "Process verdict \"{verdict}\": none of the 8 detection rules fired"
+    },
+    "spc_control.SPC-OK": {
+      "zh": "{rules} 条判异准则均未触发，过程受控",
+      "en": "None of the {rules} detection rules fired; the process is in control"
+    },
+    "pin_conflict.CONCLUSION": {
+      "zh": "判定「{verdict}」：错误 {errors} 项，告警 {warns} 项",
+      "en": "Verdict \"{verdict}\": {errors} error(s), {warns} warning(s)"
+    },
+    "pin_conflict.PIN-00": {
+      "zh": "存在未填引脚名的分配行",
+      "en": "There is an allocation row with no pin name"
+    },
+    "pin_conflict.PIN-01": {
+      "zh": "引脚 {pin} 被同时分配给「{a}」与「{b}」",
+      "en": "Pin {pin} is assigned to both \"{a}\" and \"{b}\""
+    },
+    "pin_conflict.PIN-02": {
+      "zh": "保留了调试口引脚 {pin} 却被占用为 {signal}",
+      "en": "Debug pin {pin} is reserved but used as {signal}"
+    },
+    "pin_conflict.PIN-03": {
+      "zh": "引脚命名不合法：{pin}（应为 P<端口><序号>，如 PA9）",
+      "en": "Illegal pin name: {pin} (expected P<port><number>, e.g. PA9)"
+    },
+    "pin_conflict.IRQ-01": {
+      "zh": "抢占优先级 {priority} 被 {count} 个中断共用：{names}",
+      "en": "Preemption priority {priority} is shared by {count} interrupt(s): {names}"
+    },
+    "pin_conflict.IRQ-02": {
+      "zh": "中断 {irq} 优先级缺失或非整数",
+      "en": "Interrupt {irq}: priority is missing or not an integer"
+    },
+    "pin_conflict.IRQ-02B": {
+      "zh": "中断 {irq} 优先级 {priority} 超出 0~{max}",
+      "en": "Interrupt {irq}: priority {priority} is outside 0~{max}"
+    },
+    "pin_conflict.DMA-01": {
+      "zh": "DMA 通道 {channel} 被重复声明 {count} 次",
+      "en": "DMA channel {channel} is declared {count} time(s)"
+    },
+    "pin_conflict.DMA-02": {
+      "zh": "DMA 通道 {channel} 被分配给多个外设：{peripherals}",
+      "en": "DMA channel {channel} is assigned to multiple peripherals: {peripherals}"
+    },
+    "pin_conflict.RES-OK": {
+      "zh": "引脚 {pins} 条、中断 {irqs} 条、DMA {dmas} 条，未发现资源冲突",
+      "en": "{pins} pins, {irqs} interrupts, {dmas} DMA entries; no resource conflicts found"
+    },
+    "salary_tax.CONCLUSION": {
+      "zh": "全年应纳个税合计 {total_tax} 元（税前收入 {total_income} 元，实际税负 {rate}%）",
+      "en": "Total income tax for the year: {total_tax} (gross income {total_income}, effective rate {rate}%)"
+    },
+    "salary_tax.TAX-YTD": {
+      "zh": "按累计预扣法逐月计算，年末累计应纳 {total_tax} 元",
+      "en": "Computed month by month with the cumulative withholding method; year-end total {total_tax}"
+    },
+    "bid_quote.CONCLUSION": {
+      "zh": "建议报价 {currency} {total}（直接成本 {direct_cost}，明细来源 {source}）",
+      "en": "Recommended quote {currency} {total} (direct cost {direct_cost}, line items from {source})"
+    },
+    "loan_dscr.CONCLUSION": {
+      "zh": "DSCR = {dscr}，判定「{verdict}」；可用于偿债的现金流 {cfads}，当年还本付息 {debt_service}",
+      "en": "DSCR = {dscr}, verdict \"{verdict}\"; cash available for debt service {cfads}, principal and interest {debt_service}"
+    },
+    "loan_dscr.DSCR-OK": {
+      "zh": "DSCR {dscr} 达到阈值 {threshold}",
+      "en": "DSCR {dscr} meets the {threshold} threshold"
+    },
+    "loan_dscr.DSCR-REVIEW": {
+      "zh": "DSCR {dscr} 低于 {ok} 但高于 {review}，需补充担保或调整还款计划",
+      "en": "DSCR {dscr} is below {ok} but above {review}; extra collateral or a revised repayment schedule is required"
+    },
+    "loan_dscr.DSCR-FAIL": {
+      "zh": "DSCR {dscr} 低于下限 {floor}",
+      "en": "DSCR {dscr} is below the {floor} floor"
+    },
+    "loan_dscr.ICR-LOW": {
+      "zh": "利息保障倍数 {icr} 低于 {threshold}",
+      "en": "Interest coverage {icr} is below {threshold}"
+    },
+    "modbus_poll.CONCLUSION": {
+      "zh": "一轮轮询 {cycle_ms} ms（合并后 {requests} 次请求），目标周期 {target_ms} ms —— 判定「{verdict}」",
+      "en": "One polling cycle {cycle_ms} ms ({requests} requests after merging), target {target_ms} ms — verdict \"{verdict}\""
+    },
+    "modbus_poll.POLL-MERGED": {
+      "zh": "合并连续寄存器后：{requests} 次请求，一轮 {cycle_ms} ms（占目标周期 {pct}%）",
+      "en": "After merging adjacent registers: {requests} requests, one cycle {cycle_ms} ms ({pct}% of the target)"
+    },
+    "modbus_poll.POLL-SOLO": {
+      "zh": "不做合并：{requests} 次请求，一轮 {cycle_ms} ms —— 合并省下 {saved_pct}%",
+      "en": "Without merging: {requests} requests, one cycle {cycle_ms} ms — merging saves {saved_pct}%"
+    },
+    "modbus_poll.POLL-OVER": {
+      "zh": "一轮 {cycle_ms} ms 超过目标周期 {target_ms} ms，余量 {margin_ms} ms（缺口 {short_ms} ms）",
+      "en": "One cycle {cycle_ms} ms exceeds the target {target_ms} ms; margin {margin_ms} ms (short by {short_ms} ms)"
+    },
+    "modbus_poll.POLL-SUGGEST": {
+      "zh": "建议：波特率 {baud} → 115200 可把传输时间降到约 {cycle_ms} ms",
+      "en": "Suggestion: raising the baud rate from {baud} to 115200 cuts transmission time to about {cycle_ms} ms"
+    },
+    "modbus_poll.POLL-SUGGEST-B": {
+      "zh": "建议：放宽目标周期到 {target_ms} ms，或把链路拆成两条",
+      "en": "Suggestion: relax the target cycle to {target_ms} ms, or split the link into two"
+    },
+    "modbus_poll.POLL-ROOM": {
+      "zh": "余量 {margin_ms} ms（{pct}%）；按当前点表最多可支撑约 {max_points} 个同规模点位",
+      "en": "Margin {margin_ms} ms ({pct}%); the current point table supports roughly {max_points} points of this size"
+    },
+    "modbus_poll.POLL-SLOW": {
+      "zh": "最慢请求：FC{fc} 起始 {start} 共 {regs} 寄存器（{names}），{cost_ms} ms",
+      "en": "Slowest request: FC{fc} starting at {start}, {regs} registers ({names}), {cost_ms} ms"
+    },
+    "firmware_budget.CONCLUSION": {
+      "zh": "判定「{verdict}」：Flash {flash_used}/{flash_cap} KB（{flash_pct}%），RAM {ram_used}/{ram_cap} KB（{ram_pct}%）；错误 {errors} 项、告警 {warns} 项",
+      "en": "Verdict \"{verdict}\": Flash {flash_used}/{flash_cap} KB ({flash_pct}%), RAM {ram_used}/{ram_cap} KB ({ram_pct}%); {errors} error(s), {warns} warning(s)"
+    },
+    "firmware_budget.FR-01": {
+      "zh": "Flash 超容量：{used} KB / {cap} KB（超 {over} KB）",
+      "en": "Flash over capacity: {used} KB / {cap} KB (over by {over} KB)"
+    },
+    "firmware_budget.FR-02": {
+      "zh": "Flash 占用率 {pct}%，超过告警阈值 {threshold}%（余量 {margin} KB）",
+      "en": "Flash usage {pct}% exceeds the {threshold}% warning threshold ({margin} KB left)"
+    },
+    "firmware_budget.FR-02-OK": {
+      "zh": "Flash 占用 {used} KB / {cap} KB（{pct}%），余量充足",
+      "en": "Flash usage {used} KB / {cap} KB ({pct}%); ample headroom"
+    },
+    "firmware_budget.FR-03": {
+      "zh": "RAM 超容量：{used} KB / {cap} KB（超 {over} KB）",
+      "en": "RAM over capacity: {used} KB / {cap} KB (over by {over} KB)"
+    },
+    "firmware_budget.FR-04": {
+      "zh": "RAM 占用率 {pct}%，超过告警阈值 {threshold}%（余量 {margin} KB）",
+      "en": "RAM usage {pct}% exceeds the {threshold}% warning threshold ({margin} KB left)"
+    },
+    "firmware_budget.FR-04-OK": {
+      "zh": "RAM 占用 {used} KB / {cap} KB（{pct}%）",
+      "en": "RAM usage {used} KB / {cap} KB ({pct}%)"
+    },
+    "firmware_budget.FR-05": {
+      "zh": "任务「{task}」栈余量仅 {margin_pct}%（峰值 {peak} / 分配 {allocated} B），低于安全下限 {floor}%",
+      "en": "Task \"{task}\": stack margin only {margin_pct}% (peak {peak} / allocated {allocated} B), below the {floor}% safety floor"
+    },
+    "firmware_budget.FR-06": {
+      "zh": "任务「{task}」栈峰值 {peak} B 已超过分配 {allocated} B —— 已发生栈溢出",
+      "en": "Task \"{task}\": stack peak {peak} B exceeds the allocated {allocated} B — a stack overflow has already occurred"
     }
   }
 }

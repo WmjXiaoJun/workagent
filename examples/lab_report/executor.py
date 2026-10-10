@@ -66,7 +66,8 @@ def main():
         try:
             value = float(r.get("value"))
         except (TypeError, ValueError):
-            findings.append({"level": "warn", "code": "LAB-02", "message": name + " 数值无法解析，已跳过"})
+            findings.append({"level": "warn", "code": "LAB-02", "args": {"name": name},
+                             "message": name + " 数值无法解析"})
             continue
         ref = None
         for c, sx, lo, hi, unit in REFERENCE:
@@ -74,22 +75,27 @@ def main():
                 ref = (lo, hi, unit)
                 break
         if ref is None:
-            findings.append({"level": "info", "code": "LAB-03", "message": name + " 不在本示例参考区间表中，未判定"})
+            findings.append({"level": "info", "code": "LAB-03", "args": {"name": name},
+                             "message": name + " 无参考区间"})
             continue
         lo, hi, unit = ref
         for c, clo, chi in CRITICAL:
             if c == code and (value < clo or value > chi):
                 critical.append(code)
                 findings.append({"level": "error", "code": "CRIT-01",
-                                 "message": name + " " + str(value) + " " + unit + " 达危急值（" + str(clo) + "~" + str(chi) + "），须立即复核并报告"})
+                                 "args": {"name": name, "value": str(value), "unit": unit,
+                                          "lo": str(clo), "hi": str(chi)},
+                                 "message": name + " 达危急值"})
         if value < lo:
             abnormal.append((code, "low"))
             findings.append({"level": "warn", "code": "REF-01",
-                             "message": name + " " + str(value) + " " + unit + " 低于参考下限 " + str(lo)})
+                             "args": {"name": name, "value": str(value), "unit": unit, "ref": str(lo)},
+                             "message": name + " 低于参考下限"})
         elif value > hi:
             abnormal.append((code, "high"))
             findings.append({"level": "warn", "code": "REF-02",
-                             "message": name + " " + str(value) + " " + unit + " 高于参考上限 " + str(hi)})
+                             "args": {"name": name, "value": str(value), "unit": unit, "ref": str(hi)},
+                             "message": name + " 高于参考上限"})
 
     if critical:
         verdict = "危急"
@@ -99,13 +105,17 @@ def main():
         verdict = "未见异常"
     if source == "llm-extract":
         findings.insert(0, {"level": "info", "code": "LAB-01",
-                            "message": "指标由模型从报告文本抽取，共 " + str(len(rows)) + " 项，请对照原报告复核"})
+                            "args": {"count": str(len(rows))},
+                            "message": "指标由模型抽取"})
 
     out = {
         "subject": str(payload.get("patient_id", "")) + " 检验报告（" + ("男" if sex == "M" else "女") + "）",
         "verdict": verdict,
+        # 危急值分支改成"总是出现"的常量格式 —— 句内条件片段是语言相关的，不该由执行体拼。
         "conclusion": "判定「" + verdict + "」：共 " + str(len(rows)) + " 项，异常 " + str(len(abnormal))
-                      + " 项" + ("，危急值 " + str(len(set(critical))) + " 项" if critical else ""),
+                      + " 项，危急值 " + str(len(set(critical))) + " 项",
+        "conclusion_args": {"verdict": verdict, "items": len(rows),
+                            "abnormal": len(abnormal), "critical": len(set(critical))},
         "findings": findings,
         "abnormal": [{"code": c, "direction": d} for c, d in abnormal],
         "critical": sorted(set(critical)),

@@ -53,25 +53,32 @@ def main():
     if dscr >= threshold_ok:
         verdict = "通过"
         findings.append({"level": "info", "code": "DSCR-OK",
-                         "message": "DSCR " + format(dscr, ".2f") + " 达到阈值 " + format(threshold_ok, ".2f")})
+                         "args": {"dscr": format(dscr, ".2f"), "threshold": format(threshold_ok, ".2f")},
+                         "message": "DSCR 达到阈值"})
     elif dscr >= threshold_review:
         verdict = "需复核"
         findings.append({"level": "warn", "code": "DSCR-REVIEW",
-                         "message": "DSCR " + format(dscr, ".2f") + " 低于 " + format(threshold_ok, ".2f")
-                                    + " 但高于 " + format(threshold_review, ".2f") + "，需补充担保或调整还款计划"})
+                         "args": {"dscr": format(dscr, ".2f"), "ok": format(threshold_ok, ".2f"),
+                                  "review": format(threshold_review, ".2f")},
+                         "message": "DSCR 处于复核区间"})
     else:
         verdict = "不予通过"
         findings.append({"level": "error", "code": "DSCR-FAIL",
-                         "message": "DSCR " + format(dscr, ".2f") + " 低于下限 " + format(threshold_review, ".2f")})
+                         "args": {"dscr": format(dscr, ".2f"), "floor": format(threshold_review, ".2f")},
+                         "message": "DSCR 低于下限"})
     if icr < 2.0:
         findings.append({"level": "warn", "code": "ICR-LOW",
-                         "message": "利息保障倍数 " + format(icr, ".2f") + " 低于 2.0"})
+                         "args": {"icr": format(icr, ".2f"), "threshold": "2.00"},
+                         "message": "利息保障倍数偏低"})
 
     out = {
         "subject": str(data.get("project", "")) + " 偿债能力测算",
         "verdict": verdict,
         "conclusion": "DSCR = " + format(dscr, ".2f") + "，判定「" + verdict + "」；可用于偿债的现金流 "
                       + format(cfads, ",.2f") + "，当年还本付息 " + format(principal + interest, ",.2f"),
+        "conclusion_args": {"dscr": format(dscr, ".2f"), "verdict": verdict,
+                            "cfads": format(cfads, ",.2f"),
+                            "debt_service": format(principal + interest, ",.2f")},
         "findings": findings,
         "metrics": {"cfads": round(cfads, 2), "debt_service": round(principal + interest, 2),
                     "dscr": dscr, "interest_coverage": icr},

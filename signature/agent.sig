@@ -19,7 +19,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "7d56449765e980dc42010852d1e08b2b5a661c1a87f3a9f6325bad19ca7f4f13"
+      "sha256": "04047b5d1837e200586345b65a5813cfddc1a615b1e1000b879cb8ce847443df"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -43,7 +43,7 @@
     },
     {
       "path": "agent.yaml",
-      "sha256": "7bc7732db874d1a3ca1746b307ab532fc39a5dcc6fa02d6949f55ea909588380"
+      "sha256": "66c15e28875ca25caa95c4d524286fdb309183c4c0823e51e987770635a5e795"
     },
     {
       "path": "artifacts/output_schema.json",
@@ -51,7 +51,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "b261970cf9b6aae5ba2f591d00de3dd8537c452b590e8c1fba1b3ca9dac5b5ba"
+      "sha256": "0dbd2b4038aca01f32f2108ee0e2e7c370d44a37b71cab9d87825522d69eb6ad"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -167,7 +167,7 @@
     },
     {
       "path": "examples/bid_quote/executor.py",
-      "sha256": "8b02553c683a01ff736e391bd6d63099aa66d691c7626faf5ee3be5be5cdbcec"
+      "sha256": "c9eed660aa06806175875318579ce04222502901fd87dab35d80c880f092c337"
     },
     {
       "path": "examples/bid_quote/extract.prompt.md",
@@ -191,7 +191,7 @@
     },
     {
       "path": "examples/expense_audit/executor.py",
-      "sha256": "04ccfa28760055a02198b73d697326b2ae9cb16634aa73530c87d815eba23f93"
+      "sha256": "802029e6e02c7eec09faec59a589c80bb532d5f2a4c40963dbcc3af7915547bd"
     },
     {
       "path": "examples/expense_audit/input.natural.json",
@@ -211,7 +211,7 @@
     },
     {
       "path": "examples/firmware_budget/executor.py",
-      "sha256": "5a8d24e97d90a73c596a21133d5b39c64ad319fd37b29a6c5987410e9c099004"
+      "sha256": "f27a90a40a9d223fce1bb704eb324041139ebd3897d640d9e62b460e5387acf7"
     },
     {
       "path": "examples/firmware_budget/input.json",
@@ -227,7 +227,7 @@
     },
     {
       "path": "examples/lab_report/executor.py",
-      "sha256": "a0e12e08053e465832294814766e0da3cad2f755e3bf01efd1d177c4008a06b6"
+      "sha256": "aa7bdd6c2572d1a68080f24c4dbc73b01aa541dd1896330c62d3c125d9c731df"
     },
     {
       "path": "examples/lab_report/input.natural.json",
@@ -247,7 +247,7 @@
     },
     {
       "path": "examples/loan_dscr/executor.py",
-      "sha256": "e9c940348ffa7e85226d8e5425aefb8a9302a19fb75414d2a2e79a215df79cc8"
+      "sha256": "1c393b2be5427c3e36017c311adaa074ee5b123cef5847a70b9d6c5106bbe155"
     },
     {
       "path": "examples/loan_dscr/input.json",
@@ -263,7 +263,7 @@
     },
     {
       "path": "examples/modbus_poll/executor.py",
-      "sha256": "f16c7fce631c80b8284c7c77170ac2ce72ed8e40d6c9486bae63a121fd119c67"
+      "sha256": "135916c93d2c58ca885f700cba5ac5416d9fd17bea3a05475bd0d0a90ce4cfa0"
     },
     {
       "path": "examples/modbus_poll/input.json",
@@ -279,7 +279,7 @@
     },
     {
       "path": "examples/pin_conflict/executor.py",
-      "sha256": "b490d999179f3aaa6e0399214cf9d33541268a670b92eb35df164b46225efe12"
+      "sha256": "bef23cf063fcdf5698f61d78b59acc273fa7ad515a93fdb2cf2dff5b7f29200d"
     },
     {
       "path": "examples/pin_conflict/input.json",
@@ -295,7 +295,7 @@
     },
     {
       "path": "examples/point_table/executor.py",
-      "sha256": "3c8157a1933146f84a81752e58775e35c81022c071f52950e0499f9f84e3f170"
+      "sha256": "eddd99f69aca1952350ed244b4356e366078fb5fd34427ddbc5ec1f03226fa73"
     },
     {
       "path": "examples/point_table/input.natural.json",
@@ -331,7 +331,7 @@
     },
     {
       "path": "examples/salary_tax/executor.py",
-      "sha256": "16b24df352afc80e29a64b793a3ef39711bf6382f8be2aff18603e36c5622058"
+      "sha256": "7f684cdd665b2c8dbc76655f390861bfb512fa0c722cbcd6359e684072184a13"
     },
     {
       "path": "examples/salary_tax/input.json",
@@ -347,7 +347,7 @@
     },
     {
       "path": "examples/spc_control/executor.py",
-      "sha256": "6f00c275a9c12aefc94ccef1a892918d1afd549ce6a587a2d8a7502c513f3752"
+      "sha256": "3d1d85ca6a4a485a8abc935eb52c2d0130d53605e8309802d3116d6f7660f3e5"
     },
     {
       "path": "examples/spc_control/input.json",
@@ -387,11 +387,11 @@
     },
     {
       "path": "internal/render/render.go",
-      "sha256": "a7d815fa661b0c469cb452186be76570a079e4b20239528cc8315785ad736229"
+      "sha256": "06c0855eb680d5a9eb148ff3ff8ae9589dfb196bcecda8d8d883e7120453c4cf"
     },
     {
       "path": "messages.json",
-      "sha256": "f6322f17875e45eac0a688bdeee71e732d19f35e66b5ed6b26809c01cfb82088"
+      "sha256": "02f278f4a051c8f931d18eb468f7fc65106db77b20d4c9476c1aad9ccccba30e"
     },
     {
       "path": "provenance/assumptions.json",
@@ -435,59 +435,59 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "5f0cc05fb6ca2827a5d1d7a95b973febc959730e05dc80baa7c71f344b46170e"
+      "sha256": "55b429a6ecd5f0b795070169f5fe08c6c45b31cd0f14f5bfb3df7872d3e12ef2"
     },
     {
-      "path": "records/0001-bid_quote-20261010.md",
-      "sha256": "986b7c555bd22eefed8f0a47dcdfc62a0e2f45dbaa002dd514afc2fb156e5879"
+      "path": "records/0001-bid_quote-20261011.md",
+      "sha256": "69eec70a995ec5cb8f09704f73d95bc57ba5d5601c2d9df2712a39d9a2d588c6"
     },
     {
-      "path": "records/0002-expense_audit-20261010.md",
-      "sha256": "7500a8f8cb511d2701a1920d4c35931abd5bd8c8f43c15141d02304695915da7"
+      "path": "records/0002-expense_audit-20261011.md",
+      "sha256": "b120ca63c671f2988c40624dd2c29417f3bef61eba64992fdce1888dd45e40da"
     },
     {
-      "path": "records/0003-lab_report-20261010.md",
-      "sha256": "d5f066dd36a5cf92b9b63cb8c032ace92eff154ba5c8707e42f5e83381c9359b"
+      "path": "records/0003-lab_report-20261011.md",
+      "sha256": "3032595a96423adae2f26e206bea8ec49d141339b405d12aba8f999b89c05689"
     },
     {
-      "path": "records/0004-point_table-20261010.md",
-      "sha256": "f4722247833582e53273bc1ee898b2893a2ea543e171ddb41871b3097e6e4273"
+      "path": "records/0004-point_table-20261011.md",
+      "sha256": "a97c96b695cbee5de5a0dac78432948c681fe189441ff74c2fa60bd597557fe9"
     },
     {
-      "path": "records/0005-spc_control-20261010.md",
-      "sha256": "31cf83895ad595af3f3f2b9f8f5a3e5edfa2cee17bf8dde3cd4e23c2749cfbd5"
+      "path": "records/0005-spc_control-20261011.md",
+      "sha256": "c0aee72d5beb488171abcc5a4c52d2a0abf0b585d0b797052fee146d61349a31"
     },
     {
-      "path": "records/0006-pin_conflict-20261010.md",
-      "sha256": "3caf5cb1f26730940691d7b1926165b9a6955e9256c4da5672a2fede2384ad41"
+      "path": "records/0006-pin_conflict-20261011.md",
+      "sha256": "d36638d89f4e094e460695641f3662ba7d39a4ff5b18b0479033d1b589de7a21"
     },
     {
-      "path": "records/0007-salary_tax-20261010.md",
-      "sha256": "d25332a11b4fc2bfac3cfda700758d13e989b51abf6376958201a5c503e31e82"
+      "path": "records/0007-salary_tax-20261011.md",
+      "sha256": "2d3147dd56ee268bc616742944b587cf0ea0c6b2fb651313d7a8e4a744b54858"
     },
     {
-      "path": "records/0008-loan_dscr-20261010.md",
-      "sha256": "a778041c30a398a94c50536d96d03511ccc54cfb0cbb6b7fe496831329740c74"
+      "path": "records/0008-loan_dscr-20261011.md",
+      "sha256": "dcfea93f5b714bd78d3e81b6260d956dd2bb764fced58b53865714cfbe7e9b7c"
     },
     {
-      "path": "records/0009-modbus_poll-20261010.md",
-      "sha256": "37c4f8f0942e05aa617cfb79d24082d6aaaf0ba92aecc8553c4b733347b7be9e"
+      "path": "records/0009-modbus_poll-20261011.md",
+      "sha256": "380f75208e87e9f4df6de4f1bb7eff9673e08dc7a25de4740610058794ecf009"
     },
     {
-      "path": "records/0010-firmware_budget-20261010.md",
-      "sha256": "d957add2b7ce46be354a375624aa4da43e68c06971a6d1f50773b5af13494ff5"
+      "path": "records/0010-firmware_budget-20261011.md",
+      "sha256": "b2ef5f2bb9ff407338d2005b5028e4f80f988f7dd0e1a7e2aa74f954278c830d"
     },
     {
-      "path": "records/0011-points_reconcile-20261010.md",
-      "sha256": "ce9e7dfbf9fef1c556907b8a8dd6c37c8dbbb657c636a5e752596078bb408e96"
+      "path": "records/0011-points_reconcile-20261011.md",
+      "sha256": "fcc8caff6bcae92f887c94c8d2e94aac09af80a4ffb82dfddbc00c1b5e9a1c2f"
     },
     {
-      "path": "records/0012-audit_chain-20261010.md",
-      "sha256": "a6f1e449554f872ea59f079612d5024cfbf6c2875a8d5e60d3d4c45860e2c103"
+      "path": "records/0012-audit_chain-20261011.md",
+      "sha256": "192d44059e8ae4fde7ee17a98063a35e67ca651d14446227994bf03a5d5f3062"
     },
     {
       "path": "records/INDEX.md",
-      "sha256": "3af3636fe2cac3df5d960648da6c6f7943876df52f41f05341a9331e28e3d124"
+      "sha256": "eda6f6d028954077675e21206469c13372136c34e809dca5fe2f65712eeeb83d"
     },
     {
       "path": "signature/README.md",
@@ -514,9 +514,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T22:37:24+08:00",
+  "generated_at": "2026-10-11T00:03:35+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "dc3fa95ac60d3e33ce4065c5716a15ab3c4fa6470244032e08ed90e1a4af4aa8",
+  "package_digest": "f5e2794704a3b4ce38570f78726ebada71874bd6c84e29522f9812cc51e0d50a",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

@@ -151,38 +151,47 @@ def main():
     else:
         verdict = "不满足"
     findings.append({"level": "info", "code": "POLL-MERGED",
-                     "message": "合并连续寄存器后：%d 次请求，一轮 %.1f ms（占目标周期 %.0f%%）"
-                                % (len(merged), merged_total, merged_total / target_ms * 100)})
+                     "args": {"requests": len(merged), "cycle_ms": "%.1f" % merged_total,
+                              "pct": "%.0f" % (merged_total / target_ms * 100)},
+                     "message": "合并后一轮耗时 %d 次请求" % len(merged)})
     findings.append({"level": "info", "code": "POLL-SOLO",
-                     "message": "不做合并：%d 次请求，一轮 %.1f ms —— 合并省下 %.1f%%"
-                                % (len(solo), solo_total, (solo_total - merged_total) / solo_total * 100 if solo_total else 0)})
+                     "args": {"requests": len(solo), "cycle_ms": "%.1f" % solo_total,
+                              "saved_pct": "%.1f" % ((solo_total - merged_total) / solo_total * 100 if solo_total else 0)},
+                     "message": "不合并一轮耗时 %d 次请求" % len(solo)})
     if verdict == "不满足":
         findings.append({"level": "error", "code": "POLL-OVER",
-                         "message": "一轮 %.1f ms 超过目标周期 %.0f ms，余量 %.1f ms（缺口 %.1f ms）"
-                                    % (merged_total, target_ms, target_ms - merged_total, merged_total - target_ms)})
+                         "args": {"cycle_ms": "%.1f" % merged_total, "target_ms": "%.0f" % target_ms,
+                                  "margin_ms": "%.1f" % (target_ms - merged_total),
+                                  "short_ms": "%.1f" % (merged_total - target_ms)},
+                         "message": "一轮耗时超过目标周期"})
         if mode == "rtu" and baud < 115200:
             findings.append({"level": "warn", "code": "POLL-SUGGEST",
-                             "message": "建议：波特率 %d → 115200 可把传输时间降到约 %.1f ms"
-                                        % (baud, merged_total * baud / 115200.0)})
-        findings.append({"level": "warn", "code": "POLL-SUGGEST",
-                         "message": "建议：放宽目标周期到 %.0f ms，或把链路拆成两条" % (merged_total * 1.2)})
+                             "args": {"baud": baud, "cycle_ms": "%.1f" % (merged_total * baud / 115200.0)},
+                             "message": "建议提高波特率"})
+        findings.append({"level": "warn", "code": "POLL-SUGGEST-B",
+                         "args": {"target_ms": "%.0f" % (merged_total * 1.2)},
+                         "message": "建议放宽目标周期"})
     else:
         findings.append({"level": "info", "code": "POLL-ROOM",
-                         "message": "余量 %.1f ms（%.0f%%）；按当前点表最多可支撑约 %d 个同规模点位"
-                                    % (target_ms - merged_total, (1 - merged_total / target_ms) * 100,
-                                       int(len(points) * target_ms / merged_total) if merged_total else len(points))})
+                         "args": {"margin_ms": "%.1f" % (target_ms - merged_total),
+                                  "pct": "%.0f" % ((1 - merged_total / target_ms) * 100),
+                                  "max_points": int(len(points) * target_ms / merged_total) if merged_total else len(points)},
+                         "message": "仍有余量"})
     # 慢点识别
     slow = sorted(merged, key=lambda x: -x["cost_ms"])[:3]
     for s in slow:
         findings.append({"level": "info", "code": "POLL-SLOW",
-                         "message": "最慢请求：FC%02d 起始 %d 共 %d 寄存器（%s），%.1f ms"
-                                    % (s["fc"], s["start"], s["regs"], "、".join(s["names"][:3]), s["cost_ms"])})
+                         "args": {"fc": "%02d" % s["fc"], "start": s["start"], "regs": s["regs"],
+                                  "names": ", ".join(s["names"][:3]), "cost_ms": "%.1f" % s["cost_ms"]},
+                         "message": "最慢请求 FC%02d" % s["fc"]})
 
     out = {
         "subject": str(link.get("name", "")) + " 轮询周期测算",
         "verdict": verdict,
         "conclusion": "一轮轮询 %.1f ms（合并后 %d 次请求），目标周期 %.0f ms —— 判定「%s」"
                       % (merged_total, len(merged), target_ms, verdict),
+        "conclusion_args": {"cycle_ms": "%.1f" % merged_total, "requests": len(merged),
+                            "target_ms": "%.0f" % target_ms, "verdict": verdict},
         "findings": findings,
         "metrics": {
             "mode": mode,

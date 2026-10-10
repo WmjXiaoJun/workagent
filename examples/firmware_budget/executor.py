@@ -99,39 +99,47 @@ def main():
     findings = []
     if flash_used > flash_cap:
         findings.append({"level": "error", "code": "FR-01",
-                         "message": "Flash 超容量：%.1f KB / %.1f KB（超 %.1f KB）"
-                                    % (flash_used, flash_cap, flash_used - flash_cap)})
+                         "args": {"used": "%.1f" % flash_used, "cap": "%.1f" % flash_cap,
+                                  "over": "%.1f" % (flash_used - flash_cap)},
+                         "message": "Flash 超容量"})
     elif flash_pct > flash_warn:
         findings.append({"level": "warn", "code": "FR-02",
-                         "message": "Flash 占用率 %.1f%%，超过告警阈值 %.0f%%（余量 %.1f KB）"
-                                    % (flash_pct * 100, flash_warn * 100, flash_cap - flash_used)})
+                         "args": {"pct": "%.1f" % (flash_pct * 100), "threshold": "%.0f" % (flash_warn * 100),
+                                  "margin": "%.1f" % (flash_cap - flash_used)},
+                         "message": "Flash 占用率超阈值"})
     else:
-        findings.append({"level": "info", "code": "FR-02",
-                         "message": "Flash 占用 %.1f KB / %.1f KB（%.1f%%），余量充足"
-                                    % (flash_used, flash_cap, flash_pct * 100)})
+        findings.append({"level": "info", "code": "FR-02-OK",
+                         "args": {"used": "%.1f" % flash_used, "cap": "%.1f" % flash_cap,
+                                  "pct": "%.1f" % (flash_pct * 100)},
+                         "message": "Flash 余量充足"})
 
     if ram_used > ram_cap:
         findings.append({"level": "error", "code": "FR-03",
-                         "message": "RAM 超容量：%.1f KB / %.1f KB（超 %.1f KB）"
-                                    % (ram_used, ram_cap, ram_used - ram_cap)})
+                         "args": {"used": "%.1f" % ram_used, "cap": "%.1f" % ram_cap,
+                                  "over": "%.1f" % (ram_used - ram_cap)},
+                         "message": "RAM 超容量"})
     elif ram_pct > ram_warn:
         findings.append({"level": "warn", "code": "FR-04",
-                         "message": "RAM 占用率 %.1f%%，超过告警阈值 %.0f%%（余量 %.1f KB）"
-                                    % (ram_pct * 100, ram_warn * 100, ram_cap - ram_used)})
+                         "args": {"pct": "%.1f" % (ram_pct * 100), "threshold": "%.0f" % (ram_warn * 100),
+                                  "margin": "%.1f" % (ram_cap - ram_used)},
+                         "message": "RAM 占用率超阈值"})
     else:
-        findings.append({"level": "info", "code": "FR-04",
-                         "message": "RAM 占用 %.1f KB / %.1f KB（%.1f%%）"
-                                    % (ram_used, ram_cap, ram_pct * 100)})
+        findings.append({"level": "info", "code": "FR-04-OK",
+                         "args": {"used": "%.1f" % ram_used, "cap": "%.1f" % ram_cap,
+                                  "pct": "%.1f" % (ram_pct * 100)},
+                         "message": "RAM 余量充足"})
 
     for r in stack_rows:
         if r["peak_b"] > r["allocated_b"]:
             findings.append({"level": "error", "code": "FR-06",
-                             "message": "任务「%s」栈峰值 %d B 已超过分配 %d B —— 已发生栈溢出"
-                                        % (r["task"], r["peak_b"], r["allocated_b"])})
+                             "args": {"task": r["task"], "peak": r["peak_b"], "allocated": r["allocated_b"]},
+                             "message": "任务「%s」栈溢出" % r["task"]})
         elif r["margin"] < stack_min:
             findings.append({"level": "error", "code": "FR-05",
-                             "message": "任务「%s」栈余量仅 %.0f%%（峰值 %d / 分配 %d B），低于安全下限 %.0f%%"
-                                        % (r["task"], r["margin"] * 100, r["peak_b"], r["allocated_b"], stack_min * 100)})
+                             "args": {"task": r["task"], "margin_pct": "%.0f" % (r["margin"] * 100),
+                                      "peak": r["peak_b"], "allocated": r["allocated_b"],
+                                      "floor": "%.0f" % (stack_min * 100)},
+                             "message": "任务「%s」栈余量不足" % r["task"]})
 
     errors = [f for f in findings if f["level"] == "error"]
     warns = [f for f in findings if f["level"] == "warn"]
@@ -143,6 +151,12 @@ def main():
         "conclusion": "判定「%s」：Flash %.1f/%.1f KB（%.1f%%），RAM %.1f/%.1f KB（%.1f%%）；错误 %d 项、告警 %d 项"
                       % (verdict, flash_used, flash_cap, flash_pct * 100,
                          ram_used, ram_cap, ram_pct * 100, len(errors), len(warns)),
+        "conclusion_args": {"verdict": verdict,
+                            "flash_used": "%.1f" % flash_used, "flash_cap": "%.1f" % flash_cap,
+                            "flash_pct": "%.1f" % (flash_pct * 100),
+                            "ram_used": "%.1f" % ram_used, "ram_cap": "%.1f" % ram_cap,
+                            "ram_pct": "%.1f" % (ram_pct * 100),
+                            "errors": len(errors), "warns": len(warns)},
         "findings": findings,
         "metrics": {
             "flash_used_kb": round(flash_used, 2), "flash_capacity_kb": flash_cap,

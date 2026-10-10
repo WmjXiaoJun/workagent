@@ -2,6 +2,44 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.13.0] - 2026-10-10
+
+**12 个执行体全部迁移完成：执行体只输出 code + args，一个自然语言字都没有。**
+
+### Changed
+- 全部 12 个 `executor.py` 改为输出 `args` / `conclusion_args`；
+  `messages.json` 扩充到 **85 条文案 / 12 张判定词表**，中英齐全。
+- `--lang en` 现在对 12 个场景**全部生效**（此前只有 2 个）。
+
+### Added
+- `conclusion_code`：执行体按**事实**选文案码（如 `spc_control` 的"触发判异"与"过程受控"两种结论形态），
+  文案仍由 `messages.json` 提供 —— "执行体不写人话"这条没有被打破。
+
+### Fixed（迁移中发现的**同码不同文**，共 6 处）
+
+文案表是 `code → 模板` 的映射，一个 code 有两种文案就会被静默渲染成其中一种。
+这类错误**没有任何报错**，只会显示错的话：
+
+| 场景 | 冲突的 code | 拆分为 |
+|---|---|---|
+| `audit_chain` | `AC-01`（断链 / 首次摄入带 old） | `AC-01` / `AC-01F` |
+| `expense_audit` | `EXP-04`（日期倒挂 / 超时限） | `EXP-04` / `EXP-04B` |
+| `point_table` | `PT-04`（地址非法 / 越界）、`PT-03`（倒置 / 非数值） | `PT-04` / `PT-04B`、`PT-03` / `PT-03B` |
+| `pin_conflict` | `IRQ-02`（缺失 / 越界） | `IRQ-02` / `IRQ-02B` |
+| `modbus_poll` | `POLL-SUGGEST`（提波特率 / 放宽周期） | `POLL-SUGGEST` / `POLL-SUGGEST-B` |
+| `firmware_budget` | `FR-02`、`FR-04`（告警 / 正常） | 各拆为 `FR-0X` / `FR-0X-OK` |
+
+### 顺带去掉两处"句子里塞执行体人话"
+- `pin_conflict` 的结论原本嵌着 `errors[0]["message"]`（"首批：……"）—— 那是把执行体文案拼进句子，
+  既语言相关又和 findings 重复。已去掉。
+- `lab_report` 的结论有"有危急值才出现"的条件片段 —— 句内条件片段是语言相关的，改为常量格式。
+
+### 兼容性
+`findings[].message` 全部保留，`args` 为纯增量。归档因摘要变化已整体重生成（12 条）。
+
+### 实测
+12 个场景中英结论逐条对照通过；双语 `verify --all` 摘要序列逐位相同。
+
 ## [0.12.0] - 2026-10-10
 
 **执行体不再写人话：只输出 code + args，文案集中到 `messages.json`。** 详见 `docs/MESSAGES.md`。

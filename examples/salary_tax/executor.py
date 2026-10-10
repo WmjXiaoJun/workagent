@@ -89,8 +89,12 @@ def main():
         "verdict": "已测算",
         "conclusion": "全年应纳个税合计 " + format(total_tax, ",.2f") + " 元（税前收入 "
                       + format(total_income, ",.2f") + " 元，实际税负 " + format(eff * 100, ".2f") + "%）",
+        "conclusion_args": {"total_tax": format(total_tax, ",.2f"),
+                            "total_income": format(total_income, ",.2f"),
+                            "rate": format(eff * 100, ".2f")},
         "findings": [
             {"level": "info", "code": "TAX-YTD",
+             "args": {"total_tax": format(total_tax, ",.2f")},
              "message": "按累计预扣法逐月计算，年末累计应纳 " + format(total_tax, ",.2f") + " 元"}
         ],
         "monthly": rows,

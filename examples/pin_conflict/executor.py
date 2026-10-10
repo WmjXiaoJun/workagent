@@ -49,17 +49,19 @@ def main():
         pin = str(row.get("pin", "")).strip()
         sig = str(row.get("signal", "")).strip()
         if not pin:
-            findings.append({"level": "error", "code": "PIN-00", "message": "存在未填引脚名的分配行"})
+            findings.append({"level": "error", "code": "PIN-00", "args": {},
+                             "message": "存在未填引脚名的分配行"})
             continue
         if not re.fullmatch(r"P[A-Z][0-9]{1,2}", pin):
-            findings.append({"level": "error", "code": "PIN-03",
-                             "message": "引脚命名不合法：" + pin + "（应为 P<端口><序号>，如 PA9）"})
+            findings.append({"level": "error", "code": "PIN-03", "args": {"pin": pin},
+                             "message": "引脚命名不合法：" + pin})
         if pin in reserved:
-            findings.append({"level": "error", "code": "PIN-02",
-                             "message": "保留了调试口引脚 " + pin + " 却被占用为 " + sig})
+            findings.append({"level": "error", "code": "PIN-02", "args": {"pin": pin, "signal": sig},
+                             "message": "保留了调试口引脚 " + pin})
         if pin in seen and seen[pin] != sig:
             findings.append({"level": "error", "code": "PIN-01",
-                             "message": "引脚 " + pin + " 被同时分配给「" + seen[pin] + "」与「" + sig + "」"})
+                             "args": {"pin": pin, "a": seen[pin], "b": sig},
+                             "message": "引脚 " + pin + " 被重复分配"})
         else:
             seen[pin] = sig
 
@@ -70,16 +72,19 @@ def main():
         irq = str(row.get("irq", "")).strip()
         pr = row.get("priority")
         if isinstance(pr, bool) or not isinstance(pr, int):
-            findings.append({"level": "error", "code": "IRQ-02", "message": "中断 " + irq + " 优先级缺失或非整数"})
+            findings.append({"level": "error", "code": "IRQ-02", "args": {"irq": irq},
+                             "message": "中断 " + irq + " 优先级缺失"})
             continue
         if pr < 0 or pr > prio_max:
-            findings.append({"level": "error", "code": "IRQ-02",
-                             "message": "中断 " + irq + " 优先级 " + str(pr) + " 超出 0~" + str(prio_max)})
+            findings.append({"level": "error", "code": "IRQ-02B",
+                             "args": {"irq": irq, "priority": str(pr), "max": str(prio_max)},
+                             "message": "中断 " + irq + " 优先级越界"})
         prio_map.setdefault(pr, []).append(irq)
     for pr, names in sorted(prio_map.items()):
         if len(names) > 1:
             findings.append({"level": "error", "code": "IRQ-01",
-                             "message": "抢占优先级 " + str(pr) + " 被 " + str(len(names)) + " 个中断共用：" + ", ".join(names)})
+                             "args": {"priority": str(pr), "count": str(len(names)), "names": ", ".join(names)},
+                             "message": "抢占优先级 " + str(pr) + " 被共用"})
 
     # DMA-01 / DMA-02
     chan_map = {}
@@ -92,24 +97,28 @@ def main():
         uniq = sorted(set(pers))
         if len(pers) > 1 and len(uniq) > 1:
             findings.append({"level": "error", "code": "DMA-02",
-                             "message": "DMA 通道 " + ch + " 被分配给多个外设：" + ", ".join(uniq)})
+                             "args": {"channel": ch, "peripherals": ", ".join(uniq)},
+                             "message": "DMA 通道 " + ch + " 分配给多个外设"})
         elif len(pers) > 1:
             findings.append({"level": "warn", "code": "DMA-01",
-                             "message": "DMA 通道 " + ch + " 被重复声明 " + str(len(pers)) + " 次"})
+                             "args": {"channel": ch, "count": str(len(pers))},
+                             "message": "DMA 通道 " + ch + " 被重复声明"})
 
     errors = [f for f in findings if f["level"] == "error"]
     warns = [f for f in findings if f["level"] == "warn"]
     verdict = "存在冲突" if errors else ("有告警" if warns else "无冲突")
     if not findings:
         findings.append({"level": "info", "code": "RES-OK",
-                         "message": "引脚 " + str(len(pins)) + " 条、中断 " + str(len(irqs)) + " 条、DMA "
-                                    + str(len(dmas)) + " 条，未发现资源冲突"})
+                         "args": {"pins": str(len(pins)), "irqs": str(len(irqs)), "dmas": str(len(dmas))},
+                         "message": "未发现资源冲突"})
 
     out = {
         "subject": str(data.get("mcu", "")) + " 硬件资源冲突检测",
         "verdict": verdict,
-        "conclusion": "判定「" + verdict + "」：错误 " + str(len(errors)) + " 项，告警 " + str(len(warns)) + " 项"
-                      + ("；首批：" + errors[0]["message"] if errors else ""),
+        # 原结论里嵌了"首批：<第一条 finding 的文案>" —— 那等于在句子里塞执行体的人话，
+        # 且语言相关。去掉；首条发现在 findings 里本来就有。
+        "conclusion": "判定「" + verdict + "」：错误 " + str(len(errors)) + " 项，告警 " + str(len(warns)) + " 项",
+        "conclusion_args": {"verdict": verdict, "errors": len(errors), "warns": len(warns)},
         "findings": findings,
         "metrics": {"pins": len(pins), "interrupts": len(irqs), "dma": len(dmas),
                     "errors": len(errors), "warnings": len(warns)},

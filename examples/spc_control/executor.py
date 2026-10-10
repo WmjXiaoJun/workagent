@@ -111,14 +111,26 @@ def main():
         for v in violations[:40]
     ]
     if not findings:
-        findings.append({"level": "info", "code": "SPC-OK", "message": "8 条判异准则均未触发，过程受控"})
+        findings.append({"level": "info", "code": "SPC-OK",
+                         "args": {"rules": 8},
+                         "message": "8 条判异准则均未触发，过程受控"})
+
+    # 两种结论形态由**事实**决定，文案仍来自 messages.json。
+    if violations:
+        concl = "过程判定「" + verdict + "」：共触发 " + str(len(violations)) + " 处判异（" \
+                + ", ".join(sorted(set(v["rule"] for v in violations))) + "）"
+        concl_code = "CONCLUSION"
+    else:
+        concl = "过程判定「受控」：8 条判异准则均未触发"
+        concl_code = "CONCLUSION_CLEAN"
 
     out = {
         "subject": str(data.get("process", "")) + " 控制图判异",
         "verdict": verdict,
-        "conclusion": "过程判定「" + verdict + "」：共触发 " + str(len(violations)) + " 处判异（"
-                      + ", ".join(sorted(set(v["rule"] for v in violations))) + "）"
-                      if violations else "过程判定「受控」：8 条判异准则均未触发",
+        "conclusion": concl,
+        "conclusion_code": concl_code,
+        "conclusion_args": {"verdict": verdict, "count": len(violations),
+                            "rules": ", ".join(sorted(set(v["rule"] for v in violations))) or "-"},
         "findings": findings,
         "violations": violations,
         "metrics": {"n": len(xs), "center_line": round(cl, 6), "sigma": round(sigma, 6),

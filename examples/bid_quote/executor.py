@@ -146,6 +146,10 @@ def main():
                       + format(total_price, ",.2f")
                       + "（直接成本 " + format(round(direct_cost, 2), ",.2f")
                       + "，明细来源 " + source + "）",
+        "conclusion_args": {"currency": str(payload.get("currency", "CNY")),
+                            "total": format(total_price, ",.2f"),
+                            "direct_cost": format(round(direct_cost, 2), ",.2f"),
+                            "source": source},
         "risks": [
             "结论不构成报价承诺，需业务负责人签字确认",
             extra_risk,
