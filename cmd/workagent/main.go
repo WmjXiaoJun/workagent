@@ -147,6 +147,24 @@ func asList(v any) []any {
 	return nil
 }
 
+// relToRoot 把包内文件记成相对路径 —— trace 是跨机器复现的依据，
+// 记绝对路径会让它在另一台机器上直接失效（真被 CI 抓到过）。
+func relToRoot(root, p string) string {
+	r, err := filepath.Rel(root, p)
+	if err != nil || strings.HasPrefix(r, "..") {
+		return p
+	}
+	return filepath.ToSlash(r)
+}
+
+// resolveInputPath 兼容相对与绝对两种记录。
+func resolveInputPath(root, p string) string {
+	if p == "" || filepath.IsAbs(p) {
+		return p
+	}
+	return filepath.Join(root, filepath.FromSlash(p))
+}
+
 func resolveRoot(p string) string {
 	abs, err := filepath.Abs(p)
 	if err != nil {
@@ -508,8 +526,12 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		return 2
 	}
 	if inputArg == "" {
-		fmt.Fprintln(os.Stderr, "run 需要 --input 参数")
-		return 2
+		// 没给 --input 就用场景自带的样例，便于 run --all 与快速试用
+		if c.SampleInput == "" {
+			fmt.Fprintln(os.Stderr, "run 需要 --input 参数（场景 "+c.ID+" 未声明 sample_input）")
+			return 2
+		}
+		inputArg = c.SampleInput
 	}
 	inputPath := inputArg
 	if !filepath.IsAbs(inputPath) {
@@ -646,7 +668,7 @@ func cmdRun(root, caseID, inputArg string, replay bool, providerOverride, modelO
 		"at":            nowISO(),
 		"step":          "run",
 		"executor":      strings.Join(cmd, " "),
-		"input_file":    inputPath,
+		"input_file":    relToRoot(root, inputPath),
 		"input_digest":  inputDigest,
 		"output_digest": outputDigest,
 		"evidence_id":   evidenceID,
@@ -702,7 +724,7 @@ func cmdVerify(root string, live bool) int {
 	}
 	fmt.Println("verify —— 复现校验，证据包 " + asString(last["evidence_id"]))
 
-	inputFile := asString(last["input_file"])
+	inputFile := resolveInputPath(root, asString(last["input_file"]))
 	if !fileExists(inputFile) {
 		inputFile = filepath.Join(root, evidenceDir, asString(last["evidence_id"]), "input.json")
 	}
@@ -837,7 +859,7 @@ func cmdVerifyAll(root string) int {
 			failures++
 			continue
 		}
-		inputFile := asString(st["input_file"])
+		inputFile := resolveInputPath(root, asString(st["input_file"]))
 		if !fileExists(inputFile) {
 			inputFile = filepath.Join(root, evidenceDir, asString(st["evidence_id"]), "input.json")
 		}
@@ -1021,12 +1043,15 @@ func main() {
 		// 这里做成位置无关：显式声明的开关一定生效。
 		var inputArg, provider, model, caseID string
 		replayFlag := false
+		allFlag := false
 		var positional []string
 		for i := 0; i < len(args); i++ {
 			a := args[i]
 			switch {
 			case a == "--replay" || a == "-replay":
 				replayFlag = true
+			case a == "--all" || a == "-all":
+				allFlag = true
 			case a == "--input" || a == "-input":
 				if i+1 < len(args) {
 					inputArg = args[i+1]
@@ -1062,6 +1087,10 @@ func main() {
 		runRoot := resolveRoot(".")
 		if len(positional) > 0 {
 			runRoot = resolveRoot(positional[0])
+		}
+		if allFlag {
+			code = cmdRunAll(runRoot, replayFlag)
+			break
 		}
 		code = cmdRun(runRoot, caseID, inputArg, replayFlag, provider, model)
 	case "verify":

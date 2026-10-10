@@ -31,5 +31,5 @@
 4. 判定规则与阈值的来源，见 `cases/firmware_budget/README.md`。
 
 ---
-*复现等级：L3-deterministic ｜ 生成时间：2026-10-10T21:04:17+08:00*
+*复现等级：L3-deterministic ｜ 生成时间：2026-10-10T21:11:25+08:00*
 *执行体摘要：5a8d24e97d90a73c ｜ 结论摘要：959acbbc1f9b2a22 ｜ 证据包：8a1c092dc5b671b6*

@@ -7,7 +7,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "0808ce42e10594145285e4090ad8d14d7b75432950a41f5bc15a5bb98c10661a"
+      "sha256": "420e64927c2b40ad822da879a315d52883e92e900e81cbd1b62ab52e63dc2cd6"
     },
     {
       "path": ".gitignore",
@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "7061fa96370ec7f57c3ae72c91922b378d26e0bf2ecc6e19d87ac6f4bcd83b52"
+      "sha256": "89132ee0e0504c1037776594d201945ed5a4b8ceac6d8dafbb87ff88fe9a71c4"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -59,11 +59,11 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "803f3aa36ddb471c1460b0d61f2a3479542a4eec41916d24471fe4f97b78c47e"
+      "sha256": "51e08405e1479c38814cb003dd1f2ad48db3d4277e8acdb3d7a0ee553cfa350f"
     },
     {
       "path": "cmd/workagent/cases.go",
-      "sha256": "bcb2d94a62cb8fb12ecb14098cdc3f381cc3badb5ec7b7b70142fc3789dff906"
+      "sha256": "ad91054c3ce56e0400a0b2eb17d73022b0a46c6116ada352db8144040dcea2a3"
     },
     {
       "path": "cmd/workagent/llmcmd.go",
@@ -71,7 +71,7 @@
     },
     {
       "path": "cmd/workagent/main.go",
-      "sha256": "08adcbd5336860a62bb90fb4a57fbcca493a5dcd4d64e63007ea3ecd531072ed"
+      "sha256": "70ca2083d743702c433b200fdc978bd848fb012b08463b39669be54626f695ab"
     },
     {
       "path": "cmd/workagent/yaml.go",
@@ -351,7 +351,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "ab2d327581a4801fdee25dd0c91bca214299ff46ca30258b879cb685e6057c86"
+      "sha256": "fd3478e4839542ca3a010677c0aec5cf26361f1e7ba3e9a00e64610160bdc6a6"
     },
     {
       "path": "signature/README.md",
@@ -378,9 +378,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:04:18+08:00",
+  "generated_at": "2026-10-10T21:11:26+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "27c135abe06de57593a45d2217b2f4b0131a1dec330486e3e32d0fe625858e20",
+  "package_digest": "ccf6b52700acb8ed805dc092680aa0ca811d9907ced1a862797bf34f80d04b33",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",

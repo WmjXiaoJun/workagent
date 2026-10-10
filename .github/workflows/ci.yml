@@ -63,19 +63,8 @@ jobs:
       - name: 生成适配层
         run: ./workagent adapt .
 
-      - name: 运行全部场景（L3 场景纯确定性；带模型的场景重放已录制响应，无需联网与密钥）
-        shell: bash
-        run: |
-          set -e
-          ./workagent run --case bid_quote     --input examples/bid_quote/input.json . 
-          ./workagent run --case bid_quote     --input examples/bid_quote/input.natural.json . --replay
-          ./workagent run --case expense_audit --input examples/expense_audit/input.natural.json . --replay
-          ./workagent run --case lab_report    --input examples/lab_report/input.natural.json . --replay
-          ./workagent run --case point_table   --input examples/point_table/input.natural.json . --replay
-          ./workagent run --case spc_control   --input examples/spc_control/input.json .
-          ./workagent run --case pin_conflict  --input examples/pin_conflict/input.json .
-          ./workagent run --case salary_tax    --input examples/salary_tax/input.json .
-          ./workagent run --case loan_dscr     --input examples/loan_dscr/input.json .
+      - name: 运行全部场景（L3 纯确定性；带模型的场景重放已录制响应，无需联网与密钥）
+        run: ./workagent run --all . --replay
 
       - name: 全场景复现校验（必须全部 PASS）
         run: ./workagent verify --all .

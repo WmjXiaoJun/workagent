@@ -151,3 +151,47 @@ func caseSample(root string, c Case, natural bool) string {
 	}
 	return filepath.Join(root, filepath.FromSlash(p))
 }
+
+// cmdRunAll 用各场景自带的样例依次运行（样例输入与自然语言输入都跑）。
+// 这样新增场景时 CI 不需要改动 —— 少一处会忘记同步的地方。
+func cmdRunAll(root string, replay bool) int {
+	m := mustManifest(root)
+	all := casesOf(m)
+	if len(all) == 0 {
+		fmt.Println("run --all —— 本包没有场景")
+		return 1
+	}
+	mode := "真实调用模型"
+	if replay {
+		mode = "重放已录制响应（离线）"
+	}
+	fmt.Printf("run --all —— 共 %d 个场景，模型步骤：%s\n\n", len(all), mode)
+	failures, runs := 0, 0
+	for _, c := range all {
+		var inputs []string
+		if c.SampleInput != "" {
+			inputs = append(inputs, c.SampleInput)
+		}
+		if c.SampleNatural != "" && c.SampleNatural != c.SampleInput {
+			inputs = append(inputs, c.SampleNatural)
+		}
+		if len(inputs) == 0 {
+			fmt.Println("  [FAIL] " + c.ID + " 未声明 sample_input")
+			failures++
+			continue
+		}
+		for _, in := range inputs {
+			runs++
+			if code := cmdRun(root, c.ID, in, replay, "", ""); code != 0 {
+				failures++
+			}
+		}
+	}
+	fmt.Println("")
+	if failures > 0 {
+		fmt.Printf("结果: %d 个场景运行失败（共执行 %d 次）\n", failures, runs)
+		return 1
+	}
+	fmt.Printf("结果: 全部 %d 个场景运行完成（共执行 %d 次）\n", len(all), runs)
+	return 0
+}
