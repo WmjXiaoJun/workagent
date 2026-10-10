@@ -1,28 +1,48 @@
 {
-  "schema": "workagent/trace/1",
-  "policy": "记录需要留存的关键节点：数据调用、参数修改、计算步骤、结论摘要。",
   "evidence_id": "6723c555d11c0a3e",
+  "note": "由 tools/workagent.py run 写入；verify 会据此重放并比对结论摘要",
+  "policy": "记录需要留存的关键节点：数据调用、参数修改、计算步骤、结论摘要。",
+  "schema": "workagent/trace/1",
   "steps": [
     {
-      "seq": 1,
       "at": "2026-10-10T18:25:17+08:00",
-      "step": "run",
+      "evidence_id": "6723c555d11c0a3e",
       "executor": "python examples/bid_quote/executor.py",
-      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
       "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
       "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
-      "evidence_id": "6723c555d11c0a3e"
+      "seq": 1,
+      "step": "run"
     },
     {
-      "seq": 2,
       "at": "2026-10-10T18:26:58+08:00",
-      "step": "run",
+      "evidence_id": "6723c555d11c0a3e",
       "executor": "python examples/bid_quote/executor.py",
-      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
       "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
       "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
-      "evidence_id": "6723c555d11c0a3e"
+      "seq": 2,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T18:32:48+08:00",
+      "evidence_id": "6723c555d11c0a3e",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
+      "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
+      "seq": 3,
+      "step": "run"
+    },
+    {
+      "at": "2026-10-10T18:34:30+08:00",
+      "evidence_id": "6723c555d11c0a3e",
+      "executor": "python examples/bid_quote/executor.py",
+      "input_digest": "429284fce4b098ea86ef14ba9cf3fe3b530250088e45bddb553feb278570cef0",
+      "input_file": "D:\\BaiduSyncdisk\\wmj_work\\XJ\\WorkAgent\\workagent\\examples\\bid_quote\\input.json",
+      "output_digest": "8e38afbabb710b001ed63b6fbdd7a22d93294caf8bcfa119a65e131a472acf82",
+      "seq": 4,
+      "step": "run"
     }
-  ],
-  "note": "由 tools/workagent.py run 写入；verify 会据此重放并比对结论摘要"
+  ]
 }

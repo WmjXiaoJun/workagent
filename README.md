@@ -11,6 +11,7 @@
 ![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
+![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 
 [30 秒上手](#30-秒上手) · [核心概念](#核心概念) · [兼容老平台](#兼容老平台这是本项目的重点) · [CLI](#六个命令) · [English](README.en.md)
 
@@ -42,28 +43,37 @@
 
 ## 30 秒上手
 
-**零依赖。Python 3.8+。不用装任何东西，不用联网。**
+**零第三方依赖。Go 1.21+。编译出一个静态二进制，对方不需要装任何运行时。**
 
 ```bash
 git clone https://github.com/<you>/workagent.git
 cd workagent
+go build -o workagent ./cmd/workagent
 
-python tools/workagent.py check .                                          # ① 结构与兼容声明校验
-python tools/workagent.py run   --input examples/bid_quote/input.json .    # ② 执行，产出证据包
-python tools/workagent.py verify .                                         # ③ 复现校验（关键一步）
+./workagent check .                                          # ① 结构与兼容声明校验
+./workagent run   --input examples/bid_quote/input.json .    # ② 执行，产出证据包
+./workagent verify .                                         # ③ 复现校验（关键一步）
+```
+
+三平台交叉编译（`make release` 一次产出五个）：
+
+```bash
+GOOS=linux   GOARCH=amd64 go build -o dist/workagent-linux-amd64     ./cmd/workagent
+GOOS=darwin  GOARCH=arm64 go build -o dist/workagent-darwin-arm64    ./cmd/workagent
+GOOS=windows GOARCH=amd64 go build -o dist/workagent-windows-amd64.exe ./cmd/workagent
 ```
 
 真实运行输出（不是示意，是仓库里跑出来的）：
 
 ```text
-$ python tools/workagent.py run --input examples/bid_quote/input.json .
+$ ./workagent run --input examples/bid_quote/input.json .
 run —— 执行完成
   [OK]   证据包编号 6723c555d11c0a3e
   [OK]   结论: 建议报价 CNY 1,229,437.44（直接成本 968,000.00，利润率 12%）
   [OK]   输出摘要 8e38afbabb710b00
   [--]   证据目录 .../out/evidence/6723c555d11c0a3e
 
-$ python tools/workagent.py verify .
+$ ./workagent verify .
 verify —— 复现校验，证据包 6723c555d11c0a3e
   期望摘要 8e38afbabb710b001ed63b6fbdd7a22d
   重放摘要 8e38afbabb710b001ed63b6fbdd7a22d
@@ -74,7 +84,7 @@ verify —— 复现校验，证据包 6723c555d11c0a3e
 
 ```text
 $ echo '{"project":"x","line_items":[]}' > bad.json
-$ python tools/workagent.py run --input bad.json .
+$ ./workagent run --input bad.json .
 执行体失败 (exit 2): BOUNDARY_VIOLATION: line_items 为空或不是数组
 ```
 
@@ -201,7 +211,11 @@ workagent/
 │   └── test_suite/                #   unit / regression / sensitivity / stress
 ├── adapters/                      # 生成物：plugin.json + agent-card.json
 ├── signature/agent.sig            # 全包摘要
-├── tools/workagent.py             # 零依赖 CLI
+├── cmd/workagent/                 # 零依赖 CLI（Go）
+│   ├── main.go
+│   └── yaml.go
+├── go.mod                         # 零第三方依赖
+├── Makefile                       # make release 一次产出五平台二进制
 └── examples/bid_quote/            # 可运行示例
 ```
 
@@ -270,8 +284,9 @@ A：区别是 `verify` 会 FAIL。形容词不会。
 **Q：我的场景用了 LLM，还能用吗？**
 A：能。但你要么接受"结论不可复现"（那就诚实标注），要么登记完整的模型闭包摘要（`attest/closure.json` 已经预留字段）。没有第三条路。
 
-**Q：一定要 Python 吗？**
-A：CLI 是 Python（零依赖）。执行体可以是任何东西——只要遵守契约：读 `argv[1]`，向 stdout 输出 `{"output": {...}}`。
+**Q：为什么用 Go，不用 Python / Rust？**
+A：Go 编译出**单个静态二进制**，还能秒级交叉编译三平台——收到包的人不装任何运行时就能验证。Rust 同样能，但要引入 `serde@@ / `sha2@@ 等 crate，**违背"零第三方依赖"这条铁律**；Python 的问题不在语言，而在分发（对方没装 Python 就用不了）。
+**执行体**可以是任何语言——CLI 只要求它遵守契约：读 `argv[1]`，向 stdout 输出 `{"output": {...}}`。
 
 **Q：适合什么场景？**
 A：需要**逻辑论证、数据推演、结果核验**的场景：工程测算、量化预测、科研论证、项目评估、风控审查。不适合纯文案、通知、闲聊。

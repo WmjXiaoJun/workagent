@@ -1,12 +1,5 @@
 {
-  "schema": "workagent/signature/1",
-  "generated_at": "2026-10-10T18:27:08+08:00",
-  "spec_version": "0.3.0",
-  "scheme": "digest-only",
-  "signer": null,
-  "public_key": null,
-  "package_digest": "777d3b218211ea3f95e66d1686872b0124e7fcf342773eefccfe54f0f7276394",
-  "file_count": 32,
+  "file_count": 36,
   "files": [
     {
       "path": ".gitattributes",
@@ -14,11 +7,35 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "2d762a39725c2659a0d3adcdb65afa79cb91e322143d260d13cdb39c88ad3290"
+      "sha256": "8fb768b781ad95390f7e1ac699809e0536017372be207e872a38afa68a29e2ca"
     },
     {
       "path": ".gitignore",
-      "sha256": "9da3ca028bc6928ec505b1f9aa80335366de7579001091871b4121fee013eae8"
+      "sha256": "666fd0f9a954d2f5a52ac8b05ab51989aaf460e7c805f829ec20d0a51a826e35"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "7bf88a5be1d4574ba224a015110ed0100b7ef78f07b9909e328712639d054d85"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "5b091531c71421906ae7d2ea9821df48650c17b474c8f8e53ac1c48b9f74d631"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "e3077e939e2ce7feeab670d6ecabe70d65e5369811beb50ba89b261542e3294e"
+    },
+    {
+      "path": "Makefile",
+      "sha256": "79298f01ebcf552e73b62ee029d0ba99c0e2b4c21de4e7edfdab72ad06fdacae"
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "6fc96ba7f6e0bf797eae7f674b0487e13eedeb061cd409c5bff19397427d139c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "18edc16a16a6157cb6096041bba06e0f68fc135f4b66e375efa24ff96afdbb05"
     },
     {
       "path": "agent.yaml",
@@ -30,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "41a3b4d9725797da986fb90d29dfb7b468379572b0e0230df200f61f23273feb"
+      "sha256": "4d4296e05453576591ef1f0fa54b3371d8a766c1a07ed7e9b1405ba0e7d4f48e"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -38,19 +55,19 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "c8849a7d2230a8329ee5493f6bfb24a4f3db222589254707049bc258146654bd"
+      "sha256": "0a0e0bad61ae38d606b8c4be7a46d0925caa27b4143ba04055a9711b4ed9b660"
     },
     {
-      "path": "CHANGELOG.md",
-      "sha256": "c6cfe347b0b65f00828cff6b29ac18917de4f36088a4e903d8522bee5d0e55ab"
+      "path": "cmd/workagent/main.go",
+      "sha256": "6b1870bb12f3822aa6d97c37f4956205ea4c6d0f5d198866fd1acc99730d8c8d"
+    },
+    {
+      "path": "cmd/workagent/yaml.go",
+      "sha256": "0f988f5f641ff7d84f9bba770124da9f37e3dd4368dbae3b442c088a82aa34df"
     },
     {
       "path": "compat.json",
       "sha256": "bdb728fc6e9dfd91bc3904b686967bcda9a9388f648bbffb27cbe2df8b8ae3ee"
-    },
-    {
-      "path": "CONTRIBUTING.md",
-      "sha256": "5b091531c71421906ae7d2ea9821df48650c17b474c8f8e53ac1c48b9f74d631"
     },
     {
       "path": "docs/COMPAT.md",
@@ -58,7 +75,11 @@
     },
     {
       "path": "docs/SPEC.md",
-      "sha256": "7d9d7e92e981786c0ee62b9a263a44c54535cac5f0d27fa17bc9a1d31d42674d"
+      "sha256": "1289e0b64fc64cba6d2221ab3f9a1ab4a4b426b5d932cfd43d7bc99f4115ed24"
+    },
+    {
+      "path": "examples/bid_quote/README.md",
+      "sha256": "66c7e7156e07f707d6403328fa427994973d5cccc3b6dd5f178340626545d169"
     },
     {
       "path": "examples/bid_quote/executor.py",
@@ -69,24 +90,20 @@
       "sha256": "81fe6c7f3b434e576dd6540d1668ad51b18ffc57c9a76c0f9be8145acef0537e"
     },
     {
-      "path": "examples/bid_quote/README.md",
-      "sha256": "2a4cba7fe0075c0e7bee7b5469df31ef8c565c7b603f60a0bad4186efa51dbc1"
-    },
-    {
       "path": "execution/runtime.dockerfile",
-      "sha256": "17cd0186926bce3d7000f69abeb10f3cabb1130687020202beac41e43294cfe5"
+      "sha256": "6d08427e2ef0b6e4bb658ca68b0967a6eb7a7c732e17285d221f6e7cdeabca1f"
     },
     {
       "path": "execution/workflow.yml",
       "sha256": "4704c521c57a6b3eb3c9a83ba47024c84c80e889a14ebefb2452d3a3678651ac"
     },
     {
-      "path": "inputs.schema.json",
-      "sha256": "484d8fdcb00982615cdffb565ad0025704e2067015094d4d82886de07b87ed15"
+      "path": "go.mod",
+      "sha256": "c17b9cfc350de46744978d03245f3a1284af851578f681b180fce592aab5f0a7"
     },
     {
-      "path": "LICENSE",
-      "sha256": "e3077e939e2ce7feeab670d6ecabe70d65e5369811beb50ba89b261542e3294e"
+      "path": "inputs.schema.json",
+      "sha256": "484d8fdcb00982615cdffb565ad0025704e2067015094d4d82886de07b87ed15"
     },
     {
       "path": "provenance/assumptions.json",
@@ -98,23 +115,15 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "eab46a050a3ab539ee73e652c5961ef303cb883557107531435477aa4adba53b"
-    },
-    {
-      "path": "README.en.md",
-      "sha256": "1a3e7f92585c997947d626a0bbc5edc4ab3672d74e621ae166270f35712b08db"
-    },
-    {
-      "path": "README.md",
-      "sha256": "244177efc4c94873ab44752eac6244caff4f0179d43dfad550b0520d3f39aae3"
+      "sha256": "46603d56dd0d0ebfcca988f70ad18bc7e8a0ea1818ed93c8d8c0245dc4561177"
     },
     {
       "path": "signature/README.md",
       "sha256": "ecc9981a0151aac348af9181ff69e5774838cde80f59eef0b7827e6317de921e"
     },
     {
-      "path": "tools/workagent.py",
-      "sha256": "b338873666d2b59c0d7ae0f44eef37d3959e53a95f89286bbe40141cac19c726"
+      "path": "workagent.exe",
+      "sha256": "06e6514bc8b287e4d1a20ef8a192d5d30b06071f5758d6bd741ba50a0fed74e0"
     },
     {
       "path": "x-workagent/boundary.json",
@@ -137,5 +146,13 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。"
+  "generated_at": "2026-10-10T18:34:30+08:00",
+  "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
+  "package_digest": "afc181a7748c76aa1c7442d47fc9a4e05f446f53bffef7e77a252b8c5ab56838",
+  "public_key": null,
+  "schema": "workagent/signature/1",
+  "scheme": "digest-only",
+  "signer": null,
+  "spec_version": "0.3.0",
+  "tool_version": "0.3.0"
 }

@@ -1,11 +1,21 @@
+# 生成物
 adapters/*
 !adapters/.gitignore
 !adapters/README.md
+out/
+dist/
+bin/
+workagent
+workagent.exe
+
+# Go
+*.test
+
+# Python（示例执行体可能用到）
 __pycache__/
 *.pyc
 .venv/
-dist/
+
+# 其它
 build/
 .DS_Store
-out/
-evidence/

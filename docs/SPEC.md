@@ -16,7 +16,7 @@
 
 ## 2. 包模型与必需文件
 
-文件清单以 `tools/workagent.py` 的 `REQUIRED_FILES` 为准（单一事实来源）。`check` 会逐项校验。
+文件清单以 `cmd/workagent/main.go` 的 `requiredFiles` 为准（单一事实来源）。`check` 会逐项校验。
 
 关键约定：
 
@@ -64,7 +64,8 @@
 `attest/closure.json` 的 `closure` 必须覆盖：
 
 - 执行体、输入 schema、工作流、清单的摘要
-- 运行环境：Python 版本、平台、数值环境（`PYTHONHASHSEED` / `LC_ALL` / `TZ`）
+- 运行环境：构建工具链版本、平台、数值环境（`PYTHONHASHSEED` / `LC_ALL` / `TZ`）
+- 执行体命令（`executor_command`）；**执行体自身的运行时版本**（如 Python / Node）由执行体作者负责登记
 
 **若启用 LLM 步骤**，还必须填写：
 `model_weights_digest`、`tokenizer_digest`、`chat_template_digest`、`engine_build_digest`、`decoding_config`。

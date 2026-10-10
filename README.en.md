@@ -11,6 +11,7 @@
 ![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![status](https://img.shields.io/badge/status-early-orange)
+![go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 
 [Quickstart](#quickstart) · [Concepts](#core-concepts) · [Legacy compatibility](#legacy-platform-compatibility) · [CLI](#the-six-commands) · [中文](README.md)
 
@@ -42,28 +43,37 @@ The reality today: you can build an agent in 15 minutes, but you cannot answer t
 
 ## Quickstart
 
-**Zero dependencies. Python 3.8+. Nothing to install, no network required.**
+**Zero third-party dependencies. Go 1.21+. One static binary — no runtime needed on the receiving end.**
 
 ```bash
 git clone https://github.com/<you>/workagent.git
 cd workagent
+go build -o workagent ./cmd/workagent
 
-python tools/workagent.py check .                                          # 1. structure + compatibility check
-python tools/workagent.py run   --input examples/bid_quote/input.json .    # 2. execute, produce evidence bundle
-python tools/workagent.py verify .                                         # 3. reproducibility check (the important one)
+./workagent check .                                          # 1. structure + compatibility check
+./workagent run   --input examples/bid_quote/input.json .    # 2. execute, produce evidence bundle
+./workagent verify .                                         # 3. reproducibility check (the important one)
+```
+
+Cross-compile for three platforms (or `make release` for all five):
+
+```bash
+GOOS=linux   GOARCH=amd64 go build -o dist/workagent-linux-amd64     ./cmd/workagent
+GOOS=darwin  GOARCH=arm64 go build -o dist/workagent-darwin-arm64    ./cmd/workagent
+GOOS=windows GOARCH=amd64 go build -o dist/workagent-windows-amd64.exe ./cmd/workagent
 ```
 
 Real output — this is the repo actually running, not an illustration:
 
 ```text
-$ python tools/workagent.py run --input examples/bid_quote/input.json .
+$ ./workagent run --input examples/bid_quote/input.json .
 run —— done
   [OK]   evidence id 6723c555d11c0a3e
   [OK]   conclusion: recommended price CNY 1,229,437.44 (direct cost 968,000.00, margin 12%)
   [OK]   output digest 8e38afbabb710b00
   [--]   evidence dir .../out/evidence/6723c555d11c0a3e
 
-$ python tools/workagent.py verify .
+$ ./workagent verify .
 verify —— replaying evidence bundle 6723c555d11c0a3e
   expected digest 8e38afbabb710b001ed63b6fbdd7a22d
   replay digest   8e38afbabb710b001ed63b6fbdd7a22d
@@ -74,7 +84,7 @@ An out-of-bounds input is rejected rather than silently computed:
 
 ```text
 $ echo '{"project":"x","line_items":[]}' > bad.json
-$ python tools/workagent.py run --input bad.json .
+$ ./workagent run --input bad.json .
 executor failed (exit 2): BOUNDARY_VIOLATION: line_items is empty or not an array
 ```
 
@@ -201,7 +211,11 @@ workagent/
 │   └── test_suite/                # unit / regression / sensitivity / stress
 ├── adapters/                      # generated: plugin.json + agent-card.json
 ├── signature/agent.sig            # whole-package digest
-├── tools/workagent.py             # zero-dependency CLI
+├── cmd/workagent/                 # zero-dependency CLI (Go)
+│   ├── main.go
+│   └── yaml.go
+├── go.mod                         # zero third-party dependencies
+├── Makefile                       # make release builds all five binaries
 └── examples/bid_quote/            # runnable example
 ```
 
@@ -270,8 +284,9 @@ The difference is that `verify` can FAIL. Adjectives cannot.
 **My scenario uses an LLM. Can I still use this?**
 Yes. Either accept that the conclusion is not reproducible (and say so honestly), or record the full model closure — `attest/closure.json` already reserves the fields. There is no third option.
 
-**Does it have to be Python?**
-The CLI is Python (zero dependencies). The executor can be anything, as long as it honours the contract: read `argv[1]`, print `{"output": {...}}` to stdout.
+**Why Go rather than Python or Rust?**
+Go compiles to **a single static binary** and cross-compiles for three platforms in seconds — whoever receives a package can verify it without installing any runtime. Rust can do the same, but it pulls in `serde@@ / `sha2@@ and friends, **breaking the zero-third-party-dependency rule**. Python's problem is not the language, it is distribution (no Python installed, no tool).
+The **executor** can be in any language — the CLI only requires the contract: read `argv[1]`, print `{"output": {...}}` to stdout.
 
 **What scenarios fit?**
 Anything requiring **reasoning, data derivation, or result verification**: engineering estimation, quantitative forecasting, research argumentation, project appraisal, risk review. Not for copywriting, notifications or chit-chat.

@@ -5,9 +5,11 @@
 ## 运行
 
 ```bash
-python tools/workagent.py run --input examples/bid_quote/input.json .
-python tools/workagent.py verify .
+workagent run    --input examples/bid_quote/input.json .
+workagent verify .
 ```
+
+（`workagent` 是构建出来的 CLI：`go build -o workagent ./cmd/workagent`）
 
 ## 为什么这个例子是"可验证"的
 
@@ -22,7 +24,9 @@ python tools/workagent.py verify .
 ## 换成你自己的场景
 
 1. 复制本目录为 `examples/your_case/`；
-2. 改 `executor.py`（保持契约：读 argv[1]，向 stdout 输出 `{"output": {...}}`）；
+2. 改 `executor.py`（保持契约：读 `argv[1]`，向 stdout 输出 `{"output": {...}}`），**换任何语言都可以**；
 3. 改根目录 `inputs.schema.json` 与 `artifacts/output_schema.json`；
 4. 改 `agent.yaml` 里的 `execution.executor.command`；
 5. 重跑 `check / adapt / attest / run / verify / seal`。
+
+> 提示：CLI 会自动处理 `python@@ / `python3@@ 的差异——声明的解释器在系统上不存在时，会尝试另一个。

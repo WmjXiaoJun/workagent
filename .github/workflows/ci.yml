@@ -6,32 +6,56 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.11", "3.13"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go: ["1.21", "1.22"]
+        exclude:
+          - os: macos-latest
+            go: "1.21"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - uses: actions/setup-go@v5
         with:
-          python-version: `{{ matrix.python-version }}`
+          go-version: ${{ matrix.go }}
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: gofmt 检查
+        if: runner.os != 'Windows'
+        run: test -z "$(gofmt -l ./cmd)"
+
+      - name: 构建
+        run: go build -o workagent ./cmd/workagent
+
       - name: 包结构校验
-        run: python tools/workagent.py check .
+        run: ./workagent check .
+
       - name: 计算闭包摘要
-        run: python tools/workagent.py attest .
+        run: ./workagent attest .
+
       - name: 生成适配层
-        run: python tools/workagent.py adapt .
+        run: ./workagent adapt .
+
       - name: 执行并产出证据包
-        run: python tools/workagent.py run --input examples/bid_quote/input.json .
+        run: ./workagent run --input examples/bid_quote/input.json .
+
       - name: 复现校验（必须 PASS）
-        run: python tools/workagent.py verify .
+        run: ./workagent verify .
+
       - name: 边界拒绝测试（越界输入必须失败）
+        shell: bash
         run: |
           echo '{"project":"x","line_items":[]}' > /tmp/bad.json
-          if python tools/workagent.py run --input /tmp/bad.json . ; then
+          if ./workagent run --input /tmp/bad.json . ; then
             echo "越界输入未被拒绝，边界失效"; exit 1
           else
             echo "越界输入已正确拒绝"
           fi
+
       - name: 全包摘要
-        run: python tools/workagent.py seal .
+        run: ./workagent seal .
