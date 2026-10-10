@@ -47,7 +47,7 @@
     },
     {
       "path": "artifacts/summary.md",
-      "sha256": "89132ee0e0504c1037776594d201945ed5a4b8ceac6d8dafbb87ff88fe9a71c4"
+      "sha256": "fc84509181cf3195d9d377293f4daea2570efe4639e313531d8bf4654e813067"
     },
     {
       "path": "artifacts/summary.template.md",
@@ -59,7 +59,7 @@
     },
     {
       "path": "attest/closure.json",
-      "sha256": "51e08405e1479c38814cb003dd1f2ad48db3d4277e8acdb3d7a0ee553cfa350f"
+      "sha256": "98eb11acd969ddc1d9ddffdeb615b118d0df2e6aa2d815e85bf77ab42d730654"
     },
     {
       "path": "cmd/workagent/cases.go",
@@ -351,7 +351,7 @@
     },
     {
       "path": "provenance/trace.json",
-      "sha256": "fd3478e4839542ca3a010677c0aec5cf26361f1e7ba3e9a00e64610160bdc6a6"
+      "sha256": "69dd47161086932bd79386735afc954b969416d7ab40e421046561e24de419fc"
     },
     {
       "path": "signature/README.md",
@@ -378,9 +378,9 @@
       "sha256": "b6c607f331507736b4f6ab4ce924d3d59491b91aa9449c8538330e5e9a5e2b6a"
     }
   ],
-  "generated_at": "2026-10-10T21:11:26+08:00",
+  "generated_at": "2026-10-10T21:11:53+08:00",
   "honesty_note": "digest-only 只证明『内容自生成后未变』，不证明『谁签的』。如需不可否认性，请用 GPG/Ed25519 对 package_digest 另行签名，并把公钥放入 signature/。",
-  "package_digest": "ccf6b52700acb8ed805dc092680aa0ca811d9907ced1a862797bf34f80d04b33",
+  "package_digest": "f1be852c0052aa4ebdbf2d25a6c39007b00e64ff51d61184d574347941406510",
   "public_key": null,
   "schema": "workagent/signature/1",
   "scheme": "digest-only",
