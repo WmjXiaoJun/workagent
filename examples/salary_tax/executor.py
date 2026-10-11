@@ -86,6 +86,7 @@ def main():
     eff = round(total_tax / total_income, 6) if total_income else 0.0
     out = {
         "subject": str(data.get("employee", "")) + " " + str(data.get("tax_year", "")) + " 年度个税测算",
+        "subject_args": {"employee": str(data.get("employee", "")), "year": str(data.get("tax_year", ""))},
         "verdict": "已测算",
         "conclusion": "全年应纳个税合计 " + format(total_tax, ",.2f") + " 元（税前收入 "
                       + format(total_income, ",.2f") + " 元，实际税负 " + format(eff * 100, ".2f") + "%）",
@@ -100,12 +101,17 @@ def main():
         "monthly": rows,
         "metrics": {"total_income": total_income, "total_tax": total_tax,
                     "effective_rate": eff, "months": len(rows)},
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "规则取自《个人所得税法》7 级累进预扣率表，纯确定性计算，无外部数据依赖"},
         "risks": [
             "未计入年终奖单独计税、劳务报酬、股权激励等特殊项目",
             "专项附加扣除以输入值为准，未做资格校验",
             "各地社保基数上下限差异未体现",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "未计入年终奖单独计税、劳务报酬、股权激励等特殊项目"},
+            {"code": "02", "text": "专项附加扣除以输入值为准，未做资格校验"},
+            {"code": "03", "text": "各地社保基数上下限差异未体现"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

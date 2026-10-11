@@ -491,6 +491,294 @@
     "firmware_budget.FR-06": {
       "zh": "任务「{task}」栈峰值 {peak} B 已超过分配 {allocated} B —— 已发生栈溢出",
       "en": "Task \"{task}\": stack peak {peak} B exceeds the allocated {allocated} B — a stack overflow has already occurred"
+    },
+    "expense_audit.SUBJECT": {
+      "zh": "{claim} {submitter} 报销单",
+      "en": "{claim} {submitter} expense claim"
+    },
+    "lab_report.SUBJECT-M": {
+      "zh": "{patient} 检验报告（男）",
+      "en": "{patient} lab report (male)"
+    },
+    "lab_report.SUBJECT-F": {
+      "zh": "{patient} 检验报告（女）",
+      "en": "{patient} lab report (female)"
+    },
+    "point_table.SUBJECT": {
+      "zh": "{device} 通信点表核对",
+      "en": "{device} Modbus point-table audit"
+    },
+    "spc_control.SUBJECT": {
+      "zh": "{process} 控制图判异",
+      "en": "{process} control-chart rule analysis"
+    },
+    "pin_conflict.SUBJECT": {
+      "zh": "{mcu} 硬件资源冲突检测",
+      "en": "{mcu} hardware resource conflict check"
+    },
+    "salary_tax.SUBJECT": {
+      "zh": "{employee} {year} 年度个税测算",
+      "en": "{employee} {year} income tax estimate"
+    },
+    "loan_dscr.SUBJECT": {
+      "zh": "{project} 偿债能力测算",
+      "en": "{project} debt-service coverage"
+    },
+    "modbus_poll.SUBJECT": {
+      "zh": "{link} 轮询周期测算",
+      "en": "{link} polling cycle estimate"
+    },
+    "firmware_budget.SUBJECT": {
+      "zh": "{mcu} 固件资源预算",
+      "en": "{mcu} firmware resource budget"
+    },
+    "points_reconcile.SUBJECT": {
+      "zh": "{system} 一致性对账",
+      "en": "{system} consistency reconciliation"
+    },
+    "audit_chain.SUBJECT": {
+      "zh": "{system} 一致性核验",
+      "en": "{system} integrity check"
+    },
+    "bid_quote.BASIS": {
+      "zh": "纯确定性计算，无外部数据依赖；上限受输入质量与假设 AS-001/AS-003 约束",
+      "en": "Purely deterministic computation with no external data dependency; the ceiling is bounded by input quality and assumptions AS-001/AS-003"
+    },
+    "bid_quote.BASIS-LLM": {
+      "zh": "明细由模型从自然语言抽取，存在识别误差；计算部分为确定性",
+      "en": "The line items were extracted from natural language by a model, so recognition errors are possible; the computation itself is deterministic"
+    },
+    "expense_audit.BASIS": {
+      "zh": "明细为结构化输入，判定为确定性规则",
+      "en": "The line items are structured input, and the judgement is a deterministic rule"
+    },
+    "expense_audit.BASIS-LLM": {
+      "zh": "明细由模型从报销说明抽取，存在识别误差；合规判定为确定性规则",
+      "en": "The line items were extracted from the claim text by a model, so recognition errors are possible; the compliance judgement is a deterministic rule"
+    },
+    "lab_report.BASIS": {
+      "zh": "参考区间为示例值，未与具体实验室报告单核对；判定逻辑为确定性规则",
+      "en": "The reference intervals are example values and were not checked against a specific laboratory report; the judgement logic is a deterministic rule"
+    },
+    "point_table.BASIS": {
+      "zh": "点位为结构化输入，检查为确定性规则",
+      "en": "The points are structured input, and the checks are deterministic rules"
+    },
+    "point_table.BASIS-LLM": {
+      "zh": "点位由模型抽取，存在识别误差；一致性检查为确定性规则",
+      "en": "The points were extracted by a model, so recognition errors are possible; the consistency checks are deterministic rules"
+    },
+    "spc_control.BASIS": {
+      "zh": "判异准则为公开标准；中心线与西格玛由输入或 I-MR 法确定，纯确定性",
+      "en": "The detection rules are a public standard; the centre line and sigma come from the input or the I-MR method, fully deterministic"
+    },
+    "pin_conflict.BASIS": {
+      "zh": "规则集为确定性检查，无模型参与；同一分配表必然得到同一清单",
+      "en": "The rule set is a deterministic check with no model involved; the same allocation table always yields the same list"
+    },
+    "salary_tax.BASIS": {
+      "zh": "规则取自《个人所得税法》7 级累进预扣率表，纯确定性计算，无外部数据依赖",
+      "en": "The rules come from the 7-bracket progressive withholding table of China's Individual Income Tax Law; purely deterministic, with no external data dependency"
+    },
+    "loan_dscr.BASIS": {
+      "zh": "纯确定性公式；阈值来自贷款审批惯例，可在输入中覆盖",
+      "en": "A purely deterministic formula; the thresholds follow lending practice and can be overridden in the input"
+    },
+    "modbus_poll.BASIS": {
+      "zh": "按 Modbus 帧格式与字符时间计算，纯确定性；不含从站内部处理耗时以外的随机因素",
+      "en": "Computed from the Modbus frame format and character times, fully deterministic; no randomness beyond the slave's own processing delay"
+    },
+    "firmware_budget.BASIS": {
+      "zh": "汇总与容量比对为纯算术；阈值来自实践惯例且可在输入中覆盖",
+      "en": "Summation and capacity comparison are pure arithmetic; the thresholds follow practice and can be overridden in the input"
+    },
+    "points_reconcile.BASIS": {
+      "zh": "七项不变量为纯确定性校验，已在真实生产库上验证（违反数 0）；规则不依赖模型",
+      "en": "The seven invariants are purely deterministic checks, validated against a real production database (zero violations); the rules do not depend on a model"
+    },
+    "audit_chain.BASIS": {
+      "zh": "六项校验全部基于事件字段的确定性语义，不依赖模型；字段定义取自真实审计日志",
+      "en": "All six checks rest on the deterministic semantics of the event fields and do not depend on a model; the field definitions come from a real audit log"
+    },
+    "bid_quote.RISK-01": {
+      "zh": "结论不构成报价承诺，需业务负责人签字确认",
+      "en": "This conclusion is not a quotation commitment; a business owner must sign it off"
+    },
+    "bid_quote.RISK-02": {
+      "zh": "管理费费率假设（AS-001）失效时结论系统性偏低",
+      "en": "If the overhead-rate assumption (AS-001) fails, the conclusion is systematically low"
+    },
+    "bid_quote.RISK-02-LLM": {
+      "zh": "明细来自模型抽取，请对照原始描述复核后再签字",
+      "en": "The line items came from model extraction; check them against the original description before signing"
+    },
+    "bid_quote.RISK-03": {
+      "zh": "未计入税费、汇率波动与工期延误",
+      "en": "Taxes, exchange-rate movement and schedule slippage are not included"
+    },
+    "expense_audit.RISK-01": {
+      "zh": "结论不构成付款依据，需业务负责人签字确认",
+      "en": "This conclusion is not a payment authority; a business owner must sign it off"
+    },
+    "expense_audit.RISK-02": {
+      "zh": "发票真伪与税额未做校验",
+      "en": "Invoice authenticity and tax amounts are not checked"
+    },
+    "expense_audit.RISK-03": {
+      "zh": "类别限额为示例值，需替换为企业实际制度",
+      "en": "The category limits are example values and must be replaced with your organisation's actual policy"
+    },
+    "lab_report.RISK-01": {
+      "zh": "**本结论不构成医学诊断**，仅供参考，必须由执业医师结合临床判断",
+      "en": "**This conclusion is not a medical diagnosis.** It is for reference only and a licensed physician must judge it alongside the clinical picture"
+    },
+    "lab_report.RISK-02": {
+      "zh": "参考区间随实验室、方法学、年龄、妊娠状态变化，示例值可能与实际报告单不符",
+      "en": "Reference intervals vary by laboratory, methodology, age and pregnancy status; the example values may not match an actual report"
+    },
+    "lab_report.RISK-03": {
+      "zh": "模型抽取的数值存在误读风险，关键指标必须人工核对",
+      "en": "Values extracted by a model may be misread; critical indicators must be checked by hand"
+    },
+    "point_table.RISK-01": {
+      "zh": "未校验字节序（大端/小端）与上位机实际解析设置是否一致",
+      "en": "Byte order (big/little endian) is not checked against the host software's actual parsing settings"
+    },
+    "point_table.RISK-02": {
+      "zh": "未校验从站地址与波特率等通信参数",
+      "en": "Slave addresses, baud rates and other communication parameters are not checked"
+    },
+    "point_table.RISK-03": {
+      "zh": "地址重叠判断按连续寄存器区间，未考虑厂商自定义映射",
+      "en": "Overlap detection assumes contiguous register ranges and ignores vendor-specific mappings"
+    },
+    "spc_control.RISK-01": {
+      "zh": "控制限基于历史数据，过程均值漂移后需重新计算基线",
+      "en": "The control limits rest on historical data; after a mean shift the baseline must be recomputed"
+    },
+    "spc_control.RISK-02": {
+      "zh": "R6（分层）与 R7（交替）属于异常好/周期性信号，需结合工艺判断",
+      "en": "R6 (stratification) and R7 (alternation) are unusually-good or periodic signals and need process knowledge to interpret"
+    },
+    "spc_control.RISK-03": {
+      "zh": "样本量 {n} 偏少时 R6/R7 不会触发，属正常",
+      "en": "With only {n} samples, R6/R7 will not fire; that is normal"
+    },
+    "pin_conflict.RISK-01": {
+      "zh": "规则集是示例，未覆盖复用功能表、时钟树与电气约束（需按具体 MCU 数据手册扩展）",
+      "en": "The rule set is an example and does not cover alternate-function tables, the clock tree or electrical constraints; extend it from the specific MCU datasheet"
+    },
+    "pin_conflict.RISK-02": {
+      "zh": "引脚冲突不等于功能不可实现：部分 MCU 允许分时复用，需人工确认",
+      "en": "A pin conflict does not always mean the function is impossible: some MCUs allow time-multiplexing, so confirm by hand"
+    },
+    "salary_tax.RISK-01": {
+      "zh": "未计入年终奖单独计税、劳务报酬、股权激励等特殊项目",
+      "en": "Year-end bonus separate taxation, remuneration for services and equity incentives are not included"
+    },
+    "salary_tax.RISK-02": {
+      "zh": "专项附加扣除以输入值为准，未做资格校验",
+      "en": "Additional special deductions are taken from the input as given, with no eligibility check"
+    },
+    "salary_tax.RISK-03": {
+      "zh": "各地社保基数上下限差异未体现",
+      "en": "Regional differences in social-insurance base floors and ceilings are not reflected"
+    },
+    "loan_dscr.RISK-01": {
+      "zh": "未考虑现金流季节性波动与建设期超支",
+      "en": "Seasonal cash-flow variation and construction-period overruns are not considered"
+    },
+    "loan_dscr.RISK-02": {
+      "zh": "净利润为会计口径，与经营现金流可能背离",
+      "en": "Net profit is an accounting figure and may diverge from operating cash flow"
+    },
+    "loan_dscr.RISK-03": {
+      "zh": "阈值 DSCR>={threshold} 为示例惯例，各行政策不同",
+      "en": "The DSCR >= {threshold} threshold follows example practice; policies differ between lenders"
+    },
+    "modbus_poll.RISK-01": {
+      "zh": "turnaround_ms 为估计值，实际从站响应间隔需现场实测（不同厂商差异可达数倍）",
+      "en": "turnaround_ms is an estimate; the real slave response interval must be measured on site (vendors can differ by several times)"
+    },
+    "modbus_poll.RISK-02": {
+      "zh": "未计入网络交换机时延、无线链路重传与丢包重试",
+      "en": "Switch latency, wireless retransmission and packet-loss retries are not included"
+    },
+    "modbus_poll.RISK-03": {
+      "zh": "未计入主站软件自身的调度与处理开销",
+      "en": "The host software's own scheduling and processing overhead is not included"
+    },
+    "firmware_budget.RISK-01": {
+      "zh": "栈峰值为实测高水位，未覆盖尚未走到的分支；建议留足余量",
+      "en": "Stack peaks are measured high-water marks and do not cover branches not yet taken; leave ample margin"
+    },
+    "firmware_budget.RISK-02": {
+      "zh": "未计入中断栈、DMA 缓冲区与运行时动态分配",
+      "en": "Interrupt stacks, DMA buffers and runtime dynamic allocation are not included"
+    },
+    "firmware_budget.RISK-03": {
+      "zh": "Flash 未计入未来 OTA 双分区与升级余量",
+      "en": "Flash does not account for future OTA dual-partition layout or upgrade headroom"
+    },
+    "points_reconcile.RISK-01": {
+      "zh": "只校验账本与账户自身的自洽性，不校验业务语义（例如某笔授予是否该给）",
+      "en": "This checks the ledger and accounts for self-consistency only, not business semantics (for example whether a grant was warranted)"
+    },
+    "points_reconcile.RISK-02": {
+      "zh": "reserve/capture 配对按 reference_id 计数，跨系统对账需保证 reference_id 口径一致",
+      "en": "Reserve/capture pairing counts by reference_id; cross-system reconciliation requires a consistent reference_id convention"
+    },
+    "points_reconcile.RISK-03": {
+      "zh": "未见得覆盖并发写入下的瞬时中间态（应在事务边界处对账）",
+      "en": "Transient intermediate states under concurrent writes are not covered; reconcile at transaction boundaries"
+    },
+    "audit_chain.RISK-01": {
+      "zh": "只校验事件序列内部自洽，不校验文档内容是否正确",
+      "en": "This checks the event stream for internal consistency only, not whether document contents are correct"
+    },
+    "audit_chain.RISK-02": {
+      "zh": "哈希链按 doc_id 分组，若同一文档跨多个来源路径需先统一 doc_id 口径",
+      "en": "The hash chain is grouped by doc_id; if one document spans several source paths, unify the doc_id convention first"
+    },
+    "audit_chain.RISK-03": {
+      "zh": "line_count 突降也可能是合法的文档精简，需人工确认",
+      "en": "A sudden drop in line_count may also be legitimate trimming and needs human confirmation"
+    },
+    "bid_quote.BQ-SRC": {
+      "zh": "明细来源：{source}，共 {count} 项",
+      "en": "Line items from {source}, {count} in total"
+    },
+    "spc_control.R1": {
+      "zh": "第 {index} 点：单点超出 3σ",
+      "en": "point {index}: a single point beyond 3σ"
+    },
+    "spc_control.R2": {
+      "zh": "第 {index} 点：连续 3 点中 2 点超出同侧 2σ",
+      "en": "point {index}: 2 of 3 consecutive points beyond 2σ on the same side"
+    },
+    "spc_control.R3": {
+      "zh": "第 {index} 点：连续 5 点中 4 点超出同侧 1σ",
+      "en": "point {index}: 4 of 5 consecutive points beyond 1σ on the same side"
+    },
+    "spc_control.R4": {
+      "zh": "第 {index} 点：连续 8 点在中心线同侧",
+      "en": "point {index}: 8 consecutive points on the same side of the centre line"
+    },
+    "spc_control.R5": {
+      "zh": "第 {index} 点：连续 6 点单调递增/递减",
+      "en": "point {index}: 6 consecutive points monotonically increasing or decreasing"
+    },
+    "spc_control.R6": {
+      "zh": "第 {index} 点：连续 15 点落在 1σ 内",
+      "en": "point {index}: 15 consecutive points within 1σ"
+    },
+    "spc_control.R7": {
+      "zh": "第 {index} 点：连续 14 点交替上下",
+      "en": "point {index}: 14 consecutive points alternating up and down"
+    },
+    "spc_control.R8": {
+      "zh": "第 {index} 点：连续 8 点超出 1σ",
+      "en": "point {index}: 8 consecutive points beyond 1σ"
     }
   }
 }

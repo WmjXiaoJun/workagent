@@ -147,6 +147,7 @@ def main():
 
     out = {
         "subject": str(data.get("mcu", "")) + " 固件资源预算",
+        "subject_args": {"mcu": str(data.get("mcu", ""))},
         "verdict": verdict,
         "conclusion": "判定「%s」：Flash %.1f/%.1f KB（%.1f%%），RAM %.1f/%.1f KB（%.1f%%）；错误 %d 项、告警 %d 项"
                       % (verdict, flash_used, flash_cap, flash_pct * 100,
@@ -171,12 +172,17 @@ def main():
         "flash_top": flash_detail[:5],
         "ram_top": ram_detail[:5],
         "stack_rows": stack_rows,
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "汇总与容量比对为纯算术；阈值来自实践惯例且可在输入中覆盖"},
         "risks": [
             "栈峰值为实测高水位，未覆盖尚未走到的分支；建议留足余量",
             "未计入中断栈、DMA 缓冲区与运行时动态分配",
             "Flash 未计入未来 OTA 双分区与升级余量",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "栈峰值为实测高水位，未覆盖尚未走到的分支"},
+            {"code": "02", "text": "未计入中断栈、DMA 缓冲区与运行时动态分配"},
+            {"code": "03", "text": "Flash 未计入未来 OTA 双分区与升级余量"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

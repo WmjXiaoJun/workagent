@@ -110,6 +110,8 @@ def main():
 
     out = {
         "subject": str(payload.get("patient_id", "")) + " 检验报告（" + ("男" if sex == "M" else "女") + "）",
+        "subject_code": "SUBJECT-M" if sex == "M" else "SUBJECT-F",
+        "subject_args": {"patient": str(payload.get("patient_id", ""))},
         "verdict": verdict,
         # 危急值分支改成"总是出现"的常量格式 —— 句内条件片段是语言相关的，不该由执行体拼。
         "conclusion": "判定「" + verdict + "」：共 " + str(len(rows)) + " 项，异常 " + str(len(abnormal))
@@ -121,12 +123,17 @@ def main():
         "critical": sorted(set(critical)),
         "metrics": {"item_count": len(rows), "abnormal_count": len(abnormal),
                     "critical_count": len(set(critical))},
-        "confidence": {"level": "medium",
+        "confidence": {"level": "medium", "basis_code": "BASIS",
                        "basis": "参考区间为示例值，未与具体实验室报告单核对；判定逻辑为确定性规则"},
         "risks": [
             "**本结论不构成医学诊断**，仅供参考，必须由执业医师结合临床判断",
             "参考区间随实验室、方法学、年龄、妊娠状态变化，示例值可能与实际报告单不符",
             "模型抽取的数值存在误读风险，关键指标必须人工核对",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "本结论不构成医学诊断"},
+            {"code": "02", "text": "参考区间随实验室、方法学、年龄、妊娠状态变化"},
+            {"code": "03", "text": "模型抽取的数值存在误读风险"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

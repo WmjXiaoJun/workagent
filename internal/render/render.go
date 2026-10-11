@@ -113,6 +113,15 @@ func Format(tpl string, args map[string]any) string {
 	})
 }
 
+// hasEntry 报告某个键在当前语言下是否有可用文案。
+func (c *Catalog) hasEntry(lang, key string) bool {
+	if c == nil {
+		return false
+	}
+	_, ok := pick(lang, c.Messages[key])
+	return ok
+}
+
 func pick(lang string, e map[string]string) (string, bool) {
 	if e == nil {
 		return "", false
@@ -171,7 +180,56 @@ func (c *Catalog) Verdict(lang, caseID, verdict string) string {
 	return verdict
 }
 
-// Apply 生成**用于显示**的副本：结论、判定、发现文案按 lang 渲染。
+// Subject 渲染结论的"对象"行。code 为空时用保留码 SUBJECT。
+// 需要两种形态时（如按性别），执行体给出不同的 subject_code。
+func (c *Catalog) Subject(lang, caseID, code string, args map[string]any) (string, bool) {
+	if c == nil || args == nil {
+		return "", false
+	}
+	if code == "" {
+		code = "SUBJECT"
+	}
+	tpl, ok := pick(lang, c.Messages[caseID+"."+code])
+	if !ok {
+		return "", false
+	}
+	return Format(tpl, args), true
+}
+
+// Basis 渲染置信度依据。code 为空时用保留码 BASIS。
+func (c *Catalog) Basis(lang, caseID, code string, args map[string]any) (string, bool) {
+	if c == nil {
+		return "", false
+	}
+	if code == "" {
+		code = "BASIS"
+	}
+	tpl, ok := pick(lang, c.Messages[caseID+"."+code])
+	if !ok {
+		return "", false
+	}
+	if args == nil {
+		args = map[string]any{}
+	}
+	return Format(tpl, args), true
+}
+
+// Risk 渲染一条风险说明。
+func (c *Catalog) Risk(lang, caseID, code string, args map[string]any) (string, bool) {
+	if c == nil || code == "" {
+		return "", false
+	}
+	tpl, ok := pick(lang, c.Messages[caseID+".RISK-"+code])
+	if !ok {
+		return "", false
+	}
+	if args == nil {
+		args = map[string]any{}
+	}
+	return Format(tpl, args), true
+}
+
+// Apply 生成**用于显示**的副本：对象、判定、结论、发现、置信度依据与风险，全部按 lang 渲染。
 //
 // 返回的是深拷贝，调用方务必只在显示/存档路径上用它；
 // 证据包里的原始输出保持不动，摘要才对得上。
@@ -182,6 +240,45 @@ func (c *Catalog) Apply(lang, caseID string, output any) any {
 	}
 	if v := asString(m["verdict"]); v != "" {
 		m["verdict"] = c.Verdict(lang, caseID, v)
+	}
+	// 对象行（summary.md 的"对象"）：执行体写的是中文拼接，这里按 args 重渲染。
+	if args, ok := m["subject_args"].(map[string]any); ok {
+		if s, done := c.Subject(lang, caseID, asString(m["subject_code"]), args); done {
+			m["subject"] = s
+		}
+	}
+	// 置信度依据
+	if conf, ok := m["confidence"].(map[string]any); ok {
+		if cc, ok2 := deepCopy(conf).(map[string]any); ok2 {
+			var bargs map[string]any
+			if a, has := cc["basis_args"].(map[string]any); has {
+				bargs = a
+			}
+			if s, done := c.Basis(lang, caseID, asString(cc["basis_code"]), bargs); done {
+				cc["basis"] = s
+				m["confidence"] = cc
+			}
+		}
+	}
+	// 风险说明：有 risks_i18n 就按码重渲染 risks（原始数组不动，只在显示副本上替换）
+	if ri, ok := m["risks_i18n"].([]any); ok && len(ri) > 0 {
+		rendered := make([]any, 0, len(ri))
+		for _, item := range ri {
+			im, isMap := item.(map[string]any)
+			if !isMap {
+				continue
+			}
+			code := asString(im["code"])
+			args, _ := im["args"].(map[string]any)
+			if s, done := c.Risk(lang, caseID, code, args); done {
+				rendered = append(rendered, s)
+			} else if t := asString(im["text"]); t != "" {
+				rendered = append(rendered, t)
+			}
+		}
+		if len(rendered) > 0 {
+			m["risks"] = rendered
+		}
 	}
 	if args, ok := m["conclusion_args"].(map[string]any); ok {
 		// 结论句里通常嵌着判定词，它也得跟着翻 —— 否则英文句子里夹一个中文词。

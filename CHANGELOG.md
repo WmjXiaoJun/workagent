@@ -6,6 +6,31 @@
 > [releases page](https://github.com/WmjXiaoJun/workagent/releases) are written in both languages,
 > and all current documentation is English by default with a `.zh-CN` counterpart.
 
+## [0.15.0] - 2026-10-11
+
+**执行体文案迁移收尾：`subject` / `confidence.basis` / `risks` 也进了文案表。**
+
+### Changed
+- 12 个执行体全部补齐 `subject_args` / `basis_code` / `risks_i18n`；
+  `messages.json` 从 85 条扩到 **157 条**。
+- `spc_control` 的 R1–R8 发现原本由执行体拼"第 N 点：<中文描述>"，
+  现在描述放进文案表、执行体只传 `index`。
+- `bid_quote` 的 `BQ-SRC` 补上 `args`。
+
+### 实测（英文摘要残留中文）
+```text
+迁移前 599 字符  →  迁移后 179 字符
+spc_control 422  →  8
+```
+
+**剩下的全是输入数据本身**（工程名、患者号、检验项名 `谷丙转氨酶`、点位名 `进水流量`），
+不是呈现文案 —— 那本来就不该翻。
+
+### 兼容性
+`subject` / `confidence.basis` / `risks` 三个原始字段**全部保留**；
+新增 `subject_args` / `basis_code` / `risks_i18n` 为纯增量。
+归档因摘要变化已整体重生成。
+
 ## [0.14.0] - 2026-10-11
 
 **文档英文化：仓库对外的默认语言全部切换为英文，中文以 `*.zh-CN.md` 保留。**

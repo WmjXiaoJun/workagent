@@ -122,6 +122,7 @@ def main():
 
     out = {
         "subject": str(payload.get("claim_id", "")) + " " + str(payload.get("submitter", "")) + " 报销单",
+        "subject_args": {"claim": str(payload.get("claim_id", "")), "submitter": str(payload.get("submitter", ""))},
         "verdict": verdict,
         "conclusion": "审核判定「" + verdict + "」：明细 " + str(len(items)) + " 项合计 "
                       + format(round(total, 2), ",.2f") + " 元；错误 " + str(len(errors)) + " 项、告警 " + str(len(warns)) + " 项",
@@ -136,11 +137,17 @@ def main():
                     "errors": len(errors), "warnings": len(warns)},
         "confidence": {"level": "medium" if source == "llm-extract" else "high",
                        "basis": ("明细由模型从报销说明抽取，存在识别误差；合规判定为确定性规则"
-                                 if source == "llm-extract" else "明细为结构化输入，判定为确定性规则")},
+                                 if source == "llm-extract" else "明细为结构化输入，判定为确定性规则"),
+                       "basis_code": "BASIS-LLM" if source == "llm-extract" else "BASIS"},
         "risks": [
             "结论不构成付款依据，需业务负责人签字确认",
             "发票真伪与税额未做校验",
             "类别限额为示例值，需替换为企业实际制度",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "结论不构成付款依据，需业务负责人签字确认"},
+            {"code": "02", "text": "发票真伪与税额未做校验"},
+            {"code": "03", "text": "类别限额为示例值，需替换为企业实际制度"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

@@ -130,6 +130,7 @@ def main():
         "verdict": "已测算",
         "findings": [
             {"level": "info", "code": "BQ-SRC",
+             "args": {"source": source, "count": len(items)},
              "message": "明细来源：" + source + "，共 " + str(len(items)) + " 项"},
         ],
         "project": payload.get("project", ""),
@@ -141,7 +142,8 @@ def main():
         "margin": round(margin, 2),
         "total_price": total_price,
         "unit_price_breakdown": breakdown,
-        "confidence": {"level": level, "basis": basis},
+        "confidence": {"level": level, "basis": basis,
+                       "basis_code": "BASIS-LLM" if source == "llm-extract" else "BASIS"},
         "conclusion": "建议报价 " + str(payload.get("currency", "CNY")) + " "
                       + format(total_price, ",.2f")
                       + "（直接成本 " + format(round(direct_cost, 2), ",.2f")
@@ -154,6 +156,12 @@ def main():
             "结论不构成报价承诺，需业务负责人签字确认",
             extra_risk,
             "未计入税费、汇率波动与工期延误",
+        ],
+        # 风险文案的事实：渲染层按 code 取中/英文；text 为兼容回退。
+        "risks_i18n": [
+            {"code": "01", "text": "结论不构成报价承诺，需业务负责人签字确认"},
+            {"code": "02-LLM" if source == "llm-extract" else "02", "text": extra_risk},
+            {"code": "03", "text": "未计入税费、汇率波动与工期延误"},
         ],
     }
     sys.stdout.write(json.dumps({"output": result}, ensure_ascii=True, sort_keys=True))

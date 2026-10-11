@@ -187,6 +187,7 @@ def main():
 
     out = {
         "subject": str(link.get("name", "")) + " 轮询周期测算",
+        "subject_args": {"link": str(link.get("name", ""))},
         "verdict": verdict,
         "conclusion": "一轮轮询 %.1f ms（合并后 %d 次请求），目标周期 %.0f ms —— 判定「%s」"
                       % (merged_total, len(merged), target_ms, verdict),
@@ -208,12 +209,17 @@ def main():
             "utilization": round(merged_total / target_ms, 4),
         },
         "requests": merged,
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "按 Modbus 帧格式与字符时间计算，纯确定性；不含从站内部处理耗时以外的随机因素"},
         "risks": [
             "turnaround_ms 为估计值，实际从站响应间隔需现场实测（不同厂商差异可达数倍）",
             "未计入网络交换机时延、无线链路重传与丢包重试",
             "未计入主站软件自身的调度与处理开销",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "turnaround_ms 为估计值，需现场实测"},
+            {"code": "02", "text": "未计入网络交换机时延与无线重传"},
+            {"code": "03", "text": "未计入主站软件自身的调度开销"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

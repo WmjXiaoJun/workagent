@@ -67,6 +67,18 @@ plugin_manager  action: install_bundle
 > The exact spec syntax depends on your `plugin_manager` version; the first two are the paths we
 > have actually verified.
 
+#### What has to happen, mechanically
+
+A profile records its bundles in an explicit list inside its own `package.json`:
+
+```json
+{ "dsh": { "profile": { "bundles": [ "@deepseek-ai/dsh-base", "...", "dsh-plugin-workagent" ] } } }
+```
+
+`install_bundle` does **two** things: installs the package, and adds its name to that list.
+The `dsh plugin` CLI only forwards its arguments to pnpm, so it covers the first half — the second
+half is what makes the bundle actually load, and it is why the supported path is `plugin_manager`.
+
 ## Configuration
 
 Edit `cordis.patch.yml`:

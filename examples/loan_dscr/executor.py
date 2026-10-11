@@ -73,6 +73,7 @@ def main():
 
     out = {
         "subject": str(data.get("project", "")) + " 偿债能力测算",
+        "subject_args": {"project": str(data.get("project", ""))},
         "verdict": verdict,
         "conclusion": "DSCR = " + format(dscr, ".2f") + "，判定「" + verdict + "」；可用于偿债的现金流 "
                       + format(cfads, ",.2f") + "，当年还本付息 " + format(principal + interest, ",.2f"),
@@ -82,12 +83,17 @@ def main():
         "findings": findings,
         "metrics": {"cfads": round(cfads, 2), "debt_service": round(principal + interest, 2),
                     "dscr": dscr, "interest_coverage": icr},
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "纯确定性公式；阈值来自贷款审批惯例，可在输入中覆盖"},
         "risks": [
             "未考虑现金流季节性波动与建设期超支",
             "净利润为会计口径，与经营现金流可能背离",
             "阈值 DSCR>=" + format(threshold_ok, ".2f") + " 为示例惯例，各行政策不同",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "未考虑现金流季节性波动与建设期超支"},
+            {"code": "02", "text": "净利润为会计口径，与经营现金流可能背离"},
+            {"code": "03", "args": {"threshold": format(threshold_ok, ".2f")}, "text": "阈值为示例惯例"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

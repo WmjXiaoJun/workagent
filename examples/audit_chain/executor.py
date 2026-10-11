@@ -151,6 +151,7 @@ def main():
 
     out = {
         "subject": str(data.get("system", "知识库审计日志")) + " 一致性核验",
+        "subject_args": {"system": str(data.get("system", "知识库审计日志"))},
         "verdict": verdict,
         "conclusion": "核验判定「" + verdict + "」：事件 %d 条 / 文档 %d 个，错误 %d 项、告警 %d 项"
                       % (len(evs), len(known_docs), len(errors), len(warns)),
@@ -161,12 +162,17 @@ def main():
         "metrics": {"events": len(evs), "documents": len(known_docs),
                     "errors": len(errors), "warnings": len(warns),
                     "chain_breaks": len([f for f in errors if f["code"] == "AC-01"])},
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "六项校验全部基于事件字段的确定性语义，不依赖模型；字段定义取自真实审计日志"},
         "risks": [
             "只校验事件序列内部自洽，不校验文档内容是否正确",
             "哈希链按 doc_id 分组，若同一文档跨多个来源路径需先统一 doc_id 口径",
             "line_count 突降也可能是合法的文档精简，需人工确认",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "只校验事件序列内部自洽，不校验文档内容"},
+            {"code": "02", "text": "哈希链按 doc_id 分组，跨来源路径需先统一口径"},
+            {"code": "03", "text": "line_count 突降也可能是合法的文档精简"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

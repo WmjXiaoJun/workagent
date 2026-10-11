@@ -105,9 +105,12 @@ def main():
     errors = [v for v in violations if v["rule"] in ("R1", "R2", "R3", "R4")]
     verdict = "失控" if errors else ("预警" if violations else "受控")
 
+    # 规则本身的描述放进 messages.json（按 code = R1..R8 取），
+    # 执行体只传"第几点"这个事实。
     findings = [
         {"level": "error" if v["rule"] in ("R1", "R2", "R3", "R4") else "warn",
-         "code": v["rule"], "message": "第 " + str(v["index"]) + " 点：" + v["desc"]}
+         "code": v["rule"], "args": {"index": v["index"]},
+         "message": "第 " + str(v["index"]) + " 点：" + v["desc"]}
         for v in violations[:40]
     ]
     if not findings:
@@ -126,6 +129,7 @@ def main():
 
     out = {
         "subject": str(data.get("process", "")) + " 控制图判异",
+        "subject_args": {"process": str(data.get("process", ""))},
         "verdict": verdict,
         "conclusion": concl,
         "conclusion_code": concl_code,
@@ -136,12 +140,17 @@ def main():
         "metrics": {"n": len(xs), "center_line": round(cl, 6), "sigma": round(sigma, 6),
                     "ucl": round(cl + 3 * sigma, 6), "lcl": round(cl - 3 * sigma, 6),
                     "violation_count": len(violations)},
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "判异准则为公开标准；中心线与西格玛由输入或 I-MR 法确定，纯确定性"},
         "risks": [
             "控制限基于历史数据，过程均值漂移后需重新计算基线",
             "R6（分层）与 R7（交替）属于异常好/周期性信号，需结合工艺判断",
             "样本量 " + str(len(xs)) + " 偏少时 R6/R7 不会触发，属正常",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "控制限基于历史数据"},
+            {"code": "02", "text": "R6 与 R7 需结合工艺判断"},
+            {"code": "03", "args": {"n": len(xs)}, "text": "样本量偏少时 R6/R7 不会触发"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

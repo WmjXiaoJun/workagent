@@ -107,6 +107,7 @@ def main():
 
     out = {
         "subject": str(payload.get("device", "")) + " 通信点表核对",
+        "subject_args": {"device": str(payload.get("device", ""))},
         "verdict": verdict,
         "conclusion": "核对判定「" + verdict + "」：点位 " + str(len(points)) + " 条，错误 " + str(len(errors))
                       + " 项、告警 " + str(len(warns)) + " 项",
@@ -118,11 +119,17 @@ def main():
                     "register_span": sum(s[2] - s[1] + 1 for s in spans)},
         "confidence": {"level": "medium" if source == "llm-extract" else "high",
                        "basis": ("点位由模型抽取，存在识别误差；一致性检查为确定性规则"
-                                 if source == "llm-extract" else "点位为结构化输入，检查为确定性规则")},
+                                 if source == "llm-extract" else "点位为结构化输入，检查为确定性规则"),
+                       "basis_code": "BASIS-LLM" if source == "llm-extract" else "BASIS"},
         "risks": [
             "未校验字节序（大端/小端）与上位机实际解析设置是否一致",
             "未校验从站地址与波特率等通信参数",
             "地址重叠判断按连续寄存器区间，未考虑厂商自定义映射",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "未校验字节序与上位机实际解析设置"},
+            {"code": "02", "text": "未校验从站地址与波特率等通信参数"},
+            {"code": "03", "text": "地址重叠判断未考虑厂商自定义映射"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

@@ -114,6 +114,7 @@ def main():
 
     out = {
         "subject": str(data.get("mcu", "")) + " 硬件资源冲突检测",
+        "subject_args": {"mcu": str(data.get("mcu", ""))},
         "verdict": verdict,
         # 原结论里嵌了"首批：<第一条 finding 的文案>" —— 那等于在句子里塞执行体的人话，
         # 且语言相关。去掉；首条发现在 findings 里本来就有。
@@ -122,11 +123,15 @@ def main():
         "findings": findings,
         "metrics": {"pins": len(pins), "interrupts": len(irqs), "dma": len(dmas),
                     "errors": len(errors), "warnings": len(warns)},
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "规则集为确定性检查，无模型参与；同一分配表必然得到同一清单"},
         "risks": [
             "规则集是示例，未覆盖复用功能表、时钟树与电气约束（需按具体 MCU 数据手册扩展）",
             "引脚冲突不等于功能不可实现：部分 MCU 允许分时复用，需人工确认",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "规则集未覆盖复用功能表、时钟树与电气约束"},
+            {"code": "02", "text": "引脚冲突不等于功能不可实现"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))

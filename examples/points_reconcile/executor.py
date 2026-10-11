@@ -172,6 +172,7 @@ def main():
 
     out = {
         "subject": str(data.get("system", "积分账本")) + " 一致性对账",
+        "subject_args": {"system": str(data.get("system", "积分账本"))},
         "verdict": verdict,
         "conclusion": "对账判定「" + verdict + "」：账本 %d 条 / 账户 %d 个，错误 %d 项、告警 %d 项；可用合计 %.2f，冻结合计 %.2f"
                       % (len(ledger), len(accounts), len(errors), len(warns), total_available, total_frozen),
@@ -186,12 +187,17 @@ def main():
             "errors": len(errors), "warnings": len(warns),
             "total_available": round(total_available, 2), "total_frozen": round(total_frozen, 2),
         },
-        "confidence": {"level": "high",
+        "confidence": {"level": "high", "basis_code": "BASIS",
                        "basis": "七项不变量为纯确定性校验，已在真实生产库上验证（违反数 0）；规则不依赖模型"},
         "risks": [
             "只校验账本与账户自身的自洽性，不校验业务语义（例如某笔授予是否该给）",
             "reserve/capture 配对按 reference_id 计数，跨系统对账需保证 reference_id 口径一致",
             "未见得覆盖并发写入下的瞬时中间态（应在事务边界处对账）",
+        ],
+        "risks_i18n": [
+            {"code": "01", "text": "只校验自洽性，不校验业务语义"},
+            {"code": "02", "text": "reserve/capture 配对按 reference_id 计数"},
+            {"code": "03", "text": "未覆盖并发写入下的瞬时中间态"},
         ],
     }
     sys.stdout.write(json.dumps({"output": out}, ensure_ascii=True, sort_keys=True))
