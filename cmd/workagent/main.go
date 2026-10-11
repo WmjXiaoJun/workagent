@@ -353,6 +353,20 @@ func cmdCheck(root string) int {
 		}
 	}
 
+	// 版本一致性：HEAD 正好在某个 vX.Y.Z 标签上时，agent.yaml 的版本必须与之一致。
+	// 这条规则是被同一种漂移坑了三次之后加的 —— 人肉记得同步版本是不可靠的。
+	fmt.Println(i18n.T("\n[7/7] 版本一致性", "\n[7/7] Version consistency"))
+	if tag := exactTag(root); tag == "" {
+		info(i18n.T("HEAD 不在版本标签上（开发中），跳过该检查",
+			"HEAD is not on a version tag (in development); skipping"))
+	} else if want, got := strings.TrimPrefix(tag, "v"), versionOf(root); want != got {
+		bad(i18n.Tf("版本不一致：标签 %s 而 agent.yaml 是 %s",
+			"version mismatch: tag %s but agent.yaml says %s", tag, got))
+		failures++
+	} else {
+		ok(i18n.Tf("版本与标签一致（%s）", "version matches the tag (%s)", tag))
+	}
+
 	fmt.Println("")
 	if failures > 0 {
 		fmt.Print(i18n.Tf("结果: 不通过，共 %d 项问题\n", "Result: FAILED, %d problem(s)\n", failures))
@@ -1040,6 +1054,23 @@ func versionOf(root string) string {
 		}
 	}
 	return toolVersion
+}
+
+// exactTag 返回恰好指向 HEAD 的标签（如 v0.15.0），没有则返回空串。
+// 用于"版本一致性"校验：只有 HEAD 正好落在标签上时才要求两者相等，
+// 这样开发期间不会误报，而发布时一定会被拦住。
+func exactTag(root string) string {
+	proc := exec.Command("git", "describe", "--tags", "--exact-match", "HEAD")
+	proc.Dir = root
+	out, err := proc.Output()
+	if err != nil {
+		return ""
+	}
+	tag := strings.TrimSpace(string(out))
+	if !strings.HasPrefix(tag, "v") {
+		return ""
+	}
+	return tag
 }
 
 // currentVersion 读当前目录交付包的版本。
