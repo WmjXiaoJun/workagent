@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-workagent",
-  "version": "0.10.0",
+  "version": "0.17.0",
   "description": "DeepSeek Harness bundle: expose a WorkAgent delivery package as MCP tools (cases / run / verify), so any MCP client can obtain a reproducible, evidence-backed conclusion.",
   "keywords": [
     "dsh",

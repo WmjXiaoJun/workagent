@@ -94,12 +94,47 @@ Edit `cordis.patch.yml`:
 ## Publishing to npm
 
 The package is already configured for publication (`private` removed, license / author /
-repository / keywords / files in place).
+repository / keywords / files in place). The name `dsh-plugin-workagent` is **not yet taken**.
+
+### First time only: create the npm account
+
+An npm account is an identity: it carries your name and your acceptance of npm's terms, and npm
+verifies it by email. **Nobody else can do this step for you** — not least because it needs your
+email and the verification link npm sends.
+
+1. Sign up at <https://www.npmjs.com/signup>
+2. **Click the verification link in the email** — publishing fails until the address is verified
+3. Enable 2FA when prompted (npm requires it for publishing)
+
+### Then publish (about two minutes)
 
 ```bash
 cd dsh-plugin
 npm login                       # your own npm account
 npm publish --access public     # --access is unnecessary for unscoped packages
+```
+
+### Or publish from CI, so no token ever passes through a chat window
+
+A token pasted into a conversation is an exposed token. Put it in **GitHub Secrets** instead —
+it goes straight from your browser to GitHub and never through anyone else:
+
+1. On npmjs.com: **Access Tokens → Generate New Token → Automation**
+2. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**,
+   name it `NPM_TOKEN`
+3. **Actions → publish-dsh-plugin → Run workflow**, leaving `dry_run` at `true` first
+4. Run it again with `dry_run=false`
+
+The workflow asserts the bundle manifest is complete (patch, icon, both locales) **before** publishing,
+and publishes with npm provenance.
+
+### After it is published
+
+Switch the profile from the local link to the published package:
+
+```bash
+dsh plugin --profile web remove dsh-plugin-workagent
+dsh plugin --profile web add dsh-plugin-workagent
 ```
 
 Self-checks that need no login:
