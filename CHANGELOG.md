@@ -6,6 +6,35 @@
 > [releases page](https://github.com/WmjXiaoJun/workagent/releases) are written in both languages,
 > and all current documentation is English by default with a `.zh-CN` counterpart.
 
+## [0.17.0] - 2026-10-12
+
+**插件已装进实际使用的 profile；顺带修掉一个会让它"每次启动都报错"的缺陷。**
+
+### Added / Fixed
+- **`workagent mcp` 不再要求启动时存在 `agent.yaml`。**
+  插件配的是 `args: ["mcp", "."]`，即**用会话的工作目录当包根** —— 而绝大多数会话的 cwd 不是交付包。
+  原实现走 `mustManifest` 会直接 `os.Exit(2)`，**装进任何 profile 都会让它在不相关目录的会话里每次启动失败**。
+  现在：服务端照常启动、`tools/list` 正常，**具体工具调用**返回可操作的提示：
+
+```text
+当前目录不是 WorkAgent 交付包（缺 agent.yaml）：<dir>。把插件配置里的 args 指向一个交付包目录即可。
+```
+
+### 安装结果（实测）
+- 二进制装到 `%LOCALAPPDATA%\Programs\workagent\workagent.exe` 并加入用户 `PATH`
+- 插件装进 `web` profile：`dependencies` 新增 `dsh-plugin-workagent`，`dsh.profile.bundles` 从 17 项变 **18 项**
+- `dsh --profile web --dump-config` 组合树里出现 `workagent-mcp` 行
+- **需要重启会话生效** —— 从运行中的会话之外安装不会热加载
+
+### 经验：安装时可能撞上瞬时文件锁
+pnpm 用"写临时文件再改名"的方式落锁文件，而运行中的 harness 正打开着该 profile：
+
+```text
+EPERM: operation not permitted, rename 'pnpm-lock.yaml.<n>' -> 'pnpm-lock.yaml'
+```
+
+失败是**干净的**（profile 未被改动，成功那次与失败那次内容一致），**重试即成功**。
+
 ## [0.16.0] - 2026-10-12
 
 **DSH 插件的装载侧**：从"无法验证"变成**已验证到组合层**。

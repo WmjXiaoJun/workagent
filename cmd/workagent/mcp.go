@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/WmjXiaoJun/workagent/internal/i18n"
@@ -132,6 +133,14 @@ func mcpCall(root string, params json.RawMessage) (string, bool) {
 	if args.Root != "" {
 		target = args.Root
 	}
+	// 会话的工作目录未必是交付包。与其让子进程抛一句裸错误，
+	// 不如直接告诉调用方该改什么。
+	if !fileExists(filepath.Join(target, "agent.yaml")) {
+		return i18n.T("当前目录不是 WorkAgent 交付包（缺 agent.yaml）：",
+			"The working directory is not a WorkAgent package (no agent.yaml): ") + target +
+			i18n.T("。把插件配置里的 args 指向一个交付包目录即可。",
+				". Point the plugin's args at a package directory."), true
+	}
 	switch p.Name {
 	case "workagent_cases":
 		out, isErr := runCLI(target, "cases")
@@ -163,20 +172,30 @@ func mcpCall(root string, params json.RawMessage) (string, bool) {
 
 // manifestVersion 从 agent.yaml 实时读版本，避免常量与真源漂移
 // （toolVersion 常量已经漂过一次：写死 0.3.0，而 manifest 早就是 0.7.x）。
+// manifestVersion 尽力读版本，**读不到不算错**。
+//
+// MCP 服务端必须在"当前目录不是交付包"时也能正常启动 —— 否则一个 cwd 不巧的会话
+// 会让 MCP 客户端每次启动都失败（插件配的是 failOnStartupError: true）。
+// 包的问题应该在**具体工具调用**上暴露，而不是在进程启动时。
 func manifestVersion(root string) string {
-	m := mustManifest(root)
-	if m == nil {
-		return toolVersion
+	b, err := os.ReadFile(filepath.Join(root, "agent.yaml"))
+	if err != nil {
+		return ""
 	}
-	if v := asString(m["version"]); v != "" {
-		return v
+	if m, isMap := parseYAML(string(b)).(map[string]any); isMap {
+		if v := asString(m["version"]); v != "" {
+			return v
+		}
 	}
-	return toolVersion
+	return ""
 }
 
 // cmdMCP 在 stdin/stdout 上提供 MCP（stdio 传输：一行一个 JSON-RPC 消息）。
 func cmdMCP(root string) int {
 	ver := manifestVersion(root)
+	if ver == "" {
+		ver = toolVersion
+	}
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Buffer(make([]byte, 0, 1<<20), 16<<20)
 	for scanner.Scan() {

@@ -13,7 +13,7 @@ id: "io.github.wmjxiaojun/workagent"
 name: "workagent"
 display_name: "WorkAgent"
 display_name_en: "WorkAgent"
-version: "0.16.0"
+version: "0.17.0"
 license: "MIT"
 summary: "别人交付对话，我们交付可复现的结论。"
 summary_en: "Others ship conversations. We ship reproducible conclusions."
@@ -190,7 +190,7 @@ signature:
 
 x-workagent:
   namespace: "x-workagent"
-  version: "0.16.0"
+  version: "0.17.0"
   compat: "compat.json"
   boundary: "x-workagent/boundary.json"
   test_suite: "x-workagent/test_suite"

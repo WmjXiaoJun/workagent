@@ -130,8 +130,8 @@ workagent --help
 | Layer | Status |
 |---|---|
 | **MCP server** | ✅ handshake, `tools/list`, `tools/call` and unknown-tool errors were all exercised directly |
-| **Cordis composition** | ✅ installed into a throwaway profile; the composed config contains the row below |
-| **Runtime connect** | ⚠️ not exercised — DSH's MCP client actually spawning the process needs a live session |
+| **Cordis composition** | ✅ verified twice: in a throwaway profile, then **installed into a live profile** — both composed trees contain the row below |
+| **Runtime connect** | ⚠️ installed; needs a **session restart** to take effect (installing from outside a running session does not hot-reload it) |
 
 ```yaml
 # == dsh-plugin-workagent
@@ -144,7 +144,32 @@ workagent --help
 ```
 
 `dsh --profile <name> --dump-config` prints that tree without booting anything, which is how the
-composition was checked. The throwaway profile was removed afterwards.
+composition was checked.
+
+### Two operational notes we hit while installing
+
+**The working directory is usually not a package.** The plugin runs `workagent mcp .`, so the
+package root is whatever directory the session happens to be in. The server therefore **starts even
+when that directory has no `agent.yaml`**, answers `tools/list` normally, and returns an actionable
+message per call:
+
+```text
+The working directory is not a WorkAgent package (no agent.yaml): <dir>.
+Point the plugin's args at a package directory.
+```
+
+If it instead exited at startup, every session in an unrelated directory would fail — do not "fix" it
+by making the server refuse to boot.
+
+**Installing while the profile's session is running can hit a transient lock.** pnpm writes the
+lockfile by rename, and the running harness holds the profile open:
+
+```text
+EPERM: operation not permitted, rename 'pnpm-lock.yaml.<n>' -> 'pnpm-lock.yaml'
+```
+
+The failure is clean — the profile is left untouched, and `plugin_manager` snapshots and restores
+`package.json` and `pnpm-lock.yaml` on failure. **Retrying succeeded.**
 
 ### ⚠️ Order matters: put `workagent` on `PATH` first
 
