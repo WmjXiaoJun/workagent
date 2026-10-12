@@ -104,11 +104,33 @@ DSH 安装依赖时会**默认拦截包的安装脚本**（pnpm 11 的 `pendingB
 workagent --help
 ```
 
-## ⚠️ 验证状态
+## 验证状态
 
-- ✅ **MCP server 侧已验证**：握手、`tools/list`、`tools/call`、未知工具报错，全部实测通过
-- ⚠️ **Cordis 装载侧未验证**：我没有 `plugin_manager` 工具，无法在本机安装，
-  所以**"装上去以后 Harness 里能用"这件事我无法声称**。装完请自行确认一次。
+| 层 | 状态 |
+|---|---|
+| **MCP server** | ✅ 握手、`tools/list`、`tools/call`、未知工具报错，全部直接实测 |
+| **Cordis 组合** | ✅ 装进一次性 profile，组合出来的配置里出现了下面这一段 |
+| **运行时连接** | ⚠️ 未实测 —— 需要真实会话里由 DSH 的 MCP 客户端真正拉起进程 |
+
+```yaml
+# == dsh-plugin-workagent
+- id: workagent-mcp
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: workagent
+    transport: stdio
+    command: workagent
+```
+
+`dsh --profile <名字> --dump-config` 能在**不启动任何东西**的情况下打出这棵树，组合就是这样核对的。
+一次性 profile 事后已删除。
+
+### ⚠️ 顺序很重要：先把 `workagent` 放进 `PATH`
+
+插件设了 `failOnStartupError: true`。如果 `workagent` 还**不在** `PATH` 上就装进某个 profile，
+MCP 客户端会**每次启动都失败** —— 那等于把"缺一个前提"变成了"反复报错"。
+
+所以：先装好二进制、确认 `workagent --help` 能跑，**再**装插件。
 
 ## 卸载
 

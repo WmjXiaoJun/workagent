@@ -6,6 +6,39 @@
 > [releases page](https://github.com/WmjXiaoJun/workagent/releases) are written in both languages,
 > and all current documentation is English by default with a `.zh-CN` counterpart.
 
+## [0.16.0] - 2026-10-12
+
+**DSH 插件的装载侧**：从"无法验证"变成**已验证到组合层**。
+
+### 验证结果
+| 层 | 状态 |
+|---|---|
+| MCP server | ✅ 握手 / `tools/list` / `tools/call` / 未知工具报错，直接实测 |
+| **Cordis 组合** | ✅ **本轮新增** —— 装进一次性 profile，组合配置里出现了 `workagent-mcp` 行 |
+| 运行时连接 | ⚠️ 未实测（需要真实会话里 DSH 的 MCP 客户端拉起进程） |
+
+做法：用错误信息给出的线索 `dsh plugin --profile <新名> add <包>` 新建一次性 profile，
+再用 `dsh --profile <名> --dump-config` **在不启动任何东西的前提下**打出组合树核对。
+一次性 profile 事后已删除，未触碰正在使用的 `web` profile。
+
+### Fixed（更正一处我说错的结论）
+上一版我查完 `dsh plugin` 后写道："它只把参数转发给 pnpm，覆盖不了 bundle 选择那一步"。
+**这是错的。** `dsh plugin --profile X add <包>` **两件事都做**：装包，**并把包名加进
+`dsh.profile.bundles`**。实测后的 `package.json`：
+
+```json
+{ "dsh": { "profile": { "bundles": [ "@deepseek-ai/dsh-base", "dsh-plugin-workagent" ] } } }
+```
+
+我当时只跑了 `plugin list`（它确实只是 pnpm list），**从一次 list 推断了 add 的行为** ——
+那是猜测，不是验证。
+
+### 新增警告：顺序很重要
+插件设了 `failOnStartupError: true`。**若 `workagent` 不在 `PATH` 上就装进某个 profile，
+MCP 客户端会每次启动都失败** —— 把"缺一个前提"变成"反复报错"。
+本机实测 `workagent` 不在 `PATH` 上，**因此没有把它装进 `web` profile**
+（那会让当前会话每次启动报错，用零收益换真风险）。文档已写明正确顺序：先装二进制，再装插件。
+
 ## [0.15.0] - 2026-10-11
 
 **执行体文案迁移收尾：`subject` / `confidence.basis` / `risks` 也进了文案表。**

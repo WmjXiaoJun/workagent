@@ -72,12 +72,14 @@ plugin_manager  action: install_bundle
 A profile records its bundles in an explicit list inside its own `package.json`:
 
 ```json
-{ "dsh": { "profile": { "bundles": [ "@deepseek-ai/dsh-base", "...", "dsh-plugin-workagent" ] } } }
+{ "dsh": { "profile": { "bundles": [ "@deepseek-ai/dsh-base", "dsh-plugin-workagent" ] } } }
 ```
 
-`install_bundle` does **two** things: installs the package, and adds its name to that list.
-The `dsh plugin` CLI only forwards its arguments to pnpm, so it covers the first half — the second
-half is what makes the bundle actually load, and it is why the supported path is `plugin_manager`.
+Installing a bundle is **two** things: install the package, **and add its name to that list** — the
+second is what makes it actually load. Both `plugin_manager.installBundle` and
+`dsh plugin --profile <name> add <package>` do both.
+
+Every path that forwards to `pnpm` and skips that list installs the files without ever loading them.
 
 ## Configuration
 
@@ -123,13 +125,34 @@ deliberate.
 workagent --help
 ```
 
-## ⚠️ Verification status
+## Verification status
 
-- ✅ **The MCP server side is verified**: handshake, `tools/list`, `tools/call` and unknown-tool
-  errors were all exercised.
-- ⚠️ **The Cordis loading side is not.** There is no `plugin_manager` tool available here, so it
-  could not be installed locally — therefore "it works inside the Harness once installed" is
-  **not something we can claim**. Please confirm it yourself after installing.
+| Layer | Status |
+|---|---|
+| **MCP server** | ✅ handshake, `tools/list`, `tools/call` and unknown-tool errors were all exercised directly |
+| **Cordis composition** | ✅ installed into a throwaway profile; the composed config contains the row below |
+| **Runtime connect** | ⚠️ not exercised — DSH's MCP client actually spawning the process needs a live session |
+
+```yaml
+# == dsh-plugin-workagent
+- id: workagent-mcp
+  name: '@deepseek-ai/dsh-mcp-client'
+  config:
+    serverName: workagent
+    transport: stdio
+    command: workagent
+```
+
+`dsh --profile <name> --dump-config` prints that tree without booting anything, which is how the
+composition was checked. The throwaway profile was removed afterwards.
+
+### ⚠️ Order matters: put `workagent` on `PATH` first
+
+The bundle sets `failOnStartupError: true`. If you install it into a profile while `workagent` is
+**not** on `PATH`, the MCP client fails on **every** session start — you have turned a missing
+prerequisite into a recurring fault.
+
+So install the binary first, confirm `workagent --help` works, and only then install the bundle.
 
 ## Uninstall
 
